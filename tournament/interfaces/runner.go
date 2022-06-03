@@ -1,8 +1,12 @@
 package interfaces
 
-// Responsible for Running a Tournament
-type runner interface {
-	Run(tour_name string) error
-	GetPlayGraph(tour_name string) // @todo what is the return type? Graph?
+import "github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 
+// Responsible for Running a Tournament
+type Runner interface {
+	Run(tm *Runnable)
+}
+
+type Runnable interface {
+	GetMatches() <-chan *domain.MatchToRun
 }

@@ -473,7 +473,7 @@ func (x *Match) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Match.ProtoReflect.Descriptor instead.
+// Deprecated: Use Pairing.ProtoReflect.Descriptor instead.
 func (*Match) Descriptor() ([]byte, []int) {
 	return file_middleware_proto_rawDescGZIP(), []int{5}
 }
@@ -573,14 +573,14 @@ var file_middleware_proto_goTypes = []interface{}{
 	(*TournamentResp)(nil), // 5: pb.TournamentResp
 	(*RunReq)(nil),         // 6: pb.RunReq
 	(*RunResp)(nil),        // 7: pb.RunResp
-	(*Match)(nil),          // 8: pb.Match
+	(*Match)(nil),          // 8: pb.Pairing
 }
 var file_middleware_proto_depIdxs = []int32{
 	2, // 0: pb.TournamentReq.tour_type:type_name -> pb.TournType
 	3, // 1: pb.TournamentReq.files:type_name -> pb.File
-	8, // 2: pb.RunResp.matchs:type_name -> pb.Match
-	0, // 3: pb.Match.state:type_name -> pb.State
-	1, // 4: pb.Match.result:type_name -> pb.Result
+	8, // 2: pb.RunResp.matchs:type_name -> pb.Pairing
+	0, // 3: pb.Pairing.state:type_name -> pb.State
+	1, // 4: pb.Pairing.result:type_name -> pb.Result
 	4, // 5: pb.Middleware.UploadTournament:input_type -> pb.TournamentReq
 	6, // 6: pb.Middleware.RunTournament:input_type -> pb.RunReq
 	5, // 7: pb.Middleware.UploadTournament:output_type -> pb.TournamentResp
