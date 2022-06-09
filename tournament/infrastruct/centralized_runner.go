@@ -13,7 +13,8 @@ type CentRunner struct {
 func (runner *CentRunner) Run(tm interfaces.Runnable) {
 	matches := tm.GetMatches()
 
-	for match := range matches {
+	for {
+		match := <-matches
 		// Players
 		fmt.Println("Playing", match.Pairing.Player1, "and", match.Pairing.Player2)
 

@@ -16,8 +16,7 @@ type Player struct {
 }
 
 type TournInfo struct {
-	//Name    string
-	Type_    TourType
-	Players  []Player
-	TourTree *TourNode
+	Name    string
+	Type_   TourType
+	Players []Player
 }

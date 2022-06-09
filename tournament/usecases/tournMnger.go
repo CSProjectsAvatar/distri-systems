@@ -28,14 +28,10 @@ func NewRndTour(dm interfaces.DataMngr) *TournMngr {
 	tm := new(TournMngr)
 
 	// Initialize the Tournament
-	tm.name = dm.RndUnfinishedTourn()
+	tm.name = dm.UnfinishedTourn()
 	ti := dm.GetTournInfo(tm.name)
-	tm.type_, tm.players, tm.tourTree = ti.Type_, ti.Players, ti.TourTree
-
-	if tm.tourTree == nil { // If there is no tour tree, create one
-		tm.Tree()
-		dm.SaveTournTree(tm.name, tm.tourTree) // Save the tour tree
-	}
+	tm.type_, tm.players = ti.Type_, ti.Players
+	tm.tourTree = tm.Tree()
 	return tm
 }
 

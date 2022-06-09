@@ -15,11 +15,11 @@ func (dm *CentDataManager) File(tour_name string, file_name string) string {
 	return ""
 }
 
-func (dm *CentDataManager) SaveStat(tour_name string, match domain.Match) error {
+func (dm *CentDataManager) SaveMatch(tour_name string, match domain.Match) error {
 	return nil
 }
 
-func (dm *CentDataManager) Stats(tour_name string) []domain.Match {
+func (dm *CentDataManager) Matches(tour_name string) []*domain.Match {
 	return nil
 }
 
@@ -32,7 +32,7 @@ func (dm *CentDataManager) TournTree(tour_name string) *domain.TourNode {
 	return GetMockTree()
 }
 
-func (dm *CentDataManager) RndUnfinishedTourn() string {
+func (dm *CentDataManager) UnfinishedTourn() string {
 	return "chezz" // @todo implement
 }
 
@@ -42,13 +42,11 @@ func (dm *CentDataManager) GetTournInfo(tour_name string) *domain.TournInfo {
 	player2 := domain.Player{Name: "Player2"}
 	//player3 := domain.Player{Name: "Player3"}
 
-	tree := dm.TournTree(tour_name)
-
 	return &domain.TournInfo{
 		Type_:   domain.First_Defeat,
 		Players: []domain.Player{player1, player2},
 		//Players:  []domain.Player{player1, player2, player3},
-		TourTree: tree}
+	}
 }
 
 func GetMockTree() *domain.TourNode {

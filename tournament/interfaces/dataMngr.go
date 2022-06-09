@@ -6,16 +6,21 @@ import (
 
 // Responsible for Save and Retrieve Data
 type DataMngr interface {
+	// SaveFiles Saves the tournament files. 'files' is a map of file names to file contents.
 	SaveFiles(tour_name string, files map[string]string) error
+
+	// File Retrieves a file from the tournament.
 	File(tour_name string, file_name string) string
 
-	SaveStat(tour_name string, match domain.Match) error
-	Stats(tour_name string) []domain.Match
+	// SaveMatch Saves a match already run
+	SaveMatch(tour_name string, match domain.Match) error
 
-	SaveTournTree(tour_name string, tree *domain.TourNode) error
-	TournTree(tour_name string) *domain.TourNode
+	// Matches Retrieves the tournament's matches
+	Matches(tour_name string) []*domain.Match
 
-	RndUnfinishedTourn() string
-
+	// GetTournInfo Loads a tournament main info
 	GetTournInfo(tour_name string) *domain.TournInfo
+
+	// UnfinishedTourn Loads a tournament not finished
+	UnfinishedTourn() string
 }
