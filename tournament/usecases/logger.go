@@ -1,6 +1,10 @@
 package usecases
 
 type Logger interface {
-	Error(format string, args ...any)
-	Info(format string, args ...any)
+	Errorf(format string, args ...any)
+	Infof(format string, args ...any)
+	Info(msg string, fields LogArgs)
+	Error(msg string, fields LogArgs)
 }
+
+type LogArgs map[string]any

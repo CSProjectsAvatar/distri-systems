@@ -1,5 +1,7 @@
 package dht
 
+import "fmt"
+
 // Helper for RingApi.Notify().
 func (node *RemoteNode) notify(pred *RemoteNode, ring RingApi) error {
 	return ring.Notify(node, pred)
@@ -19,4 +21,15 @@ func (node *RemoteNode) findSuccessor(id []byte, ring RingApi) (*RemoteNode, err
 // Helper for RingApi.GetSuccessor().
 func (node *RemoteNode) getSuccessor(ring RingApi) (*RemoteNode, error) {
 	return ring.GetSuccessor(node)
+}
+
+func unvoid(node *RemoteNode) bool {
+	return node != nil && node.Id != nil
+}
+
+func (node *RemoteNode) Addr() string {
+	if node == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("%s:%d", node.Ip, node.Port)
 }

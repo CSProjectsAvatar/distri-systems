@@ -2,8 +2,9 @@ package dht
 
 import (
 	"bytes"
+	"encoding/hex"
+	"fmt"
 	"hash"
-	"math/big"
 	"time"
 
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
@@ -11,16 +12,18 @@ import (
 )
 
 // NewRemoteNode Creates an entry point to the Chord ring.
-func NewRemoteNode(id string, addr string, h hash.Hash) (*RemoteNode, error) {
+func NewRemoteNode(id string, ip string, port uint, h hash.Hash) (*RemoteNode, error) {
 	if _, err := h.Write([]byte(id)); err != nil {
 		return nil, err
 	}
 	return &RemoteNode{
 		Id:   h.Sum(nil),
-		Addr: addr,
+		Ip:   ip,
+		Port: port,
 	}, nil
 }
 
+// NewNode sets up a new node in the ring. Arg entry is the entry point to the ring.
 func NewNode(config *Config, entry *RemoteNode, log usecases.Logger) (*Node, error) {
 	node := &Node{
 		log:  log,
@@ -31,13 +34,17 @@ func NewNode(config *Config, entry *RemoteNode, log usecases.Logger) (*Node, err
 	if config.Id != "" {
 		strId = config.Id
 	} else {
-		strId = config.Addr
+		strId = config.Ip + ":" + fmt.Sprint(config.Port)
 	}
 	var err error
-	if node.RemoteNode, err = NewRemoteNode(strId, config.Addr, config.Hash()); err != nil {
+	if node.RemoteNode, err = NewRemoteNode(strId, config.Ip, config.Port, config.Hash()); err != nil {
 		return nil, err
 	}
-	log.Info("Creating new node with ID = %d\n", new(big.Int).SetBytes(node.RemoteNode.Id))
+	log.Info(
+		"Creating new node...",
+		usecases.LogArgs{
+			"id": hex.EncodeToString(node.Id),
+		})
 
 	m := config.Hash().Size() * 8
 
@@ -50,8 +57,19 @@ func NewNode(config *Config, entry *RemoteNode, log usecases.Logger) (*Node, err
 	node.ring = ring
 	node.ring.StartNode(node) // now node is a ring server
 
-	if err := node.join(entry); err != nil {
-		return nil, err
+	node.predMtx.Lock()
+	node.predecessor = nil
+	node.predMtx.Unlock()
+
+	if entry != nil {
+		if err := node.join(entry); err != nil {
+			return nil, err
+		}
+	} else {
+		// create() implementation from paper
+		node.succMtx.Lock()
+		node.successor = node.RemoteNode
+		node.succMtx.Unlock()
 	}
 	go utils.RepeatAction(node.stabilize, 1*time.Second, node.kill)         // stabilize node once in a second
 	go ensureFtable(node, m)                                                // ensure finger table is ok
@@ -68,7 +86,7 @@ func (node *Node) checkPredecessor() {
 
 	if pred != nil {
 		if err := node.ring.CheckNode(pred); err != nil {
-			node.log.Error(
+			node.log.Errorf(
 				"node with ID = %v failed. Message sent from node %v.",
 				pred.Id, node.Id,
 			)
@@ -91,34 +109,45 @@ func (node *Node) stabilize() {
 	node.succMtx.RUnlock()
 
 	succPred, err := succ.getPredecessor(node.ring)
-	if err != nil || succPred == nil {
-		node.log.Error("predecessor retrieval failed when stabilizing.\n"+
+	if err != nil {
+		node.log.Errorf("predecessor retrieval failed when stabilizing.\n"+
 			"\tError: %v "+
 			"\tPredecessor of successor: %v",
 			err, succPred,
 		)
 		return
 	}
-	if succPred.Id != nil && utils.InInterval(succPred.Id, node.Id, succ.Id) { // @audit why can succPred.Id be nil?
+	if unvoid(succPred) && utils.InInterval(succPred.Id, node.Id, succ.Id) {
 		node.succMtx.Lock()
+		node.log.Info(
+			"Updating successor.",
+			usecases.LogArgs{
+				"host":           node.RemoteNode.Addr(),
+				"prev successor": node.successor.Addr(),
+				"new successor":  succPred.Addr()})
 		node.successor = succPred
 		node.succMtx.Unlock()
 	}
-	if err := succ.notify(node.RemoteNode, node.ring); err != nil {
-		node.log.Error(
-			"error when node with ID = %v was notifying successor with ID = %v.",
-			node.Id, succ.Id,
-		)
+	if bytes.Compare(node.Id, succ.Id) != 0 { // node != succ
+		if err := succ.notify(node.RemoteNode, node.ring); err != nil {
+			node.log.Error(
+				"Error when notifying.",
+				usecases.LogArgs{
+					"node":      node.Addr(),
+					"successor": succ.Addr(),
+					"error":     err,
+				},
+			)
+		}
 	}
 }
 
 // join puts node inside ring as a predecessor of entry.
 func (node *Node) join(entry *RemoteNode) error {
-	nodeToAsk := entry
 	if entry == nil {
-		nodeToAsk = node.RemoteNode
+		panic("entry point is nil. At least one node of the ring must be known.")
 	}
-	succEntry, err := nodeToAsk.findSuccessor(node.Id, node.ring)
+	succEntry, err := entry.findSuccessor(node.Id, node.ring)
 	if err != nil {
 		return err
 	}
@@ -126,6 +155,12 @@ func (node *Node) join(entry *RemoteNode) error {
 		return ErrNodeAlreadyExists
 	}
 	node.succMtx.Lock()
+	node.log.Info(
+		"Updating successor.",
+		usecases.LogArgs{
+			"host":           node.RemoteNode.Addr(),
+			"prev successor": node.successor.Addr(),
+			"new successor":  succEntry.Addr()})
 	node.successor = succEntry
 	node.succMtx.Unlock()
 
@@ -133,7 +168,7 @@ func (node *Node) join(entry *RemoteNode) error {
 }
 
 func newRingApi(config *Config) (RingApi, error) {
-	panic("implement me")
+	return &RpcRing{}, nil
 }
 
 func ensureFtable(node *Node, m int) {
@@ -157,7 +192,7 @@ func (node *Node) updateFingerRow(row int, m int) int {
 	nextRow := (row + 1) % m
 
 	if err != nil || succEntry == nil {
-		node.log.Error(
+		node.log.Errorf(
 			"error when finding finger. "+
 				"\n\tError: %v "+
 				"\n\tRemote Node: %v"+
@@ -192,12 +227,13 @@ func (node *Node) findSuccessor(id []byte) (*RemoteNode, error) {
 	toAsk := node.closestPrecedingNode(id)
 	var err error
 	if bytes.Compare(toAsk.Id, node.Id) == 0 {
-		succ, err = toAsk.getSuccessor(node.ring)
+		succ, err := node.GetSuccessor()
 		if err != nil {
 			return nil, err
 		}
 		if succ == nil {
-			return toAsk, nil
+			// return toAsk, nil
+			panic("successor is nil")
 		}
 		return succ, nil
 	}
@@ -235,6 +271,12 @@ func (node *Node) Stop() error {
 }
 
 func (node *Node) FindSuccessor(id []byte) (*RemoteNode, error) {
+	node.log.Info(
+		"FindSuccessor RPC.",
+		usecases.LogArgs{
+			"server": node.RemoteNode.Addr(),
+			"id":     hex.EncodeToString(id)})
+
 	succ, err := node.findSuccessor(id)
 	if err != nil {
 		return nil, err
@@ -245,7 +287,7 @@ func (node *Node) FindSuccessor(id []byte) (*RemoteNode, error) {
 	return succ, nil
 }
 
-func (node *Node) GetSuccessor() (*RemoteNode, error) {
+func (node *Node) GetSuccessor() (*RemoteNode, error) { // todo @audit this method is returning an error in vane
 	node.succMtx.RLock()
 	defer node.succMtx.RUnlock()
 	return node.successor, nil
@@ -257,7 +299,12 @@ func (node *Node) Notify(pred *RemoteNode) error {
 	defer node.predMtx.Unlock()
 
 	if node.predecessor == nil || utils.InInterval(pred.Id, node.predecessor.Id, node.Id) {
-		node.log.Info("updating predecessor of %v to %v", node.Id, pred.Id)
+		node.log.Info(
+			"Updating predecessor.",
+			usecases.LogArgs{
+				"node":             node.Addr(),
+				"prev predecessor": node.predecessor.Addr(),
+				"new predecessor":  pred.Addr()})
 		prevPred := node.predecessor
 		node.predecessor = pred
 
@@ -287,8 +334,7 @@ func (node *Node) GetPredecessor() (*RemoteNode, error) {
 	return node.predecessor, nil
 }
 
-// @todo ReceiveData() (endpoint of SendData RPC method)
 func (node *Node) ReceiveData(data []*Data) error {
-
-	panic("not implemented")
+	node.data.Save(data)
+	return nil
 }

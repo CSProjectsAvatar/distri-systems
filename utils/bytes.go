@@ -20,6 +20,6 @@ func InInterval(x, a, b []byte) bool { // @audit test it
 	case -1:
 		return aLtx && xLtb // x in (a, b)
 	default:
-		return false
+		return bytes.Compare(a, x) != 0 // (a, a) means Universe but a, so x belongs to (a, a) <=> x != a
 	}
 }

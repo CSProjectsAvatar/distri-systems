@@ -25,4 +25,5 @@ type DataInteract interface {
 	// LowerEq returns the key-value pairs when key is <= the given value.
 	LowerEq(upper []byte) []*Data
 	Delete(data []*Data)
+	Save(data []*Data)
 }

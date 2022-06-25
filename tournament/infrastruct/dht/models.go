@@ -8,7 +8,8 @@ import (
 
 type RemoteNode struct {
 	Id   []byte
-	Addr string
+	Ip   string
+	Port uint
 }
 
 type Node struct {
@@ -27,7 +28,8 @@ type Node struct {
 
 type Config struct {
 	Id   string
-	Addr string
+	Ip   string
+	Port uint
 	Hash func() hash.Hash
 }
 
