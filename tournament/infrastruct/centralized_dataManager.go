@@ -27,10 +27,10 @@ func (dm *CentDataManager) SaveTournTree(tour_name string, tree *domain.TourNode
 	return nil
 }
 
-func (dm *CentDataManager) TournTree(tour_name string) *domain.TourNode {
-	// Mock Tree @todo
-	return GetMockTree()
-}
+//func (dm *CentDataManager) TournTree(tour_name string) *domain.TourNode {
+//	// Mock Tree @todo
+//	return GetMockTree()
+//}
 
 func (dm *CentDataManager) UnfinishedTourn() string {
 	return "chezz" // @todo implement
@@ -46,36 +46,5 @@ func (dm *CentDataManager) GetTournInfo(tour_name string) *domain.TournInfo {
 		Type_:   domain.First_Defeat,
 		Players: []domain.Player{player1, player2},
 		//Players:  []domain.Player{player1, player2, player3},
-	}
-}
-
-func GetMockTree() *domain.TourNode {
-	// Mock Tree @todo
-	player1 := domain.Player{Name: "Player1"}
-	player2 := domain.Player{Name: "Player2"}
-	player3 := domain.Player{Name: "Player3"}
-	player4 := domain.Player{Name: "Player4"}
-
-	return &domain.TourNode{
-		Children: []*domain.TourNode{
-			&domain.TourNode{
-				Winner: &player1,
-			},
-			&domain.TourNode{
-				Winner: &player2,
-			},
-			&domain.TourNode{
-				Children: []*domain.TourNode{
-					&domain.TourNode{
-						Winner: &player3,
-					},
-					&domain.TourNode{
-						Winner: &player4,
-					},
-				},
-				JoinFunc: domain.DefNodeFunc,
-			},
-		},
-		JoinFunc: domain.DefNodeFunc,
 	}
 }

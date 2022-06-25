@@ -2,9 +2,10 @@ package infrastruct
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
-	"time"
 )
 
 type CentRunner struct {
@@ -13,10 +14,9 @@ type CentRunner struct {
 func (runner *CentRunner) Run(tm interfaces.Runnable) {
 	matches := tm.GetMatches()
 
-	for {
-		match := <-matches
+	for match := range matches {
 		// Players
-		fmt.Println("Playing", match.Pairing.Player1, "and", match.Pairing.Player2)
+		fmt.Println("Playing", match.Pairing.Player1, "and", match.Pairing.Player2) // @warning seems here
 
 		// Mock the match
 		// @todo call dm if already ran, only one time at the beguining

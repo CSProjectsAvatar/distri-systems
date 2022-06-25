@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 )
