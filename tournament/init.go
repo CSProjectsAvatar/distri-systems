@@ -7,10 +7,6 @@ import (
 )
 
 func main() {
-	myCh := make(chan int)
-
-	fmt.Println(cap(myCh))
-	fmt.Println(len(myCh))
 
 	dm := &infrastruct.CentDataManager{}
 	tMngr := usecases.NewRndTour(dm)
@@ -19,5 +15,4 @@ func main() {
 
 	runner.Run(tMngr)
 
-	myCh <- 1
 }

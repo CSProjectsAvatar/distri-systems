@@ -28,7 +28,7 @@ func NewRndTour(dm interfaces.DataMngr) *TournMngr {
 	tm := new(TournMngr)
 
 	// Initialize the Tournament
-	tm.name = dm.UnfinishedTourn()
+	tm.name = dm.UnfinishedTourn() // @todo When exist 2 leaders, manage syncronization
 	ti := dm.GetTournInfo(tm.name)
 	tm.type_, tm.players = ti.Type_, ti.Players
 	tm.tourTree = tm.Tree()
@@ -43,6 +43,7 @@ func (tm *TournMngr) GetMatches() <-chan *domain.MatchToRun {
 		tm.tourTree.PlayNode(runnerCh, winnerCh)
 		tm.winner = <-winnerCh
 		fmt.Println("The Winner of the Tournament is", tm.winner)
+		// @todo call dm here
 	}() // @audit exception here
 
 	return runnerCh

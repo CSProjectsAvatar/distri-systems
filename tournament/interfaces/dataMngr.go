@@ -13,7 +13,7 @@ type DataMngr interface {
 	File(tour_name string, file_name string) string
 
 	// SaveMatch Saves a match already run
-	SaveMatch(tour_name string, match domain.Match) error
+	SaveMatch(tour_name string, match domain.Match) error // @todo pass the info to the DHT in json
 
 	// Matches Retrieves the tournament's matches
 	Matches(tour_name string) []*domain.Match
