@@ -10,9 +10,8 @@ import (
 type TournMngr struct {
 	dm interfaces.DataMngr
 
-	name     string
-	type_    domain.TourType
-	players  []domain.Player
+	TInfo *domain.TournInfo
+
 	tourTree *domain.TourNode
 	winner   *domain.Player
 }
@@ -64,10 +63,10 @@ func NewRndTour(dm interfaces.DataMngr) *TournMngr {
 	tm := new(TournMngr)
 
 	// Initialize the Tournament
-	tm.name = dm.UnfinishedTourn()
-	ti := dm.GetTournInfo(tm.name)
-	tm.type_, tm.players = ti.Type_, ti.Players
+	name := dm.UnfinishedTourn()
+	tm.TInfo = dm.GetTournInfo(name)
 	tm.tourTree = tm.Tree()
+
 	return tm
 }
 
@@ -83,4 +82,5 @@ func (tm *TournMngr) GetMatches() <-chan *domain.MatchToRun {
 	}() // @audit exception here
 
 	return runnerCh
+
 }

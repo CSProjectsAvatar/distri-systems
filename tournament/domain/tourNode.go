@@ -2,9 +2,10 @@ package domain
 
 import (
 	"fmt"
-	"github.com/CSProjectsAvatar/distri-systems/utils"
 	"sort"
 	"sync"
+
+	"github.com/CSProjectsAvatar/distri-systems/utils"
 )
 
 // TourNode is the Tournament Node
@@ -28,13 +29,13 @@ func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player) []*MatchT
 		// get the players ahead
 		for j := i + 1; j < len(winnerSlice); j++ {
 			pj := winnerSlice[j]
-			match := Match{
+			match := &Pairing{
 				Player1: pi,
 				Player2: pj,
 			}
 			matchToRun := &MatchToRun{
 				Pairing: match,
-				Result:  make(chan MatchResult, 1),
+				result:  make(chan MatchResult, 1),
 			}
 			matches = append(matches, matchToRun) // Add the match to the list of matches to run
 			wg.Add(1)                             // Add the match to the wait group
@@ -43,7 +44,7 @@ func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player) []*MatchT
 			go func(i, j int) {
 				defer wg.Done()
 
-				res := <-matchToRun.Result
+				res := <-matchToRun.result
 				if res == Player1Wins {
 					gamesWon[i]++
 				} else if res == Player2Wins {

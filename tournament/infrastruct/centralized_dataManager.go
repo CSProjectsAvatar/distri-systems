@@ -15,11 +15,11 @@ func (dm *CentDataManager) File(tour_name string, file_name string) string {
 	return ""
 }
 
-func (dm *CentDataManager) SaveMatch(tour_name string, match domain.Match) error {
+func (dm *CentDataManager) SaveMatch(tour_name string, match domain.Pairing) error {
 	return nil
 }
 
-func (dm *CentDataManager) Matches(tour_name string) []*domain.Match {
+func (dm *CentDataManager) Matches(tour_name string) []*domain.Pairing {
 	return nil
 }
 

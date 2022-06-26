@@ -8,12 +8,13 @@ type Runner interface {
 	Run(tm *Runnable)
 
 	// AlreadyRan Returns True if a match has already been run
-	AlreadyRan(match *domain.Match) bool
+	AlreadyRan(match *domain.Pairing) bool
 
 	// MatchRan Marks a match as ran
-	MatchRan(match *domain.Match)
+	MatchRan(match *domain.Pairing)
 }
 
 type Runnable interface {
 	GetMatches() <-chan *domain.MatchToRun
+	AlreadyRun(match *domain.Pairing) (bool, domain.MatchResult)
 }
