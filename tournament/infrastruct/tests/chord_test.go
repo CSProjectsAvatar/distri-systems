@@ -1,17 +1,29 @@
-package dht
+package tests
 
 import (
 	"bytes"
 	"crypto/sha1"
+	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
+	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	"testing"
 	"time"
 )
 
+func localConfig(port uint) *chord.Config {
+	return &chord.Config{
+		Ip:   "127.0.0.1",
+		Port: port,
+		Hash: sha1.New,
+		Ring: &infrastruct.RpcRing{},
+		Data: &usecases.DataMap{},
+	}
+}
+
 func TestJoin(t *testing.T) {
-	entry, _ := NewNode(&Config{Ip: "127.0.0.1", Port: 8080, Hash: sha1.New}, nil, infrastruct.NewLogger())
-	node, err := NewNode(
-		&Config{Ip: "127.0.0.1", Port: 8081, Hash: sha1.New},
+	entry, _ := usecases.NewNode(localConfig(8004), nil, infrastruct.NewLogger())
+	node, err := usecases.NewNode(
+		localConfig(8005),
 		entry.RemoteNode,
 		infrastruct.NewLogger(),
 	)
@@ -44,9 +56,9 @@ func TestJoin(t *testing.T) {
 }
 
 func TestCheckNode(t *testing.T) {
-	entry, _ := NewNode(&Config{Ip: "127.0.0.1", Port: 8080, Hash: sha1.New}, nil, infrastruct.NewLogger())
-	node, err := NewNode(
-		&Config{Ip: "127.0.0.1", Port: 8081, Hash: sha1.New},
+	entry, _ := usecases.NewNode(localConfig(8004), nil, infrastruct.NewLogger())
+	node, err := usecases.NewNode(
+		localConfig(8005),
 		entry.RemoteNode,
 		infrastruct.NewLogger(),
 	)
@@ -55,7 +67,7 @@ func TestCheckNode(t *testing.T) {
 	}
 	time.Sleep(time.Second * 4)
 
-	if err := node.ring.CheckNode(entry.RemoteNode); err != nil {
+	if err := node.Ring.CheckNode(entry.RemoteNode); err != nil {
 		t.Fatal(err)
 	}
 

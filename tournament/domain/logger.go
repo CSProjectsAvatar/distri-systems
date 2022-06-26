@@ -1,4 +1,4 @@
-package usecases
+package domain
 
 type Logger interface {
 	Errorf(format string, args ...any)

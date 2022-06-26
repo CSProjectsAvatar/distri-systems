@@ -1,4 +1,4 @@
-package dht
+package chord
 
 // RingApi defines how nodes talk to the Chord ring.
 type RingApi interface {

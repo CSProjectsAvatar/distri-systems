@@ -1,7 +1,7 @@
 package infrastruct
 
 import (
-	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
+	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,14 +16,14 @@ func (log *Logrus) Infof(format string, args ...any) {
 	logrus.Infof(format, args...)
 }
 
-func (log *Logrus) Info(msg string, args usecases.LogArgs) {
+func (log *Logrus) Info(msg string, args domain.LogArgs) {
 	logrus.WithFields(logrus.Fields(args)).Info(msg)
 }
 
-func (log *Logrus) Error(msg string, args usecases.LogArgs) {
+func (log *Logrus) Error(msg string, args domain.LogArgs) {
 	logrus.WithFields(logrus.Fields(args)).Error(msg)
 }
 
-func NewLogger() usecases.Logger {
+func NewLogger() domain.Logger {
 	return &Logrus{}
 }
