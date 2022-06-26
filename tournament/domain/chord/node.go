@@ -2,7 +2,6 @@ package chord
 
 import (
 	"bytes"
-	"encoding/hex"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/utils"
 	"sync"
@@ -30,9 +29,12 @@ func (node *Node) CheckPredecessor() {
 
 	if pred != nil {
 		if err := node.Ring.CheckNode(pred); err != nil {
-			node.Log.Errorf(
-				"node with ID = %v failed. Message sent from node %v.",
-				pred.Id, node.Id,
+			node.Log.Error(
+				"Predecessor is out.",
+				domain.LogArgs{
+					"me":   node.Addr(),
+					"pred": pred.Addr(),
+				},
 			)
 			node.PredMtx.Lock()
 			node.Predecessor = nil
@@ -48,18 +50,26 @@ func (node *Node) Stabilize() {
 	succ := node.Successor
 	if succ == nil {
 		node.SuccMtx.RUnlock()
-		return
+		panic("successor is nil")
 	}
 	node.SuccMtx.RUnlock()
 
 	succPred, err := succ.getPredecessor(node.Ring)
 	if err != nil {
-		node.Log.Errorf("predecessor retrieval failed when stabilizing.\n"+
-			"\tError: %v "+
-			"\tPredecessor of successor: %v",
-			err, succPred,
+		node.Log.Error(
+			"Predecessor retrieval failed when stabilizing.",
+			domain.LogArgs{
+				"error":     err,
+				"me":        node.Addr(),
+				"successor": succ.Addr(),
+			},
 		)
-		return
+		// todo @audit it's better to change successor to a finger rather than to itself
+		succ = node.RemoteNode // now I am my own successor so my successor will be properly updated in next calls
+
+		node.PredMtx.RLock()
+		succPred = node.Predecessor
+		node.PredMtx.RUnlock()
 	}
 	if unvoid(succPred) && utils.InInterval(succPred.Id, node.Id, succ.Id) {
 		node.SuccMtx.Lock()
@@ -118,13 +128,13 @@ func (node *Node) UpdateFingerRow(row int, m int) int {
 	nextRow := (row + 1) % m
 
 	if err != nil || succEntry == nil {
-		node.Log.Errorf(
-			"error when finding finger. "+
-				"\n\tError: %v "+
-				"\n\tRemote Node: %v"+
-				"\n\tHost ID: %x"+
-				"\n\trow hash: %x",
-			err, succEntry, node.Id, id,
+		node.Log.Error(
+			"error when finding finger.",
+			domain.LogArgs{
+				"error":    err,
+				"row hash": id,
+				"me":       node.Addr(),
+			},
 		)
 		// @todo handle retry, passing ahead for now
 
@@ -153,7 +163,7 @@ func (node *Node) findSuccessor(id []byte) (*RemoteNode, error) {
 	toAsk := node.closestPrecedingNode(id)
 	var err error
 	if bytes.Compare(toAsk.Id, node.Id) == 0 {
-		succ, err := node.GetSuccessor()
+		succ := node.GetSuccessor()
 		if err != nil {
 			return nil, err
 		}
@@ -192,17 +202,11 @@ func (node *Node) closestPrecedingNode(id []byte) *RemoteNode {
 }
 
 func (node *Node) Stop() error {
-	node.Kill <- 0
+	close(node.Kill)
 	return node.Ring.StopNode()
 }
 
 func (node *Node) FindSuccessor(id []byte) (*RemoteNode, error) {
-	node.Log.Info(
-		"FindSuccessor RPC.",
-		domain.LogArgs{
-			"server": node.RemoteNode.Addr(),
-			"id":     hex.EncodeToString(id)})
-
 	succ, err := node.findSuccessor(id)
 	if err != nil {
 		return nil, err
@@ -213,10 +217,10 @@ func (node *Node) FindSuccessor(id []byte) (*RemoteNode, error) {
 	return succ, nil
 }
 
-func (node *Node) GetSuccessor() (*RemoteNode, error) { // todo @audit this method is returning an error in vane
+func (node *Node) GetSuccessor() *RemoteNode {
 	node.SuccMtx.RLock()
 	defer node.SuccMtx.RUnlock()
-	return node.Successor, nil
+	return node.Successor
 }
 
 // Notify updates the node predecessor.
@@ -254,10 +258,10 @@ func (node *Node) moveKeysPred(newPred *RemoteNode) error {
 	return nil
 }
 
-func (node *Node) GetPredecessor() (*RemoteNode, error) {
+func (node *Node) GetPredecessor() *RemoteNode {
 	node.PredMtx.RLock()
 	defer node.PredMtx.RUnlock()
-	return node.Predecessor, nil
+	return node.Predecessor
 }
 
 func (node *Node) ReceiveData(data []*Data) error {

@@ -10,7 +10,8 @@ func RepeatAction(action func(), delay time.Duration, kill <-chan any) {
 		case <-ticker.C:
 			action()
 		case <-kill:
-			break
+			ticker.Stop()
+			return
 		}
 	}
 }

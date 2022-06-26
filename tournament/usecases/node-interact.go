@@ -10,16 +10,22 @@ import (
 	"time"
 )
 
-// NewRemoteNode Creates an entry point to the Chord ring.
+// NewRemoteNode creates an entry point to the Chord ring. The given hash function is used
+// to hash the node ID. If h is nil, then no hash is applied.
 func NewRemoteNode(id string, ip string, port uint, h hash.Hash) (*chord.RemoteNode, error) {
-	if _, err := h.Write([]byte(id)); err != nil {
-		return nil, err
-	}
-	return &chord.RemoteNode{
-		Id:   h.Sum(nil),
+	ans := &chord.RemoteNode{
 		Ip:   ip,
 		Port: port,
-	}, nil
+	}
+	if h == nil {
+		ans.Id = []byte(id)
+	} else {
+		if _, err := h.Write([]byte(id)); err != nil {
+			return nil, err
+		}
+		ans.Id = h.Sum(nil)
+	}
+	return ans, nil
 }
 
 // NewNode sets up a new node in the ring. Arg entry is the entry point to the ring.
@@ -30,13 +36,15 @@ func NewNode(config *chord.Config, entry *chord.RemoteNode, log domain.Logger) (
 	}
 
 	var strId string
+	var idHash hash.Hash = nil
 	if config.Id != "" {
 		strId = config.Id
 	} else {
 		strId = fmt.Sprintf("%s:%d_%d", config.Ip, config.Port, time.Now().Unix())
+		idHash = config.Hash()
 	}
 	var err error
-	if node.RemoteNode, err = NewRemoteNode(strId, config.Ip, config.Port, config.Hash()); err != nil {
+	if node.RemoteNode, err = NewRemoteNode(strId, config.Ip, config.Port, idHash); err != nil {
 		return nil, err
 	}
 	log.Info(

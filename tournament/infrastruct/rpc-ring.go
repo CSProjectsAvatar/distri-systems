@@ -104,10 +104,7 @@ func (r *RpcRing) FindSuccessor(entry *chord.RemoteNode, id []byte) (*chord.Remo
 }
 
 func (r *RpcRing) GetSuccRpc(_ *bool, reply *chord.RemoteNode) error {
-	succ, err := r.node.GetSuccessor()
-	if err != nil {
-		return err
-	}
+	succ := r.node.GetSuccessor()
 	*reply = *succ
 	return nil
 }
@@ -145,10 +142,7 @@ func (r *RpcRing) Notify(node *chord.RemoteNode, pred *chord.RemoteNode) error {
 }
 
 func (r *RpcRing) GetPredRpc(_ *int, reply *chord.RemoteNode) error {
-	pred, err := r.node.GetPredecessor()
-	if err != nil {
-		return err
-	}
+	pred := r.node.GetPredecessor()
 	if pred != nil {
 		*reply = *pred
 	}
@@ -186,7 +180,7 @@ func (r *RpcRing) CheckNode(node *chord.RemoteNode) error {
 }
 
 func (r *RpcRing) StopNode() error {
-	r.quit <- 1
+	close(r.quit)
 	time.Sleep(time.Second * 6)
 	return nil
 }
