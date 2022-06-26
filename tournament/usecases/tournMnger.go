@@ -1,19 +1,18 @@
 package usecases
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
 )
 
 type TournMngr struct {
-	dm interfaces.DataMngr
+	TInfo  *domain.TournInfo
+	Winner *domain.Player
 
-	TInfo *domain.TournInfo
-
+	dm       interfaces.DataMngr
 	tourTree *domain.TourNode
-	winner   *domain.Player
 }
 
 func (tm *TournMngr) Tree() *domain.TourNode {
@@ -60,7 +59,7 @@ func GetMockTree() *domain.TourNode {
 
 // Returns the name of a Random Unfinished Tournament
 func NewRndTour(dm interfaces.DataMngr) *TournMngr {
-	tm := new(TournMngr)
+	tm := &TournMngr{dm: dm}
 
 	// Initialize the Tournament
 	name := dm.UnfinishedTourn()
@@ -76,11 +75,15 @@ func (tm *TournMngr) GetMatches() <-chan *domain.MatchToRun {
 
 	go func() {
 		tm.tourTree.PlayNode(runnerCh, winnerCh)
-		tm.winner = <-winnerCh
+		tm.Winner = <-winnerCh
 		close(runnerCh)
-		fmt.Println("The Winner of the Tournament is", tm.winner)
+		log.Println("The Winner of the", tm.TInfo.Name, "Tournament is", tm.Winner)
 	}() // @audit exception here
 
 	return runnerCh
 
+}
+
+func (tm *TournMngr) AlreadyRun(match *domain.Pairing) (bool, domain.MatchResult) {
+	return false, domain.NotPlayed
 }

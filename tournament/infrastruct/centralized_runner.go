@@ -20,7 +20,7 @@ func (runner *CentRunner) Run(tm interfaces.Runnable) {
 
 		// Mock the match
 		// @todo call dm if already ran, only one time at the beguining
-		match.Result <- domain.Player2Wins
+		match.Result(domain.Player1Wins)
 		// @todo call dm for save
 		fmt.Println("Winner: ", match.Pairing.Player2)
 

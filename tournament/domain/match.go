@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/CSProjectsAvatar/distri-systems/utils"
@@ -10,14 +11,20 @@ import (
 type Pairing struct {
 	ID uint64
 
-	TourId  int
+	TourId  uint64
 	Player1 *Player
 	Player2 *Player
 
 	Winner MatchResult
 }
 
-// @todo NewPairing builder
+func NewPairing(tourId uint64, player1, player2 *Player) *Pairing {
+	return &Pairing{
+		TourId:  tourId,
+		Player1: player1,
+		Player2: player2,
+	}
+}
 
 func (m *Pairing) GetId() uint64 { // @audit-issue not having in count 2 match with the same pairing
 	// Calculate a hash
@@ -35,6 +42,13 @@ type MatchToRun struct {
 	TimesRetry int
 }
 
+func NewMatchToRun(pi, pj *Player) *MatchToRun {
+	return &MatchToRun{
+		Pairing: NewPairing(rand.Uint64(), pi, pj),
+		result:  make(chan MatchResult),
+	}
+}
+
 func (m *MatchToRun) Result(res MatchResult) {
 	m.Pairing.Winner = res
 	m.result <- res
@@ -49,8 +63,9 @@ type Player struct {
 }
 
 type TournInfo struct {
+	ID            uint64
 	Name          string
 	Type_         TourType
-	Players       []Player
+	Players       []*Player
 	AvrgMatchTime time.Duration
 }

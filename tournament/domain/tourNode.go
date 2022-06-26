@@ -20,7 +20,7 @@ func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player) []*MatchT
 	winnerSlice := make([]*Player, 0)
 	for len(winnerSlice) < cap(childWinners) {
 		winnerSlice = append(winnerSlice, <-childWinners)
-	} // Whait for all the winners
+	} // Whait for all the winners, @audit-info can't return more than one winner per group
 
 	wg := &sync.WaitGroup{}
 	gamesWon := make([]float64, len(winnerSlice))
@@ -29,14 +29,8 @@ func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player) []*MatchT
 		// get the players ahead
 		for j := i + 1; j < len(winnerSlice); j++ {
 			pj := winnerSlice[j]
-			match := &Pairing{
-				Player1: pi,
-				Player2: pj,
-			}
-			matchToRun := &MatchToRun{
-				Pairing: match,
-				result:  make(chan MatchResult, 1),
-			}
+
+			matchToRun := NewMatchToRun(pi, pj)
 			matches = append(matches, matchToRun) // Add the match to the list of matches to run
 			wg.Add(1)                             // Add the match to the wait group
 
@@ -55,7 +49,6 @@ func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player) []*MatchT
 				}
 			}(i, j)
 		}
-
 	}
 	// Send the best Winner to the winner channel
 	go func() {

@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type TourType int
 
 const (
@@ -14,4 +16,8 @@ const (
 	Player1Wins
 	Player2Wins
 	Draw
+)
+
+const (
+	BaseWhaitTime = time.Second * 3
 )
