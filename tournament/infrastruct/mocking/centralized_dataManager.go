@@ -1,4 +1,4 @@
-package infrastruct
+package mocking
 
 import (
 	"math/rand"
