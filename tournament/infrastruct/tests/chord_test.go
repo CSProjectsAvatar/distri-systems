@@ -167,3 +167,48 @@ func TestNodeOutFromRingOf4(t *testing.T) {
 	require.Nil(t, ring3.Stop())
 	require.Nil(t, node.Stop())
 }
+
+func TestOneOutThenOther(t *testing.T) {
+	log := infrastruct.NewLogger().ToFile()
+	ring1, err := usecases.NewNode(
+		manualId("1", localConfig(8004)),
+		nil,
+		log,
+	)
+	require.Nil(t, err)
+
+	ring2, err := usecases.NewNode(
+		manualId("11", localConfig(8005)),
+		ring1.RemoteNode,
+		log,
+	)
+	require.Nil(t, err)
+
+	ring3, err := usecases.NewNode(
+		manualId("21", localConfig(8006)),
+		ring1.RemoteNode,
+		log,
+	)
+	require.Nil(t, err)
+
+	ring4, err := usecases.NewNode(
+		manualId("31", localConfig(8007)),
+		ring1.RemoteNode,
+		log,
+	)
+	require.Nil(t, err)
+
+	time.Sleep(time.Second * 10)
+
+	require.Nil(t, ring2.Stop())
+	time.Sleep(time.Second * 7) // wait for ring fixing
+	require.Nil(t, ring4.Stop())
+
+	assert.Equal(t, ring1.Id, ring3.GetSuccessor().Id)
+	assert.Equal(t, ring1.Id, ring3.GetPredecessor().Id)
+	assert.Equal(t, ring3.Id, ring1.GetSuccessor().Id)
+	assert.Equal(t, ring3.Id, ring1.GetPredecessor().Id)
+
+	require.Nil(t, ring1.Stop())
+	require.Nil(t, ring3.Stop())
+}
