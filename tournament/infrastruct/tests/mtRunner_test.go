@@ -1,4 +1,4 @@
-package infrastruct
+package test
 
 import (
 	"log"

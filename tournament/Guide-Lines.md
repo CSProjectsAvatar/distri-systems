@@ -11,7 +11,7 @@
 
 ## Worker Policies:
 
-### Ascenso a Lider
+### Election Request
 - Ring Algorithm sobre el DHT ( Pag 346, 3rd Tanembaum)
 
 ### Descubrimiento de Actual Lider
@@ -38,6 +38,8 @@
     }   
 ```
 
+## Data Manager
+- Falta la interfaz del DHT. y pensar un poco
 
 
 ## Informator Policies
