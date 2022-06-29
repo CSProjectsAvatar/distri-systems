@@ -203,3 +203,46 @@ func (r *RpcRing) SendData(data []*chord.Data, node *chord.RemoteNode) error {
 	}
 	return nil
 }
+
+func (r *RpcRing) SetValue(node *chord.RemoteNode, key []byte, value string) error {
+	client, err := rpcClient(node)
+	if err != nil {
+		return err
+	}
+	var foo int
+	args := chord.Data{
+		Key: key, Value: value,
+	}
+	if err := client.Call(meth("SetValueRpc", node), &args, &foo); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RpcRing) SetValueRpc(data *chord.Data, _ *int) error {
+	if err := r.node.SetValue(data.Key, data.Value); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RpcRing) GetValue(node *chord.RemoteNode, key []byte) (string, error) {
+	client, err := rpcClient(node)
+	if err != nil {
+		return "", err
+	}
+	var value string
+	if err := client.Call(meth("GetValueRpc", node), key, &value); err != nil {
+		return "", err
+	}
+	return value, nil
+}
+
+func (r *RpcRing) GetValueRpc(key []byte, value *string) error {
+	val, err := r.node.GetValue(key)
+	if err != nil {
+		return err
+	}
+	*value = val
+	return nil
+}

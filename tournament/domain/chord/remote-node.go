@@ -36,6 +36,14 @@ func (node *RemoteNode) Addr() string {
 	return fmt.Sprintf("%s:%d", node.Ip, node.Port)
 }
 
+func (node *RemoteNode) SetValue(key []byte, value string, ring RingApi) error {
+	return ring.SetValue(node, key, value)
+}
+
+func (node *RemoteNode) GetValue(key []byte, ring RingApi) (string, error) {
+	return ring.GetValue(node, key)
+}
+
 func unvoid(node *RemoteNode) bool {
 	return node != nil && node.Id != nil
 }

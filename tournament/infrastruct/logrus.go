@@ -39,7 +39,3 @@ func (log *Logrus) ToFile() domain.Logger {
 	log.Info("New Logger Session.", nil)
 	return log
 }
-
-func NewLogger() domain.Logger {
-	return &Logrus{Logger: logrus.New()}
-}

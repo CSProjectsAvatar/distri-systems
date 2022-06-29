@@ -19,11 +19,20 @@ type RingApi interface {
 	// StopNode sets down the ring server
 	StopNode() error
 	SendData(data []*Data, node *RemoteNode) error
+	SetValue(node *RemoteNode, key []byte, value string) error
+	GetValue(node *RemoteNode, key []byte) (string, error)
 }
 
 type DataInteract interface {
 	// LowerEq returns the key-value pairs when key is <= the given value.
 	LowerEq(upper []byte) []*Data
 	Delete(data []*Data)
-	Save(data []*Data)
+
+	// Save saves the given data. If some key exists, then no changes
+	// are committed.
+	Save(data []*Data) error
+
+	// Get gets the value for the given key. If key doesn't exist,
+	// then an error is returned.
+	Get(key []byte) (string, error)
 }

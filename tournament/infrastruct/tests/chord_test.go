@@ -17,8 +17,8 @@ func localConfig(port uint) *chord.Config {
 		Ip:   "127.0.0.1",
 		Port: port,
 		Hash: sha1.New,
-		Ring: &infrastruct.RpcRing{},
-		Data: &usecases.DataMap{},
+		Ring: infrastruct.NewRingApi(),
+		Data: infrastruct.NewDataInteract(),
 	}
 }
 
@@ -210,5 +210,107 @@ func TestOneOutThenOther(t *testing.T) {
 	assert.Equal(t, ring3.Id, ring1.GetPredecessor().Id)
 
 	require.Nil(t, ring1.Stop())
+	require.Nil(t, ring3.Stop())
+}
+
+func TestValueSetAndGet(t *testing.T) {
+	log := infrastruct.NewLogger().ToFile()
+
+	dht := usecases.NewDht[string](
+		infrastruct.NewRingApi(),
+		infrastruct.NewDataInteract(),
+		log)
+
+	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
+
+	ring1, err := usecases.NewNode(
+		manualId("1", localConfig(8002)),
+		entry,
+		log,
+	)
+	require.Nil(t, err)
+
+	ring2, err := usecases.NewNode(
+		manualId("11", localConfig(8003)),
+		entry,
+		log,
+	)
+	require.Nil(t, err)
+
+	ring3, err := usecases.NewNode(
+		manualId("21", localConfig(8004)),
+		entry,
+		log,
+	)
+	require.Nil(t, err)
+
+	time.Sleep(time.Second * 10)
+
+	// storing and checking a standard value
+	key, value := "hello", "world"
+	require.Nil(t, dht.Set(key, value))
+
+	time.Sleep(time.Second * 3)
+
+	val, err := dht.Get(key)
+	require.Nil(t, err)
+	assert.Equal(t, "world", val)
+
+	require.Nil(t, dht.Stop())
+	require.Nil(t, ring1.Stop())
+	require.Nil(t, ring2.Stop())
+	require.Nil(t, ring3.Stop())
+}
+
+func TestStructValueSetAndGet(t *testing.T) {
+	log := infrastruct.NewLogger().ToFile()
+
+	type test struct {
+		F1 string
+		F2 int
+		F3 bool
+	}
+
+	dht := usecases.NewDht[test](
+		infrastruct.NewRingApi(),
+		infrastruct.NewDataInteract(),
+		log)
+
+	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
+
+	ring1, err := usecases.NewNode(
+		manualId("1", localConfig(8002)),
+		entry,
+		log,
+	)
+	require.Nil(t, err)
+
+	ring2, err := usecases.NewNode(
+		manualId("11", localConfig(8003)),
+		entry,
+		log,
+	)
+	require.Nil(t, err)
+
+	ring3, err := usecases.NewNode(
+		manualId("21", localConfig(8004)),
+		entry,
+		log,
+	)
+	require.Nil(t, err)
+
+	time.Sleep(time.Second * 10)
+	k2, v2 := "struct", test{F1: "hello", F2: 1, F3: true}
+	require.Nil(t, dht.Set(k2, v2))
+
+	time.Sleep(time.Second * 3)
+
+	val, err := dht.Get(k2)
+	require.Nil(t, err)
+	assert.Equal(t, v2, val)
+
+	require.Nil(t, dht.Stop())
+	require.Nil(t, ring1.Stop())
+	require.Nil(t, ring2.Stop())
 	require.Nil(t, ring3.Stop())
 }

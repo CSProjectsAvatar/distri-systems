@@ -265,6 +265,13 @@ func (node *Node) GetPredecessor() *RemoteNode {
 }
 
 func (node *Node) ReceiveData(data []*Data) error {
-	node.Data.Save(data)
-	return nil
+	return node.Data.Save(data)
+}
+
+func (node *Node) GetValue(key []byte) (string, error) {
+	return node.Data.Get(key)
+}
+
+func (node *Node) SetValue(key []byte, value string) error {
+	return node.Data.Save([]*Data{{key, value}})
 }

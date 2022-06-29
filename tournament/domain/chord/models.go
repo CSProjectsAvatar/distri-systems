@@ -5,8 +5,12 @@ import (
 	"hash"
 )
 
-var ErrNodeAlreadyExists = errors.New("node already exists")
-var ErrNodeNotFound = errors.New("node not found")
+var (
+	ErrNodeAlreadyExists = errors.New("node already exists")
+	ErrNodeNotFound      = errors.New("node not found")
+	ErrKeyExists         = errors.New("key exists")
+	ErrKeyNotFound       = errors.New("key not found")
+)
 
 type Config struct {
 	Id   string
@@ -19,5 +23,6 @@ type Config struct {
 
 // Data is a key-value pair of string.
 type Data struct {
-	Key, Value string
+	Key   []byte
+	Value string
 }
