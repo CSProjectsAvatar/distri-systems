@@ -11,7 +11,7 @@ type DataMap struct {
 	mtx  sync.RWMutex
 }
 
-func (dm *DataMap) LowerEq(upper []byte) []*chord.Data {
+func (dm *DataMap) LowerEq(upper []byte) ([]*chord.Data, error) {
 	var data []*chord.Data
 	dm.mtx.RLock()
 	defer dm.mtx.RUnlock()
@@ -22,27 +22,20 @@ func (dm *DataMap) LowerEq(upper []byte) []*chord.Data {
 			data = append(data, &chord.Data{Key: bk, Value: v})
 		}
 	}
-	return data
+	return data, nil
 }
 
-func (dm *DataMap) Delete(data []*chord.Data) {
+func (dm *DataMap) Delete(data []*chord.Data) error {
 	dm.mtx.Lock()
 	defer dm.mtx.Unlock()
 
 	for _, d := range data {
 		delete(dm.data, string(d.Key))
 	}
+	return nil
 }
 
 func (dm *DataMap) Save(data []*chord.Data) error {
-	dm.mtx.RLock()
-	for _, d := range data {
-		if _, ok := dm.data[string(d.Key)]; ok {
-			return chord.ErrKeyExists
-		}
-	}
-	dm.mtx.RUnlock()
-
 	dm.mtx.Lock()
 	defer dm.mtx.Unlock()
 	for _, d := range data {

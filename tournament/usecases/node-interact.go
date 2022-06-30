@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"bytes"
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
@@ -52,7 +53,8 @@ func NewNode(config *chord.Config, entry *chord.RemoteNode, log domain.Logger) (
 	log.Info(
 		"Creating new node...",
 		domain.LogArgs{
-			"id": hex.EncodeToString(node.Id),
+			"id":   hex.EncodeToString(node.Id),
+			"addr": node.Addr(),
 		})
 
 	m := config.Hash().Size() * 8
@@ -197,4 +199,31 @@ func (dht *Dht[T]) Set(key string, value T) error {
 
 func (dht *Dht[T]) Stop() error {
 	return dht.chord.Stop()
+}
+
+// RingList returns the ring in a clockwise list of node addresses.
+func (dht *Dht[T]) RingList() ([]string, error) {
+	nodes, err := dht.allNodes()
+	if err != nil {
+		return nil, err
+	}
+	var nodesStr []string
+	for _, n := range nodes {
+		nodesStr = append(nodesStr, n.Addr())
+	}
+	return nodesStr, nil
+}
+
+func (dht *Dht[T]) allNodes() ([]*chord.RemoteNode, error) {
+	ans := []*chord.RemoteNode{dht.chord.RemoteNode}
+	for node := dht.chord.GetSuccessor(); bytes.Compare(node.Id, dht.chord.Id) != 0; {
+		ans = append(ans, node)
+
+		var err error
+		node, err = dht.chord.Ring.GetSuccessor(node)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ans, nil
 }

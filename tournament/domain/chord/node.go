@@ -141,7 +141,21 @@ func (node *Node) UpdateFingerRow(row int, m int) int {
 		return nextRow
 	}
 	node.FtableMtx.Lock()
-	node.Ftable[row] = NewFingerRow(id, succEntry)
+
+	newf := NewFingerRow(id, succEntry)
+	if bytes.Compare(newf.Node.Id, node.Ftable[row].Node.Id) != 0 {
+		node.Log.Info(
+			"changing finger...",
+			domain.LogArgs{
+				"prev finger": node.Ftable[row].Node.Addr(),
+				"new finger":  newf.Node.Addr(),
+				"row":         row,
+				"me":          node.Addr(),
+			},
+		)
+	}
+	node.Ftable[row] = newf
+
 	node.FtableMtx.Unlock()
 
 	return nextRow
@@ -161,6 +175,8 @@ func (node *Node) findSuccessor(id []byte) (*RemoteNode, error) {
 		return succ, nil
 	}
 	toAsk := node.closestPrecedingNode(id)
+	node.Log.Info("closest preceding node", domain.LogArgs{"addr": toAsk.Addr()})
+
 	var err error
 	if bytes.Compare(toAsk.Id, node.Id) == 0 {
 		succ := node.GetSuccessor()
@@ -184,7 +200,7 @@ func (node *Node) findSuccessor(id []byte) (*RemoteNode, error) {
 }
 
 func (node *Node) closestPrecedingNode(id []byte) *RemoteNode {
-	// @audit check if lock for node.predecessor is needed
+	// todo @audit check if lock for node.predecessor is needed
 	node.PredMtx.RLock()
 	defer node.PredMtx.RUnlock()
 
@@ -203,7 +219,10 @@ func (node *Node) closestPrecedingNode(id []byte) *RemoteNode {
 
 func (node *Node) Stop() error {
 	close(node.Kill)
-	return node.Ring.StopNode()
+	if err := node.Ring.StopNode(); err != nil {
+		return err
+	}
+	return node.Data.Close()
 }
 
 func (node *Node) FindSuccessor(id []byte) (*RemoteNode, error) {
@@ -249,13 +268,11 @@ func (node *Node) Notify(pred *RemoteNode) error {
 
 // moveKeysPred moves all keys less than newPred.ID in node to newPred. This is called when new predecessor arrives.
 func (node *Node) moveKeysPred(newPred *RemoteNode) error {
-	predData := node.Data.LowerEq(newPred.Id)
+	predData, _ := node.Data.LowerEq(newPred.Id)
 	if err := node.Ring.SendData(predData, newPred); err != nil {
 		return err
 	}
-	node.Data.Delete(predData)
-
-	return nil
+	return node.Data.Delete(predData)
 }
 
 func (node *Node) GetPredecessor() *RemoteNode {

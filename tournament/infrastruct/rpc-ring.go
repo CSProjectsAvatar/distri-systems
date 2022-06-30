@@ -181,7 +181,7 @@ func (r *RpcRing) CheckNode(node *chord.RemoteNode) error {
 
 func (r *RpcRing) StopNode() error {
 	close(r.quit)
-	time.Sleep(time.Second * 6)
+	time.Sleep(time.Second * 2)
 	return nil
 }
 

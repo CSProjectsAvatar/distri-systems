@@ -10,7 +10,7 @@ func InIntervalRIncluded(x, a, b []byte) bool {
 
 // Checks if x is in (a, b) interval. The interval can be circular, i.e,
 // b < a, which is equivalent to (a, MAX] + [0, b).
-func InInterval(x, a, b []byte) bool { // @audit test it
+func InInterval(x, a, b []byte) bool {
 	aLtx := bytes.Compare(a, x) < 0
 	xLtb := bytes.Compare(x, b) < 0
 

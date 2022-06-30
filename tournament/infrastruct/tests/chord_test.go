@@ -3,6 +3,8 @@ package tests
 import (
 	"bytes"
 	"crypto/sha1"
+	"fmt"
+	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
@@ -18,7 +20,8 @@ func localConfig(port uint) *chord.Config {
 		Port: port,
 		Hash: sha1.New,
 		Ring: infrastruct.NewRingApi(),
-		Data: infrastruct.NewDataInteract(),
+		Data: infrastruct.NewNamedDataInteract(
+			fmt.Sprintf("bunt-%d-%v", port, time.Now())),
 	}
 }
 
@@ -218,7 +221,7 @@ func TestValueSetAndGet(t *testing.T) {
 
 	dht := usecases.NewDht[string](
 		infrastruct.NewRingApi(),
-		infrastruct.NewDataInteract(),
+		infrastruct.NewNamedDataInteract(fmt.Sprintf("bunt-8000-%v", time.Now())),
 		log)
 
 	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
@@ -262,55 +265,75 @@ func TestValueSetAndGet(t *testing.T) {
 	require.Nil(t, ring3.Stop())
 }
 
-func TestStructValueSetAndGet(t *testing.T) {
-	log := infrastruct.NewLogger().ToFile()
+type test struct {
+	F1 string
+	F2 int
+	F3 bool
+}
 
-	type test struct {
-		F1 string
-		F2 int
-		F3 bool
-	}
+func TestRingDhtOfTestStruct(t *testing.T) {
+	log := infrastruct.NewLogger().ToFile()
 
 	dht := usecases.NewDht[test](
 		infrastruct.NewRingApi(),
-		infrastruct.NewDataInteract(),
+		infrastruct.NewNamedDataInteract(fmt.Sprintf("bunt-8001-%v", time.Now())),
 		log)
-
 	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
 
-	ring1, err := usecases.NewNode(
-		manualId("1", localConfig(8002)),
-		entry,
-		log,
-	)
+	var others []*chord.Node
+	for i := 0; i < 5; i++ {
+		o, err := usecases.NewNode(
+			localConfig(uint(8002+i)),
+			entry,
+			log,
+		)
+		require.Nil(t, err)
+		others = append(others, o)
+	}
+
+	time.Sleep(time.Second * 5)
+	log.Info("waiting for ring to stabilize is done", nil)
+
+	l, err := dht.RingList()
 	require.Nil(t, err)
+	log.Info("ring structure", domain.LogArgs{"clockwise list": l})
 
-	ring2, err := usecases.NewNode(
-		manualId("11", localConfig(8003)),
-		entry,
-		log,
-	)
-	require.Nil(t, err)
-
-	ring3, err := usecases.NewNode(
-		manualId("21", localConfig(8004)),
-		entry,
-		log,
-	)
-	require.Nil(t, err)
-
-	time.Sleep(time.Second * 10)
-	k2, v2 := "struct", test{F1: "hello", F2: 1, F3: true}
-	require.Nil(t, dht.Set(k2, v2))
-
-	time.Sleep(time.Second * 3)
-
-	val, err := dht.Get(k2)
-	require.Nil(t, err)
-	assert.Equal(t, v2, val)
+	t.Run("set and get", SubTestStructSetAndGet(dht))
+	t.Run("many savings", SubTestManySavings(dht))
 
 	require.Nil(t, dht.Stop())
-	require.Nil(t, ring1.Stop())
-	require.Nil(t, ring2.Stop())
-	require.Nil(t, ring3.Stop())
+	for _, o := range others {
+		require.Nil(t, o.Stop())
+	}
 }
+
+func SubTestStructSetAndGet(dht *usecases.Dht[test]) func(*testing.T) {
+	return func(t *testing.T) {
+		k2, v2 := "struct", test{F1: "hello", F2: 1, F3: true}
+		require.Nil(t, dht.Set(k2, v2))
+
+		val, err := dht.Get(k2)
+		require.Nil(t, err)
+		assert.Equal(t, v2, val)
+	}
+}
+
+func SubTestManySavings(dht *usecases.Dht[test]) func(*testing.T) {
+	return func(t *testing.T) {
+		for i := 0; i < 20; i++ {
+			key, value := fmt.Sprintf("key-%v", i), test{F1: "hello", F2: i, F3: true}
+			require.Nil(t, dht.Set(key, value))
+		}
+
+		// time.Sleep(time.Second * 3)
+
+		for i := 0; i < 20; i++ {
+			key := fmt.Sprintf("key-%v", i)
+			val, err := dht.Get(key)
+			require.Nil(t, err)
+			assert.Equal(t, test{F1: "hello", F2: i, F3: true}, val)
+		}
+	}
+}
+
+// @todo test data migration when a node joins

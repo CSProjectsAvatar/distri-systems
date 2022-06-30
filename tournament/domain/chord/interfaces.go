@@ -25,14 +25,13 @@ type RingApi interface {
 
 type DataInteract interface {
 	// LowerEq returns the key-value pairs when key is <= the given value.
-	LowerEq(upper []byte) []*Data
-	Delete(data []*Data)
+	LowerEq(upper []byte) ([]*Data, error)
+	Delete(data []*Data) error
 
-	// Save saves the given data. If some key exists, then no changes
-	// are committed.
 	Save(data []*Data) error
 
 	// Get gets the value for the given key. If key doesn't exist,
 	// then an error is returned.
 	Get(key []byte) (string, error)
+	Close() error
 }
