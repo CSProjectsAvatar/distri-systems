@@ -8,15 +8,33 @@ import (
 	"github.com/CSProjectsAvatar/distri-systems/utils"
 )
 
+type iMatchProvider interface {
+	GetMatch(pi, pj *Player) *MatchToRun
+}
+
+type JoinFunc func(childWinners <-chan *Player, winnerCh chan<- *Player, prov iMatchProvider) []*MatchToRun
+
 // TourNode is the Tournament Node
 type TourNode struct {
+	provider iMatchProvider
+
 	Children []*TourNode // If I am a leaf, I am a player
 	Winner   *Player
 
-	JoinFunc func(childWinners <-chan *Player, winnerCh chan<- *Player) []*MatchToRun
+	joinF JoinFunc
 }
 
-func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player) []*MatchToRun {
+func NewNode(prov iMatchProvider, f JoinFunc) *TourNode {
+	return &TourNode{provider: prov, joinF: f}
+}
+func (tnode *TourNode) SetChildrens(children []*TourNode) {
+	tnode.Children = children
+	for _, child := range children {
+		child.provider = tnode.provider
+	}
+}
+
+func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player, prov iMatchProvider) []*MatchToRun {
 	winnerSlice := make([]*Player, 0)
 	for len(winnerSlice) < cap(childWinners) {
 		winnerSlice = append(winnerSlice, <-childWinners)
@@ -30,7 +48,7 @@ func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player) []*MatchT
 		for j := i + 1; j < len(winnerSlice); j++ {
 			pj := winnerSlice[j]
 
-			matchToRun := NewMatchToRun(pi, pj)
+			matchToRun := prov.GetMatch(pi, pj)
 			matches = append(matches, matchToRun) // Add the match to the list of matches to run
 			wg.Add(1)                             // Add the match to the wait group
 
@@ -94,7 +112,7 @@ func (tnode *TourNode) PlayNode(runnerCh chan<- *MatchToRun, winnerCh chan<- *Pl
 	for _, child := range tnode.Children {
 		go child.PlayNode(runnerCh, childWinners)
 	}
-	matches := tnode.JoinFunc(childWinners, winnerCh)
+	matches := tnode.joinF(childWinners, winnerCh, tnode.provider)
 	fmt.Println("Matches to run: ", len(matches)) //@todo remove
 	// Send the matches to the runner
 	for _, match := range matches {

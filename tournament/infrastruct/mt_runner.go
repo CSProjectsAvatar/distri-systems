@@ -16,7 +16,7 @@ type MTRunner struct {
 
 	matchPool      chan *domain.MatchToRun
 	pairingResults chan *domain.Pairing
-	matchWaitList  map[uint64]*domain.MatchToRun // the key its the hash of the match
+	matchWaitList  map[string]*domain.MatchToRun // the key its the hash of the match
 
 	waitList *sync.RWMutex
 }
@@ -26,7 +26,7 @@ func NewMTRunner(workerMngr interfaces.IWorkerMngr, dataMngr interfaces.DataMngr
 		WorkerMngr:     workerMngr,
 		DataMngr:       dataMngr,
 		matchPool:      make(chan *domain.MatchToRun, 10),
-		matchWaitList:  make(map[uint64]*domain.MatchToRun),
+		matchWaitList:  make(map[string]*domain.MatchToRun),
 		pairingResults: workerMngr.NotificationChannel(),
 		waitList:       &sync.RWMutex{},
 	}

@@ -2,15 +2,17 @@ package utils
 
 import (
 	"crypto/sha256"
-	"encoding/binary"
+	"fmt"
 )
 
-func Hash(input string) uint64 {
+func Hash(input string) string {
 	h := sha256.New()
 
 	h.Write([]byte(input))
 	res := h.Sum(nil)
 
-	data := binary.BigEndian.Uint64(res)
+	// data := binary.BigEndian.Uint64(res)
+	// convert res to string
+	data := fmt.Sprintf("%x", res)
 	return data
 }

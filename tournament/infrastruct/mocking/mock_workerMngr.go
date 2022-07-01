@@ -11,8 +11,8 @@ import (
 
 // Mock WorkerMngr
 type MockWorkerMngr struct {
-	RunedMatchs         map[uint64]int
-	DrownedMatchs       map[uint64]int
+	RunedMatchs         map[string]int
+	DrownedMatchs       map[string]int
 	notificationChannel chan *do.Pairing
 	initTime            time.Time
 
@@ -22,8 +22,8 @@ type MockWorkerMngr struct {
 
 func NewMockWorkerMngr() *MockWorkerMngr {
 	return &MockWorkerMngr{
-		RunedMatchs:         make(map[uint64]int),
-		DrownedMatchs:       make(map[uint64]int),
+		RunedMatchs:         make(map[string]int),
+		DrownedMatchs:       make(map[string]int),
 		notificationChannel: make(chan *do.Pairing),
 		lock:                &sync.RWMutex{},
 		DrownedProb:         0.2,

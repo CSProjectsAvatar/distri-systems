@@ -47,9 +47,9 @@ func (dm *CentDataManager) UnfinishedTourn() string {
 
 func (dm *CentDataManager) GetTournInfo(tour_name string) *domain.TournInfo {
 	// @todo Mock
-	player1 := domain.Player{Name: "Player1"}
-	player2 := domain.Player{Name: "Player2"}
-	//player3 := domain.Player{Name: "Player3"}
+	player1 := domain.Player{Id: "Player1"}
+	player2 := domain.Player{Id: "Player2"}
+	//player3 := domain.Player{Id: "Player3"}
 
 	return &domain.TournInfo{
 		Name: "tour_" + tour_name,

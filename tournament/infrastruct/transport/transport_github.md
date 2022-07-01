@@ -1,15 +1,16 @@
-package chord
+package transport
 
 import (
 	"errors"
 	"fmt"
-	"github.com/arriqaaq/chord/models"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 	"net"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/arriqaaq/chord/models"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -26,7 +27,7 @@ func Dial(addr string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
 }
 
 /*
-	Transport enables a node to talk to the other nodes in
+	BaseTransport enables a node to talk to the other nodes in
 	the ring
 */
 type Transport interface {

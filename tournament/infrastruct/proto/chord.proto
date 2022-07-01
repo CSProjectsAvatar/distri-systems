@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package pb_chord;
+
+option go_package = "../../pb_chord";
+
+service Chord {
+    // GetPredecessor returns the node believed to be the current predecessor.
+    rpc GetPredecessor(EmptyR) returns (Node);
+    // GetSuccessor returns the node believed to be the current successor.
+    rpc GetSuccessor(EmptyR) returns (Node);
+    // Notify notifies Chord that Node thinks it is our predecessor. This has
+    // the potential to initiate the transferring of keys.
+    rpc Notify(Node) returns (EmptyR);
+    // FindSuccessor finds the node the succedes ID. May initiate RPC calls to
+    // other nodes.
+    rpc FindSuccessor(ID) returns (Node);
+    // CheckPredecessor checkes whether predecessor has failed.
+    rpc CheckPredecessor(ID) returns (EmptyR);
+    // SetPredecessor sets predecessor for a node.
+    rpc SetPredecessor(Node) returns (EmptyR);
+    // SetPredecessor sets predecessor for a node.
+    rpc SetSuccessor(Node) returns (EmptyR);
+
+    // Get returns the value in Chord ring for the given key.
+    rpc KGet(GetRequest) returns (GetResponse);
+    // Set writes a key value pair to the Chord ring.
+    rpc KSet(SetRequest) returns (SetResponse);
+    // Delete returns the value in Chord ring for the given key.
+    rpc KDelete(DeleteRequest) returns (DeleteResponse);
+    // Multiple delete returns the value in Chord ring between the given keys.
+    rpc KMultiDelete(MultiDeleteRequest) returns (DeleteResponse);
+    // RequestKeys returns the keys between given range from the Chord ring.
+    rpc KRequestKeys(RequestKeysRequest) returns (RequestKeysResponse);
+
+}
+
+
+// Node contains a node ID and address.
+message Node {
+    bytes id = 1;
+    string addr = 2;
+}
+
+message EmptyR {}
+
+message ID {
+    bytes id = 1;
+}
+
+
+message GetRequest {
+    string key = 1;
+}
+
+message GetResponse {
+    bytes value = 1;
+}
+
+message SetRequest {
+    string key = 1;
+    string value = 2;
+}
+
+message SetResponse {}
+
+
+message DeleteRequest {
+    string key = 1;
+}
+
+message DeleteResponse {
+}
+
+message MultiDeleteRequest {
+    repeated string keys = 1;
+}
+
+message RequestKeysRequest {
+    bytes from = 1;
+    bytes to = 2;
+}
+
+message KV {
+    string key = 1;
+    string value = 2;
+}
+
+message RequestKeysResponse {
+    repeated KV values = 1;
+}
