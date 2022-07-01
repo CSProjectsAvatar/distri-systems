@@ -17,11 +17,15 @@ type TournMngr struct {
 }
 
 func (tm *TournMngr) Tree() *TourNode {
-	return GetMockTree(tm)
+	SetMockTree(tm)
+	return tm.tourTree
 }
 
-func GetMockTree(tm *TournMngr) *TourNode {
-	// Mock Tree @todo
+func (tm *TournMngr) SetTree(tree *TourNode) {
+	tm.tourTree = tree
+}
+
+func SetMockTree(tm *TournMngr) {
 	player1 := Player{Id: "Player1"}
 	player2 := Player{Id: "Player2"}
 	player3 := Player{Id: "Player3"}
@@ -40,7 +44,7 @@ func GetMockTree(tm *TournMngr) *TourNode {
 	rch.SetChildrens([]*TourNode{chP3, chP4})
 	root.SetChildrens([]*TourNode{chP1, chP2, rch})
 
-	return root // [p1, p2 [p3, p4]]
+	tm.tourTree = root // [p1, p2 [p3, p4]]
 }
 
 //func (tm *TournMngr) Tree() *TourNode {
