@@ -267,21 +267,36 @@ func (node *Node) Notify(pred *RemoteNode) error {
 				"node":             node.Addr(),
 				"prev predecessor": node.Predecessor.Addr(),
 				"new predecessor":  pred.Addr()})
-		prevPred := node.Predecessor
 		node.Predecessor = pred
 
-		if prevPred != nil {
+		node.SuccMtx.RLock()
+		if bytes.Compare(node.Predecessor.Id, node.Successor.Id) != 0 {
 			if err := node.moveKeysPred(node.Predecessor); err != nil {
 				return err
 			}
 		}
+		node.SuccMtx.RUnlock()
 	}
 	return nil
 }
 
 // moveKeysPred moves all keys less than newPred.ID in node to newPred. This is called when new predecessor arrives.
 func (node *Node) moveKeysPred(newPred *RemoteNode) error {
-	predData, _ := node.Data.LowerEq(newPred.Id)
+	predData, err := node.Data.LowerEq(newPred.Id)
+	if err != nil {
+		return err
+	}
+	if predData != nil && len(predData) > 0 {
+		node.Log.Info(
+			"moving data",
+			domain.LogArgs{
+				"from": node.Addr(),
+				"to":   newPred.Addr(),
+				//"data":        hex.EncodeToString(predData[0].Key),
+				"keys-amount": len(predData),
+			},
+		)
+	}
 	if err := node.Ring.SendData(predData, newPred); err != nil {
 		return err
 	}

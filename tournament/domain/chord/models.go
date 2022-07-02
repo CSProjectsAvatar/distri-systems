@@ -13,7 +13,7 @@ var (
 )
 
 type Config struct {
-	Id   string
+	Id   []byte
 	Ip   string
 	Port uint
 	Hash func() hash.Hash
@@ -22,6 +22,9 @@ type Config struct {
 
 	// Identifiers length.
 	M uint
+
+	// Whether to include current datetime in node ID.
+	IncludeDate bool
 }
 
 // Data is a key-value pair of string.

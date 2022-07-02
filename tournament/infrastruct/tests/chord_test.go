@@ -3,6 +3,7 @@ package tests
 import (
 	"bytes"
 	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
@@ -25,11 +26,17 @@ func localConfig(port uint) *chord.Config {
 		Ring: infrastruct.NewRingApi(),
 		Data: infrastruct.NewNamedDataInteract(
 			fmt.Sprintf("bunt-%d-%v", port, time.Now())),
-		M: IdLength,
+		M:           IdLength,
+		IncludeDate: true,
 	}
 }
 
 func manualId(id string, config *chord.Config) *chord.Config {
+	config.Id = []byte(id)
+	return config
+}
+
+func manualBytesId(id []byte, config *chord.Config) *chord.Config {
 	config.Id = id
 	return config
 }
@@ -367,4 +374,46 @@ func TestFtableLen(t *testing.T) {
 	require.Nil(t, node.Stop())
 }
 
-// @todo test data migration when a node joins
+func TestMigrationOnJoin(t *testing.T) {
+	os.Remove("logrus.log")
+
+	log := infrastruct.NewLogger().ToFile()
+	logTest := infrastruct.NewLogger()
+
+	dht := usecases.NewTestDht[string]()
+
+	data := map[string]string{
+		"habla-matador": "tun tu tun",
+		"nombre":        "andy",
+		"escalafo'n":    ";)",
+		"cimafunk":      "pa mi casa",
+	}
+	for k, v := range data {
+		require.Nil(t, dht.Set(k, v))
+	}
+
+	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
+
+	node2, err := usecases.NewNode(
+		manualId("Z", localConfig(8002)),
+		entry,
+		log,
+	)
+	require.Nil(t, err)
+
+	time.Sleep(time.Second * 10)
+	log.Info("waiting for ring fixing done", nil)
+	logTest.Info("waiting for ring fixing done", nil)
+
+	bkey, err := hex.DecodeString("4832ec78c988b1")
+	require.Nil(t, err)
+	val, err := node2.Data.Get(bkey)
+	require.Nil(t, err)
+	assert.Equal(t, `"andy"`, val)
+
+	_, err = dht.Get("nombre")
+	require.Nil(t, err)
+
+	require.Nil(t, dht.Stop())
+	require.Nil(t, node2.Stop())
+}

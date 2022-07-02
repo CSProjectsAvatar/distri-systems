@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
+	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
 	"github.com/CSProjectsAvatar/distri-systems/utils"
 	"hash"
 	"time"
@@ -38,10 +39,13 @@ func NewNode(config *chord.Config, entry *chord.RemoteNode, log domain.Logger) (
 
 	var strId string
 	var hashFactory func() hash.Hash = nil
-	if config.Id != "" {
-		strId = config.Id
+	if config.Id != nil {
+		strId = string(config.Id)
 	} else {
-		strId = fmt.Sprintf("%s:%d_%d", config.Ip, config.Port, time.Now().Unix())
+		strId = fmt.Sprintf("%s:%d", config.Ip, config.Port)
+		if config.IncludeDate {
+			strId = fmt.Sprintf("%s_%d", strId, time.Now().Unix())
+		}
 		hashFactory = config.Hash
 	}
 	var err error
@@ -105,22 +109,35 @@ type Dht[T any] struct {
 
 var port uint = 8001
 
+func NewTestDht[T any]() *Dht[T] {
+	return newDht[T](
+		infrastruct.NewRingApi(),
+		infrastruct.NewNamedDataInteract(fmt.Sprintf("bunt-8001-%v", time.Now())),
+		infrastruct.NewLogger().ToFile(),
+		false)
+}
+
 // NewDht creates a DHT. A port is automatically designated for serving
 // API. DHTs must be created in the same order in all nodes
 // so communication works properly.
 func NewDht[T any](ring chord.RingApi, data chord.DataInteract, log domain.Logger) *Dht[T] {
+	return newDht[T](ring, data, log, true)
+}
+
+func newDht[T any](ring chord.RingApi, data chord.DataInteract, log domain.Logger, includeDate bool) *Dht[T] {
 	var entry *chord.RemoteNode = nil // result of discovering policy
 	hashGen := sha1.New
 	m := uint(56)
 
 	node, err := NewNode(
 		&chord.Config{
-			Ip:   "127.0.0.1",
-			Port: port,
-			Hash: hashGen,
-			Ring: ring,
-			Data: data,
-			M:    m,
+			Ip:          "127.0.0.1",
+			Port:        port,
+			Hash:        hashGen,
+			Ring:        ring,
+			Data:        data,
+			M:           m,
+			IncludeDate: includeDate,
 		},
 		entry,
 		log)
