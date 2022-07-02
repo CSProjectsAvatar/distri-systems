@@ -19,6 +19,9 @@ type Config struct {
 	Hash func() hash.Hash
 	Ring RingApi
 	Data DataInteract
+
+	// Identifiers length.
+	M uint
 }
 
 // Data is a key-value pair of string.

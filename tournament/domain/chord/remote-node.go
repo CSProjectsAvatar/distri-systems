@@ -45,5 +45,5 @@ func (node *RemoteNode) GetValue(key []byte, ring RingApi) (string, error) {
 }
 
 func unvoid(node *RemoteNode) bool {
-	return node != nil && node.Id != nil
+	return node != nil && node.Id != nil && len(node.Id) != 0
 }

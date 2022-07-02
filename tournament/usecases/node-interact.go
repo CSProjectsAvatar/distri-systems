@@ -15,18 +15,16 @@ import (
 
 // NewRemoteNode creates an entry point to the Chord ring. The given hash function is used
 // to hash the node ID. If h is nil, then no hash is applied.
-func NewRemoteNode(id string, ip string, port uint, h hash.Hash) (*chord.RemoteNode, error) {
+func NewRemoteNode(id string, ip string, port uint, h func() hash.Hash, m uint) (*chord.RemoteNode, error) {
 	ans := &chord.RemoteNode{
 		Ip:   ip,
 		Port: port,
 	}
 	if h == nil {
-		ans.Id = []byte(id)
+		ans.Id = make([]byte, m/8)
+		copy(ans.Id, id)
 	} else {
-		if _, err := h.Write([]byte(id)); err != nil {
-			return nil, err
-		}
-		ans.Id = h.Sum(nil)
+		ans.Id = utils.Sha1Sized(id, h, m)
 	}
 	return ans, nil
 }
@@ -39,15 +37,15 @@ func NewNode(config *chord.Config, entry *chord.RemoteNode, log domain.Logger) (
 	}
 
 	var strId string
-	var idHash hash.Hash = nil
+	var hashFactory func() hash.Hash = nil
 	if config.Id != "" {
 		strId = config.Id
 	} else {
 		strId = fmt.Sprintf("%s:%d_%d", config.Ip, config.Port, time.Now().Unix())
-		idHash = config.Hash()
+		hashFactory = config.Hash
 	}
 	var err error
-	if node.RemoteNode, err = NewRemoteNode(strId, config.Ip, config.Port, idHash); err != nil {
+	if node.RemoteNode, err = NewRemoteNode(strId, config.Ip, config.Port, hashFactory, config.M); err != nil {
 		return nil, err
 	}
 	log.Info(
@@ -57,9 +55,7 @@ func NewNode(config *chord.Config, entry *chord.RemoteNode, log domain.Logger) (
 			"addr": node.Addr(),
 		})
 
-	m := config.Hash().Size() * 8
-
-	node.Ftable = newFtable(node.RemoteNode, m)
+	node.Ftable = newFtable(node.RemoteNode, config.M)
 
 	node.Ring = config.Ring
 	node.Data = config.Data
@@ -81,13 +77,13 @@ func NewNode(config *chord.Config, entry *chord.RemoteNode, log domain.Logger) (
 		node.SuccMtx.Unlock()
 	}
 	go utils.RepeatAction(node.Stabilize, 1*time.Second, node.Kill)         // stabilize node once in a second
-	go ensureFtable(node, m)                                                // ensure finger table is ok
+	go ensureFtable(node, config.M)                                         // ensure finger table is ok
 	go utils.RepeatAction(node.CheckPredecessor, 10*time.Second, node.Kill) // check predecessor is alive once in 10 seconds
 
 	return node, nil
 }
 
-func ensureFtable(node *chord.Node, m int) {
+func ensureFtable(node *chord.Node, m uint) {
 	next := 0
 	t := time.NewTicker(100 * time.Millisecond)
 	for {
@@ -104,6 +100,7 @@ func ensureFtable(node *chord.Node, m int) {
 type Dht[T any] struct {
 	chord *chord.Node
 	hash  func() hash.Hash
+	m     uint
 }
 
 var port uint = 8001
@@ -114,6 +111,7 @@ var port uint = 8001
 func NewDht[T any](ring chord.RingApi, data chord.DataInteract, log domain.Logger) *Dht[T] {
 	var entry *chord.RemoteNode = nil // result of discovering policy
 	hashGen := sha1.New
+	m := uint(56)
 
 	node, err := NewNode(
 		&chord.Config{
@@ -122,6 +120,7 @@ func NewDht[T any](ring chord.RingApi, data chord.DataInteract, log domain.Logge
 			Hash: hashGen,
 			Ring: ring,
 			Data: data,
+			M:    m,
 		},
 		entry,
 		log)
@@ -134,6 +133,7 @@ func NewDht[T any](ring chord.RingApi, data chord.DataInteract, log domain.Logge
 	return &Dht[T]{
 		chord: node,
 		hash:  hashGen,
+		m:     m,
 	}
 }
 
@@ -142,11 +142,7 @@ func NewDht[T any](ring chord.RingApi, data chord.DataInteract, log domain.Logge
 func (dht *Dht[T]) Get(key string) (T, error) {
 	var ans T
 
-	h := dht.hash()
-	if _, err := h.Write([]byte(key)); err != nil {
-		return ans, err
-	}
-	bkey := h.Sum(nil)
+	bkey := utils.Sha1Sized(key, dht.hash, dht.m)
 
 	owner, err := dht.chord.FindSuccessor(bkey)
 	if err != nil {
@@ -170,11 +166,7 @@ func (dht *Dht[T]) Get(key string) (T, error) {
 // Set sets a value in the DHT. In case the given value is a struct,
 // its serializable fields must be public.
 func (dht *Dht[T]) Set(key string, value T) error {
-	h := dht.hash()
-	if _, err := h.Write([]byte(key)); err != nil {
-		return err
-	}
-	bkey := h.Sum(nil)
+	bkey := utils.Sha1Sized(key, dht.hash, dht.m)
 
 	owner, err := dht.chord.FindSuccessor(bkey)
 	if err != nil {
@@ -219,11 +211,14 @@ func (dht *Dht[T]) allNodes() ([]*chord.RemoteNode, error) {
 	for node := dht.chord.GetSuccessor(); bytes.Compare(node.Id, dht.chord.Id) != 0; {
 		ans = append(ans, node)
 
-		var err error
-		node, err = dht.chord.Ring.GetSuccessor(node)
+		succ, err := dht.chord.Ring.GetSuccessor(node)
 		if err != nil {
 			return nil, err
 		}
+		if bytes.Compare(succ.Id, node.Id) == 0 || node.Id == nil || len(node.Id) == 0 {
+			return nil, fmt.Errorf("ring is not closed yet")
+		}
+		node = succ
 	}
 	return ans, nil
 }

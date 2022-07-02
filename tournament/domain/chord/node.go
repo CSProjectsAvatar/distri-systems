@@ -80,9 +80,16 @@ func (node *Node) Stabilize() {
 				"prev successor": node.Successor.Addr(),
 				"new successor":  succPred.Addr()})
 		node.Successor = succPred
+		succ = succPred
 		node.SuccMtx.Unlock()
 	}
 	if bytes.Compare(node.Id, succ.Id) != 0 { // node != succ
+		node.Log.Trace(
+			"notifying...",
+			domain.LogArgs{
+				"me":        node.Addr(),
+				"successor": succ.Addr(),
+			})
 		if err := succ.notify(node.RemoteNode, node.Ring); err != nil {
 			node.Log.Error(
 				"Error when notifying.",
@@ -122,10 +129,10 @@ func (node *Node) Join(entry *RemoteNode) error {
 }
 
 // fix_fingers() method from paper.
-func (node *Node) UpdateFingerRow(row int, m int) int {
+func (node *Node) UpdateFingerRow(row int, m uint) int {
 	id := FingerId(node.Id, row, m)
 	succEntry, err := node.findSuccessor(id)
-	nextRow := (row + 1) % m
+	nextRow := (row + 1) % int(m)
 
 	if err != nil || succEntry == nil {
 		node.Log.Error(
@@ -143,11 +150,15 @@ func (node *Node) UpdateFingerRow(row int, m int) int {
 	node.FtableMtx.Lock()
 
 	newf := NewFingerRow(id, succEntry)
-	if bytes.Compare(newf.Node.Id, node.Ftable[row].Node.Id) != 0 {
-		node.Log.Info(
+	if node.Ftable[row] == nil || bytes.Compare(newf.Node.Id, node.Ftable[row].Node.Id) != 0 {
+		var prev string
+		if node.Ftable[row] != nil {
+			prev = node.Ftable[row].Node.Addr()
+		}
+		node.Log.Trace(
 			"changing finger...",
 			domain.LogArgs{
-				"prev finger": node.Ftable[row].Node.Addr(),
+				"prev finger": prev,
 				"new finger":  newf.Node.Addr(),
 				"row":         row,
 				"me":          node.Addr(),
@@ -169,48 +180,50 @@ func (node *Node) findSuccessor(id []byte) (*RemoteNode, error) {
 	succ := node.Successor
 
 	if succ == nil {
-		return curr, nil
+		panic("successor is nil")
 	}
 	if utils.InIntervalRIncluded(id, curr.Id, succ.Id) { // id ∈ (n, successor]
 		return succ, nil
 	}
 	toAsk := node.closestPrecedingNode(id)
-	node.Log.Info("closest preceding node", domain.LogArgs{"addr": toAsk.Addr()})
+	node.Log.Trace(
+		"closest preceding node",
+		domain.LogArgs{
+			"addr": toAsk.Addr(),
+			"me":   node.Addr(),
+		},
+	)
 
-	var err error
 	if bytes.Compare(toAsk.Id, node.Id) == 0 {
 		succ := node.GetSuccessor()
-		if err != nil {
-			return nil, err
-		}
 		if succ == nil {
 			// return toAsk, nil
 			panic("successor is nil")
 		}
 		return succ, nil
 	}
+	var err error
 	succ, err = toAsk.findSuccessor(id, node.Ring)
 	if err != nil {
 		return nil, err
 	}
 	if succ == nil {
-		return curr, nil
+		panic("successor is nil")
 	}
 	return succ, nil
 }
 
 func (node *Node) closestPrecedingNode(id []byte) *RemoteNode {
-	// todo @audit check if lock for node.predecessor is needed
-	node.PredMtx.RLock()
-	defer node.PredMtx.RUnlock()
+	node.FtableMtx.RLock()
+	defer node.FtableMtx.RUnlock()
 
 	n := node.RemoteNode
 	for i := len(node.Ftable) - 1; i >= 0; i-- {
 		frow := node.Ftable[i]
-		if frow == nil || frow.Node == nil {
+		if frow == nil {
 			continue
 		}
-		if utils.InInterval(frow.Id, n.Id, id) {
+		if utils.InInterval(frow.Node.Id, n.Id, id) {
 			return frow.Node
 		}
 	}

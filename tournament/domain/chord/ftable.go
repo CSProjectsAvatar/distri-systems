@@ -12,7 +12,7 @@ type FingerRow struct {
 }
 
 // Computes (n + 2^i) mod 2^m
-func FingerId(n []byte, i, m int) []byte {
+func FingerId(n []byte, i int, m uint) []byte {
 	id := new(big.Int).SetBytes(n) // bigint id
 
 	_2 := big.NewInt(2)

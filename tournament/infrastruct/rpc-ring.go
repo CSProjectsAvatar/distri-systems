@@ -49,7 +49,7 @@ func (r *RpcRing) StartNode(node *chord.Node) {
 				if err != nil {
 					panic(err)
 				}
-				node.Log.Info(
+				node.Log.Trace(
 					"RPC received.",
 					domain.LogArgs{
 						"caller": cnx.RemoteAddr().String(),
@@ -85,7 +85,7 @@ func (r *RpcRing) FindSuccessor(entry *chord.RemoteNode, id []byte) (*chord.Remo
 		return nil, err
 	}
 	var reply chord.RemoteNode
-	r.node.Log.Info(
+	r.node.Log.Trace(
 		"Calling FindSuccRpc.",
 		domain.LogArgs{
 			"id":     hex.EncodeToString(id),
@@ -94,7 +94,7 @@ func (r *RpcRing) FindSuccessor(entry *chord.RemoteNode, id []byte) (*chord.Remo
 	if err := client.Call(meth("FindSuccRpc", entry), id, &reply); err != nil {
 		return nil, err
 	}
-	r.node.Log.Info(
+	r.node.Log.Trace(
 		"FindSuccRpc response.",
 		domain.LogArgs{
 			"id":   hex.EncodeToString(id),
@@ -156,7 +156,7 @@ func (r *RpcRing) GetPredecessor(node *chord.RemoteNode) (*chord.RemoteNode, err
 	}
 	var reply chord.RemoteNode
 	var foo int
-	r.node.Log.Info(
+	r.node.Log.Trace(
 		"Calling GetPredRpc.",
 		domain.LogArgs{
 			"client": r.node.Port,
@@ -165,7 +165,7 @@ func (r *RpcRing) GetPredecessor(node *chord.RemoteNode) (*chord.RemoteNode, err
 	if err := client.Call(meth("GetPredRpc", node), &foo, &reply); err != nil {
 		return nil, err
 	}
-	r.node.Log.Info(
+	r.node.Log.Trace(
 		"GetPredRpc response.",
 		domain.LogArgs{
 			"predecessor": reply.Addr(),

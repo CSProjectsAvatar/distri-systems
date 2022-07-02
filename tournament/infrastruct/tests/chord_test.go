@@ -10,9 +10,12 @@ import (
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"os"
 	"testing"
 	"time"
 )
+
+const IdLength = 56
 
 func localConfig(port uint) *chord.Config {
 	return &chord.Config{
@@ -22,6 +25,7 @@ func localConfig(port uint) *chord.Config {
 		Ring: infrastruct.NewRingApi(),
 		Data: infrastruct.NewNamedDataInteract(
 			fmt.Sprintf("bunt-%d-%v", port, time.Now())),
+		M: IdLength,
 	}
 }
 
@@ -90,11 +94,12 @@ func TestCheckNode(t *testing.T) {
 }
 
 func TestJoinRingOf2(t *testing.T) {
-	ring1, _ := usecases.NewNode(
+	ring1, err := usecases.NewNode(
 		manualId("1", localConfig(8004)),
 		nil,
 		infrastruct.NewLogger(),
 	)
+	require.Nil(t, err)
 
 	ring2, err := usecases.NewNode(
 		manualId("11", localConfig(8005)),
@@ -125,7 +130,9 @@ func TestJoinRingOf2(t *testing.T) {
 }
 
 func TestNodeOutFromRingOf4(t *testing.T) {
-	log := infrastruct.NewLogger().ToFile()
+	os.Remove("logrus.log")
+
+	log := infrastruct.NewLogger().ToFile().WithLevel(domain.Debug)
 	ring1, err := usecases.NewNode(
 		manualId("1", localConfig(8004)),
 		nil,
@@ -206,6 +213,7 @@ func TestOneOutThenOther(t *testing.T) {
 	require.Nil(t, ring2.Stop())
 	time.Sleep(time.Second * 7) // wait for ring fixing
 	require.Nil(t, ring4.Stop())
+	time.Sleep(time.Second * 7) // wait for ring fixing
 
 	assert.Equal(t, ring1.Id, ring3.GetSuccessor().Id)
 	assert.Equal(t, ring1.Id, ring3.GetPredecessor().Id)
@@ -217,7 +225,10 @@ func TestOneOutThenOther(t *testing.T) {
 }
 
 func TestValueSetAndGet(t *testing.T) {
+	os.Remove("logrus.log")
+
 	log := infrastruct.NewLogger().ToFile()
+	logTest := infrastruct.NewLogger()
 
 	dht := usecases.NewDht[string](
 		infrastruct.NewRingApi(),
@@ -248,12 +259,12 @@ func TestValueSetAndGet(t *testing.T) {
 	require.Nil(t, err)
 
 	time.Sleep(time.Second * 10)
+	log.Info("waiting for ring fixing done", nil)
+	logTest.Info("waiting for ring fixing done", nil)
 
 	// storing and checking a standard value
 	key, value := "hello", "world"
 	require.Nil(t, dht.Set(key, value))
-
-	time.Sleep(time.Second * 3)
 
 	val, err := dht.Get(key)
 	require.Nil(t, err)
@@ -272,6 +283,7 @@ type test struct {
 }
 
 func TestRingDhtOfTestStruct(t *testing.T) {
+	os.Remove("logrus.log") // so log file doesn't increase its size
 	log := infrastruct.NewLogger().ToFile()
 
 	dht := usecases.NewDht[test](
@@ -281,7 +293,8 @@ func TestRingDhtOfTestStruct(t *testing.T) {
 	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
 
 	var others []*chord.Node
-	for i := 0; i < 5; i++ {
+	othersNum := 4
+	for i := 0; i < othersNum; i++ {
 		o, err := usecases.NewNode(
 			localConfig(uint(8002+i)),
 			entry,
@@ -291,12 +304,13 @@ func TestRingDhtOfTestStruct(t *testing.T) {
 		others = append(others, o)
 	}
 
-	time.Sleep(time.Second * 5)
-	log.Info("waiting for ring to stabilize is done", nil)
+	log.Info("waiting for ring to stabilize...", nil)
+	time.Sleep(time.Second * time.Duration((othersNum+1)*5))
+	log.Info("waiting done", nil)
 
-	l, err := dht.RingList()
-	require.Nil(t, err)
-	log.Info("ring structure", domain.LogArgs{"clockwise list": l})
+	//l, err := dht.RingList()
+	//require.Nil(t, err)
+	//log.Info("ring structure", domain.LogArgs{"clockwise list": l})
 
 	t.Run("set and get", SubTestStructSetAndGet(dht))
 	t.Run("many savings", SubTestManySavings(dht))
@@ -320,20 +334,37 @@ func SubTestStructSetAndGet(dht *usecases.Dht[test]) func(*testing.T) {
 
 func SubTestManySavings(dht *usecases.Dht[test]) func(*testing.T) {
 	return func(t *testing.T) {
-		for i := 0; i < 20; i++ {
+		nkeys := 20
+
+		for i := 0; i < nkeys; i++ {
 			key, value := fmt.Sprintf("key-%v", i), test{F1: "hello", F2: i, F3: true}
 			require.Nil(t, dht.Set(key, value))
 		}
 
 		// time.Sleep(time.Second * 3)
 
-		for i := 0; i < 20; i++ {
+		for i := 0; i < nkeys; i++ {
 			key := fmt.Sprintf("key-%v", i)
 			val, err := dht.Get(key)
 			require.Nil(t, err)
 			assert.Equal(t, test{F1: "hello", F2: i, F3: true}, val)
 		}
 	}
+}
+
+func TestFtableLen(t *testing.T) {
+	node, err := usecases.NewNode(
+		localConfig(8001),
+		nil,
+		infrastruct.NewLogger(),
+	)
+	require.Nil(t, err)
+
+	node.FtableMtx.RLock()
+	assert.Equal(t, IdLength, len(node.Ftable))
+	node.FtableMtx.RUnlock()
+
+	require.Nil(t, node.Stop())
 }
 
 // @todo test data migration when a node joins
