@@ -18,6 +18,6 @@ const (
 	Draw
 )
 
-const (
+var (
 	BaseWhaitTime = time.Second * 3
 )

@@ -7,14 +7,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/dht"
 	"google.golang.org/grpc"
 
 	log "github.com/sirupsen/logrus"
 )
 
 type BaseTransport struct {
-	config *dht.Config
+	config *Config
 
 	sock *net.TCPListener
 
@@ -27,7 +26,7 @@ type BaseTransport struct {
 	shutdownCancelFunc context.CancelFunc
 }
 
-func NewTransport(config *dht.Config) (*BaseTransport, error) {
+func NewBaseTransport(config *Config) (*BaseTransport, error) {
 	listener, err := net.Listen("tcp", config.Addr)
 	if err != nil {
 		return nil, err

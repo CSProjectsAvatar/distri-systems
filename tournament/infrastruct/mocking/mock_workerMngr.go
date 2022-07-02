@@ -57,6 +57,6 @@ func (wm *MockWorkerMngr) DeliverMatch(match *do.Pairing) {
 	}()
 }
 
-func (wm *MockWorkerMngr) NotificationChannel() chan *do.Pairing {
+func (wm *MockWorkerMngr) NotificationChannel() <-chan *do.Pairing {
 	return wm.notificationChannel
 }

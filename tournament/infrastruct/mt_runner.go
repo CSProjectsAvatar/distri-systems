@@ -15,7 +15,7 @@ type MTRunner struct {
 	DataMngr   interfaces.DataMngr // @todo for not repeat the games
 
 	matchPool      chan *domain.MatchToRun
-	pairingResults chan *domain.Pairing
+	pairingResults <-chan *domain.Pairing
 	matchWaitList  map[string]*domain.MatchToRun // the key its the hash of the match
 
 	waitList *sync.RWMutex

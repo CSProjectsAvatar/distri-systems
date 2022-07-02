@@ -13,6 +13,7 @@ import (
 	. "github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/pb_workerMngr"
 )
 
+// Server Side Worker Manager
 type WorkerMngr struct {
 	UnimplementedWorkerMngrServer
 

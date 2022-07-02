@@ -6,12 +6,6 @@ import "github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 type Runner interface {
 	// Run the tournament
 	Run(tm *Runnable)
-
-	// AlreadyRan Returns True if a match has already been run
-	AlreadyRan(match *domain.Pairing) bool
-
-	// MatchRan Marks a match as ran
-	MatchRan(match *domain.Pairing)
 }
 
 type Runnable interface {

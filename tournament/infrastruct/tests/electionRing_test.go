@@ -123,3 +123,7 @@ func (m *MockTransporter) SendToSuccessor(msg *interfaces.ElectionMsg) {
 func (m *MockTransporter) GetLeaderFromSuccessor() string {
 	return m.actualLeader
 }
+
+func (m *MockTransporter) MsgNotification() <-chan *interfaces.ElectionMsg {
+	return make(chan *interfaces.ElectionMsg)
+}

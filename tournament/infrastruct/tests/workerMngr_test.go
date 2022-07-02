@@ -33,7 +33,7 @@ func TestWMGiveMeWork(t *testing.T) {
 
 func TestWMCatchReq(t *testing.T) {
 	assert := assert.New(t)
-	addr := "localhost:50051"
+	addr := "localhost:50052"
 	mngr, err := transport.NewWorkerMngr(addr)
 	if err != nil {
 		assert.Nil(err)
