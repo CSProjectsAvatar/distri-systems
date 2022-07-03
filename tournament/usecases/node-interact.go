@@ -105,105 +105,123 @@ type Dht[T any] struct {
 	chord *chord.Node
 	hash  func() hash.Hash
 	m     uint
+
+	// How many extra (key, value) pairs will be inserted.
+	replicas uint
 }
 
 var port uint = 8001
 
-func NewTestDht[T any]() *Dht[T] {
-	return newDht[T](
-		infrastruct.NewRingApi(),
-		infrastruct.NewNamedDataInteract(fmt.Sprintf("bunt-8001-%v", time.Now())),
-		infrastruct.NewLogger().ToFile(),
-		false)
+func NewTestDht[T any](replicas uint) *Dht[T] {
+	return NewDhtBuilder[T]().
+		Ring(infrastruct.NewRingApi()).
+		Data(infrastruct.NewNamedDataInteract(fmt.Sprintf("bunt-8001-%v", time.Now()))).
+		Log(infrastruct.NewLogger().ToFile()).
+		Replicas(replicas).
+		Build()
 }
 
 // NewDht creates a DHT. A port is automatically designated for serving
 // API. DHTs must be created in the same order in all nodes
 // so communication works properly.
+// Deprecated: use DhtBuilder[T] instead.
 func NewDht[T any](ring chord.RingApi, data chord.DataInteract, log domain.Logger) *Dht[T] {
-	return newDht[T](ring, data, log, true)
-}
-
-func newDht[T any](ring chord.RingApi, data chord.DataInteract, log domain.Logger, includeDate bool) *Dht[T] {
-	var entry *chord.RemoteNode = nil // result of discovering policy
-	hashGen := sha1.New
-	m := uint(56)
-
-	node, err := NewNode(
-		&chord.Config{
-			Ip:          "127.0.0.1",
-			Port:        port,
-			Hash:        hashGen,
-			Ring:        ring,
-			Data:        data,
-			M:           m,
-			IncludeDate: includeDate,
-		},
-		entry,
-		log)
-
-	if err != nil {
-		panic(err)
-	}
-	port++
-
-	return &Dht[T]{
-		chord: node,
-		hash:  hashGen,
-		m:     m,
-	}
+	return NewDhtBuilder[T]().
+		Ring(ring).
+		Data(data).
+		Log(log).
+		DateInNodeId().
+		Build()
 }
 
 // Get gets a value from the DHT. In case the value to retrieve is a struct,
 // its serializable fields must be public.
 func (dht *Dht[T]) Get(key string) (T, error) {
 	var ans T
+	var lastErr error = nil
 
-	bkey := utils.Sha1Sized(key, dht.hash, dht.m)
+	for k := range dht.withReplicas(key) {
+		bkey := utils.Sha1Sized(k, dht.hash, dht.m)
+		hexKey := hex.EncodeToString(bkey)
 
-	owner, err := dht.chord.FindSuccessor(bkey)
-	if err != nil {
-		return ans, err
+		owner, err := dht.chord.FindSuccessor(bkey)
+		if err != nil {
+			dht.chord.Log.Error(
+				"error when finding key owner",
+				domain.LogArgs{
+					"error":   err,
+					"str-key": k,
+					"hex-key": hexKey,
+				})
+			lastErr = err
+			continue
+		}
+		dht.chord.Log.Info(
+			"Getting value...",
+			domain.LogArgs{
+				"str-key": k,
+				"hex-key": hexKey,
+				"owner":   owner.Addr(),
+			})
+		val, err := owner.GetValue(bkey, dht.chord.Ring)
+		if err != nil {
+			dht.chord.Log.Error(
+				"error when getting key value",
+				domain.LogArgs{
+					"error":   err,
+					"str-key": k,
+					"hex-key": hexKey,
+				})
+			lastErr = err
+			continue
+		}
+		return ans, json.Unmarshal([]byte(val), &ans)
 	}
+	return ans, lastErr
+}
 
-	dht.chord.Log.Info(
-		"Getting value...",
-		domain.LogArgs{
-			"str-key": key,
-			"hex-key": hex.EncodeToString(bkey),
-			"owner":   owner.Addr(),
-		})
-	val, err := owner.GetValue(bkey, dht.chord.Ring)
-	if err != nil {
-		return ans, err
-	}
-	return ans, json.Unmarshal([]byte(val), &ans)
+// withReplicas returns mainKey with all its replicas.
+func (dht *Dht[T]) withReplicas(mainKey string) <-chan string {
+	ch := make(chan string)
+	go func() {
+		ch <- mainKey
+		for i := uint(1); i <= dht.replicas; i++ {
+			ch <- fmt.Sprintf("%s_%d", mainKey, i)
+		}
+		close(ch)
+	}()
+	return ch
 }
 
 // Set sets a value in the DHT. In case the given value is a struct,
 // its serializable fields must be public.
 func (dht *Dht[T]) Set(key string, value T) error {
-	bkey := utils.Sha1Sized(key, dht.hash, dht.m)
+	for k := range dht.withReplicas(key) {
+		bkey := utils.Sha1Sized(k, dht.hash, dht.m)
 
-	owner, err := dht.chord.FindSuccessor(bkey)
-	if err != nil {
-		return err
+		owner, err := dht.chord.FindSuccessor(bkey)
+		if err != nil {
+			return err
+		}
+
+		bvalue, err := json.Marshal(value)
+		if err != nil {
+			return err
+		}
+
+		dht.chord.Log.Info(
+			"Setting value...",
+			domain.LogArgs{
+				"str-key": k,
+				"hex-key": hex.EncodeToString(bkey),
+				"value":   string(bvalue),
+				"owner":   owner.Addr(),
+			})
+		if err := owner.SetValue(bkey, string(bvalue), dht.chord.Ring); err != nil {
+			return err
+		}
 	}
-
-	bvalue, err := json.Marshal(value)
-	if err != nil {
-		return err
-	}
-
-	dht.chord.Log.Info(
-		"Setting value...",
-		domain.LogArgs{
-			"str-key": key,
-			"hex-key": hex.EncodeToString(bkey),
-			"value":   string(bvalue),
-			"owner":   owner.Addr(),
-		})
-	return owner.SetValue(bkey, string(bvalue), dht.chord.Ring)
+	return nil
 }
 
 func (dht *Dht[T]) Stop() error {
@@ -238,4 +256,75 @@ func (dht *Dht[T]) allNodes() ([]*chord.RemoteNode, error) {
 		node = succ
 	}
 	return ans, nil
+}
+
+type DhtBuilder[T any] struct {
+	ring     chord.RingApi
+	data     chord.DataInteract
+	log      domain.Logger
+	date     bool
+	replicas uint
+}
+
+// NewDhtBuilder returns a Dht struct builder when value type is T.
+func NewDhtBuilder[T any]() *DhtBuilder[T] {
+	return &DhtBuilder[T]{}
+}
+
+func (builder *DhtBuilder[T]) Ring(ring chord.RingApi) *DhtBuilder[T] {
+	builder.ring = ring
+	return builder
+}
+
+func (builder *DhtBuilder[T]) Data(data chord.DataInteract) *DhtBuilder[T] {
+	builder.data = data
+	return builder
+}
+
+func (builder *DhtBuilder[T]) Log(log domain.Logger) *DhtBuilder[T] {
+	builder.log = log
+	return builder
+}
+
+func (builder *DhtBuilder[T]) DateInNodeId() *DhtBuilder[T] {
+	builder.date = true
+	return builder
+}
+
+// Replicas returns a builder with the replicas field set. This is how many extra
+// (key, value) pairs are stored. Default is 0 so only one (key, value) pair is stored.
+func (builder *DhtBuilder[T]) Replicas(replicas uint) *DhtBuilder[T] {
+	builder.replicas = replicas
+	return builder
+}
+
+func (builder *DhtBuilder[T]) Build() *Dht[T] {
+	var entry *chord.RemoteNode = nil // result of discovering policy
+	hashGen := sha1.New
+	m := uint(56)
+
+	node, err := NewNode(
+		&chord.Config{
+			Ip:          "127.0.0.1",
+			Port:        port,
+			Hash:        hashGen,
+			Ring:        builder.ring,
+			Data:        builder.data,
+			M:           m,
+			IncludeDate: builder.date,
+		},
+		entry,
+		builder.log)
+
+	if err != nil {
+		panic(err)
+	}
+	port++
+
+	return &Dht[T]{
+		chord:    node,
+		hash:     hashGen,
+		m:        m,
+		replicas: builder.replicas,
+	}
 }

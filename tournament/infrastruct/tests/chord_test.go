@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 )
@@ -380,7 +381,7 @@ func TestMigrationOnJoin(t *testing.T) {
 	log := infrastruct.NewLogger().ToFile()
 	logTest := infrastruct.NewLogger()
 
-	dht := usecases.NewTestDht[string]()
+	dht := usecases.NewTestDht[string](0)
 
 	data := map[string]string{
 		"habla-matador": "tun tu tun",
@@ -416,4 +417,66 @@ func TestMigrationOnJoin(t *testing.T) {
 
 	require.Nil(t, dht.Stop())
 	require.Nil(t, node2.Stop())
+}
+
+func SubTestReplicasDown(dht *usecases.Dht[test], others []*chord.Node) func(*testing.T) {
+	return func(t *testing.T) {
+		k, v := "replica", test{F1: "valorcito, mami, valorcito"}
+		require.Nil(t, dht.Set(k, v))
+
+		require.Nil(t, others[0].Stop())
+		time.Sleep(time.Second * 3)
+		require.Nil(t, others[1].Stop())
+
+		vget, err := dht.Get(k)
+		require.Nil(t, err)
+		require.Equal(t, v, vget)
+
+		require.Nil(t, dht.Stop())
+		for i := 2; i < len(others); i++ {
+			require.Nil(t, others[i].Stop())
+		}
+	}
+}
+
+func TestRingWithReplica(t *testing.T) {
+	os.Remove("logrus.log") // so log file doesn't increase its size
+	removeDbs()
+
+	dht := usecases.NewTestDht[test](6)
+	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
+
+	var others []*chord.Node
+	othersNum := 7
+	log := infrastruct.NewLogger().ToFile()
+	for i := 0; i < othersNum; i++ {
+		o, err := usecases.NewNode(
+			//manualId(fmt.Sprintf("node%d", i), localConfig(uint(8002+i))),
+			localConfig(uint(8002+i)),
+			entry,
+			log,
+		)
+		require.Nil(t, err)
+		others = append(others, o)
+	}
+
+	log.Info("waiting for ring to stabilize...", nil)
+	time.Sleep(time.Second * time.Duration((othersNum+1)*5))
+	log.Info("waiting done", nil)
+
+	l, err := dht.RingList()
+	require.Nil(t, err)
+	log.Info("ring", domain.LogArgs{"sequence": l})
+
+	t.Run("replicas", SubTestReplicasDown(dht, others))
+}
+
+func removeDbs() {
+	files, err := filepath.Glob("bunt-*.db")
+	if err != nil {
+		panic(err)
+	}
+	for _, f := range files {
+		os.Remove(f)
+	}
 }
