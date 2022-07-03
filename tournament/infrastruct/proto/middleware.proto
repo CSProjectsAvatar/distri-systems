@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "../go server/pb";
+// proto for sending files to the server corresponding to the game
+
+service Middleware {
+    rpc UploadTournament(TournamentReq) returns (TournamentResp) {}
+    rpc RunTournament(RunReq) returns (stream RunResp) {}
+}
+
+// UploadTournament
+message File {
+    string name = 1;
+    bytes data = 2;
+    bool is_game = 3;
+}
+message TournamentReq {
+    string name = 1;
+    TournType tour_type = 2;
+    repeated File files = 3;
+}
+message TournamentResp {
+    string msg = 1;
+}
+
+// RunTournament
+message RunReq {
+    string name = 1;
+}
+
+message RunResp {
+    repeated Match matchs = 1;
+}
+message Match {
+    repeated string players = 1;
+    State state = 2;
+    Result result = 3;
+}
+
+enum State 
+{
+    NOT_STARTED = 0;
+    STARTED = 1;
+    FINISHED = 2;
+}
+
+enum Result 
+{
+    NOT_RUN = 0;
+    P1_WINS = 1;
+    P2_WINS = 2;
+    TIE = 3;
+}
+
+enum TournType {
+    First_Defeat = 0;
+    All_vs_All = 1;
+}

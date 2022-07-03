@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package pb_workerMngr;
+
+option go_package = "../pb_workerMngr";
+
+service WorkerMngr {
+    // Returns a Match for the worker to run
+    rpc GiveMeWork(MatchReq) returns (MatchResp);
+    // Receive the result of running a Match
+    rpc CatchResult(ResultReq) returns (ResultResp);
+}
+message MatchReq {}
+message MatchResp {
+    string matchId = 1;
+    string tourId = 2;
+    string FstPlayerID = 3;
+    string SndPlayerID = 4;
+}
+
+message ResultReq{
+    string matchId = 1;
+    string tourId = 2;
+    string FstPlayerID = 3;
+    string SndPlayerID = 4;
+    uint32 winner = 5; // 1, 2, 3: Winner 1, 2 or Tie
+}
+message ResultResp{}
