@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  server:
+    container_name: server_go
+    build: ./server
+    ports:
+      - "8080:8080"
+  client:
+    container_name: client_go
+    build: ./client
+    depends_on:
+      - server
