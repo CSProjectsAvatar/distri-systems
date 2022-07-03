@@ -1,21 +1,12 @@
 version: "3.9"
 services:
   server:
-    build:
-      context: ./server
-      dockerfile: server.Dockerfile
+    container_name: server_go
+    build: ./server
     ports:
       - "8080:8080"
-    networks:
-      - project_network
   client:
-    build:
-      context: ./client
-      dockerfile: client.Dockerfile
-    networks:
-      - project_network
+    container_name: client_go
+    build: ./client
     depends_on:
       - server
-networks:
-  project_network:
-    driver: bridge

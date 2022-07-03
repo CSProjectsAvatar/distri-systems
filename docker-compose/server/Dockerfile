@@ -6,6 +6,6 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 COPY server.go .
-EXPOSE 8080
+EXPOSE 8001
 RUN go build -o /docker-server-go
 CMD [ "/docker-server-go" ]

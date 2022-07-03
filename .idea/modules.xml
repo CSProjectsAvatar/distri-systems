@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/docker-compose.iml" filepath="$PROJECT_DIR$/.idea/docker-compose.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/distri-systems.iml" filepath="$PROJECT_DIR$/.idea/distri-systems.iml" />
     </modules>
   </component>
 </project>

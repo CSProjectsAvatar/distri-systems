@@ -4,16 +4,14 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"time"
 )
 
 func main() {
-	time.Sleep(8 * time.Second)
-	con, err := net.Dial("tcp", "server:8080")
+	con, err := net.Dial("tcp", "server_go:8001")
 	if err != nil {
 		fmt.Printf("%s %s %s\n", "localhost", "not responding", err.Error())
 	} else {
-		fmt.Printf("%s %s %s\n", "localhost", "responding on port:", "8080")
+		fmt.Printf("%s %s %s\n", "localhost", "responding on port:", "8001")
 	}
 	defer con.Close()
 
