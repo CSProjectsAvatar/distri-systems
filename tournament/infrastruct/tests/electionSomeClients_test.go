@@ -1,4 +1,4 @@
-package test
+package tests
 
 import (
 	"testing"
@@ -65,10 +65,10 @@ func TestElectionChangeLeader4(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
 
-	server1Addr := "localhost:50051"
-	server2Addr := "localhost:50052"
-	server3Addr := "localhost:50053"
-	server4Addr := "localhost:50054"
+	server1Addr := "localhost:50151"
+	server2Addr := "localhost:50252"
+	server3Addr := "localhost:50353"
+	server4Addr := "localhost:50454"
 
 	node1 := mock.NewMockRoutine(server1Addr, server1Addr)
 	node4 := mock.NewMockRoutine(server4Addr, server1Addr)

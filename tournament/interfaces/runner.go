@@ -12,3 +12,7 @@ type Runnable interface {
 	GetMatches() <-chan *domain.MatchToRun
 	AlreadyRun(match *domain.Pairing) (bool, domain.MatchResult)
 }
+
+type IMatchRunner interface {
+	RunMatch(match *domain.Pairing) (domain.MatchResult, error)
+}

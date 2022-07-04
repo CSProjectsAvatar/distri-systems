@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"errors"
+
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 )
 
@@ -12,6 +13,9 @@ type DataMngr interface {
 
 	// File Retrieves a file from the tournament.
 	File(tourId string, fileName string) (string, error) // @todo now an error is returned, consider that in callers
+
+	// FileGroup Retrieves a group of files from the tournament.
+	FileGroup(tourId string, fileNames []string) (map[string]string, error)
 
 	// SaveMatch Saves a match already run
 	SaveMatch(match *domain.Pairing) error

@@ -16,13 +16,12 @@ import (
 )
 
 type MainRoutine struct {
-	Elect   inter.IElectionPolicy
-	WClient inter.IWorkerTransport
-	WMngr   inter.IWorkerMngr
-	DM      DataMngr
-	Runner  inter.Runner
-
-	node
+	Elect       inter.IElectionPolicy
+	WClient     inter.IWorkerTransport
+	WMngr       inter.IWorkerMngr
+	DM          DataMngr
+	TRunner     inter.Runner
+	MatchRunner inter.IMatchRunner
 }
 
 func (m *MainRoutine) WorkDay() {
@@ -36,9 +35,10 @@ func (m *MainRoutine) WorkDay() {
 				if count > domain.MaxRetryTimes {
 					m.Elect.CreateElection()
 					<-m.Elect.OnLeaderChange() // Wait for Leader Change
-					// @audit Here Goes The Code to Run The Mngr if I Am the leader
+
+					// Run The Mngr if I Am the leader
 					if m.Elect.GetLeader() == m.Elect.GetMe() {
-						go m.WMngr.Start()
+						go m.MngrDay() // Init the Leader Mode
 						break
 					}
 
@@ -47,8 +47,10 @@ func (m *MainRoutine) WorkDay() {
 				}
 			}
 		} else {
-			// @audit Mock Match Result for now
-			match.Winner = 2
+			match.Winner, err = m.MatchRunner.RunMatch(match)
+			if err != nil {
+				log.Error(err)
+			}
 
 			// Send the Results Back
 			err = m.WClient.SendResults(match)

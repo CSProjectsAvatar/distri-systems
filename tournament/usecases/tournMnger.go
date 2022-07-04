@@ -16,9 +16,50 @@ type TournMngr struct {
 }
 
 func (tm *TournMngr) Tree() *TourNode {
-	SetMockTree(tm)
-	return tm.tourTree
+	switch tm.TInfo.Type_ {
+	case First_Defeat:
+		return tm.BuildFirstDefeat()
+	case All_vs_All:
+		return tm.BuildAllVsAll()
+	}
+	return nil
 }
+
+func (tm *TournMngr) BuildFirstDefeat() *TourNode {
+	var tourNodes []*TourNode
+
+	for i := 0; i < len(tm.TInfo.Players); i++ {
+		tourNodes = append(tourNodes, &TourNode{Children: nil, Winner: tm.TInfo.Players[i]})
+	}
+
+	for len(tourNodes) > 1 {
+		for j := 0; j < len(tourNodes); j += 2 {
+			right := tourNodes[j]
+			left := tourNodes[j+1]
+			children := []*TourNode{left, right}
+			tourNode := &TourNode{Children: children, Winner: &Player{}}
+			var tourNodes1 = append(tourNodes[0:j], tourNode)
+			tourNodes = append(tourNodes1, tourNodes[j+2:]...)
+		}
+	}
+
+	return tourNodes[0]
+}
+
+func (tm *TournMngr) BuildAllVsAll() *TourNode {
+	var children []*TourNode
+	var root *TourNode = &TourNode{Children: children, Winner: &Player{}}
+	for i := 0; i < len(tm.TInfo.Players); i++ {
+		var child *TourNode = &TourNode{Children: nil, Winner: tm.TInfo.Players[i]}
+		root.Children = append(root.Children, child)
+	}
+	return root
+}
+
+// func (tm *TournMngr) Tree() *TourNode {
+// 	SetMockTree(tm)
+// 	return tm.tourTree
+// }
 
 func (tm *TournMngr) SetTree(tree *TourNode) {
 	tm.tourTree = tree
@@ -45,13 +86,6 @@ func SetMockTree(tm *TournMngr) {
 
 	tm.tourTree = root // [p1, p2 [p3, p4]]
 }
-
-//func (tm *TournMngr) Tree() *TourNode {
-//	switch tm.type_ {
-//
-//	}
-//	return nil
-//}
 
 // Returns the name of a Random Unfinished Tournament
 func NewRndTour(dm DataMngr) *TournMngr {

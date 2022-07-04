@@ -53,6 +53,18 @@ func (data *DhtTourDataMngr) File(tourId string, fileName string) (string, error
 	return ans, nil
 }
 
+func (data *DhtTourDataMngr) FileGroup(tourId string, fileNames []string) (map[string]string, error) {
+	ans := make(map[string]string)
+	for _, fileName := range fileNames {
+		file, err := data.File(tourId, fileName)
+		if err != nil {
+			return nil, err
+		}
+		ans[fileName] = file
+	}
+	return ans, nil
+}
+
 func matchesKey(tourId string) string {
 	return "_tour-" + tourId
 }
