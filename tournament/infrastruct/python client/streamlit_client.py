@@ -25,9 +25,11 @@ st.title("Tournament Manager")
 if 'node' not in st.session_state:
     st.session_state.node = client.grpcNode()
     st.session_state.tourNames = []
+    st.session_state.t_ids = []
 
 node = st.session_state.node
 tourNames = st.session_state.tourNames
+tourn_ids = st.session_state.t_ids
 
 # Input 'Tournament Name' with button to create a new tournament
 new_t_name = st.text_input("Tournament Name", placeholder='Chez Tournament')
@@ -38,7 +40,7 @@ if new_t_name != '' and new_t_name not in tourNames:
 st.write(tourNames)
 
 # Tournaments Expanders
-for t_name in tourNames:
+for i, t_name in enumerate(tourNames):
     # Create a new tournament
     with st.expander(t_name):
         files_placeholder = st.empty()
@@ -66,11 +68,13 @@ for t_name in tourNames:
                 # To read file as bytes:
                 bytes_data = player.getvalue()
                 # grpc player File
-                player_file = mid.File(name='player' + str(i), data=bytes_data)
+                player_file = mid.File(name=f'player{i}-{player.name}', data=bytes_data)
                 file_list.append(player_file)
 
             selected = st.selectbox('Type of tournament', tour_type, key='tour_type_' + t_name)
             st.write(tour_type[selected])
+
+            t_id = tourn_ids[i] if i < len(tourn_ids) else None
 
             if st.button("Upload", key='upBttn_' + t_name):
                 # request for the game and players
@@ -86,7 +90,11 @@ for t_name in tourNames:
                     mid.File(name='player1', data=b'player1.py'),
                 ]
 
-                node.upload_tournment(t_name, tour_type[selected], file_list)
+                t_id = node.upload_tournment(t_name, tour_type[selected], file_list).id
+                if i < len(tourn_ids):
+                    tourn_ids[i] = t_id
+                else:
+                    tourn_ids.append(t_id)
 
             run_bttn = st.button("Run", key='runBttn_' + t_name)
             st.write(tour_type[selected])
@@ -95,6 +103,7 @@ for t_name in tourNames:
         if run_bttn:
             files_placeholder.empty()
             st.write("Running the tournament")
+            # @todo you must t_id in order to run the tournament
 
             for_run = 20
             running = 5
@@ -115,6 +124,10 @@ for t_name in tourNames:
                     sleep(3)
 
                 placeholder.empty()
+
+        if st.button('Stats', key='statsBttn'+t_id):
+            # @todo call GetStats() rpc method taking t_id into account
+            ...
 
 # # seleccionar el tipo de torneo
 
