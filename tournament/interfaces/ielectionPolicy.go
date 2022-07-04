@@ -1,8 +1,13 @@
 package interfaces
 
 // Policy that assure always a Leader
-type ElectionPolicy interface {
+type IElectionPolicy interface {
+	CreateElection()
 	ElectionMsg(msg *ElectionMsg)
+	OnLeaderChange() <-chan struct{}
+	GetLeader() string
+	GetMe() string
+	SetTransport(transport IElectTransport)
 }
 
 type ElectionType int

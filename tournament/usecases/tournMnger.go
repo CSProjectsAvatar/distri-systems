@@ -16,6 +16,13 @@ type TournMngr struct {
 	matchsPerPairing map[string]int
 }
 
+func NewTournMngr(tInfo *TournInfo) {
+	tm := &TournMngr{
+		TInfo: tInfo,
+	}
+	tm.tourTree = tm.Tree()
+}
+
 func (tm *TournMngr) Tree() *TourNode {
 	SetMockTree(tm)
 	return tm.tourTree

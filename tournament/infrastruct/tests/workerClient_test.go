@@ -11,10 +11,15 @@ import (
 
 type MockProvider struct {
 	server string
+	succ   string
 }
 
 func (m *MockProvider) GetLeader() string {
 	return m.server
+}
+
+func (m *MockProvider) GetSuccessor() string {
+	return m.succ
 }
 
 func TestWMGiveMeWork_Integration(t *testing.T) {
@@ -25,8 +30,8 @@ func TestWMGiveMeWork_Integration(t *testing.T) {
 	assert.Nil(err)
 
 	confg := transport.DefaultConfig()
-	prov := &MockProvider{serverAddr}
-	client, err := transport.NewWorkerClient(confg, prov)
+	prov := &MockProvider{serverAddr, serverAddr}
+	client, err := transport.NewWorkerClient(confg, prov, prov)
 	assert.Nil(err)
 
 	pair1 := &domain.Pairing{ID: "1", TourId: "1", Player1: &domain.Player{Id: "1"}, Player2: &domain.Player{Id: "2"}}
@@ -71,10 +76,10 @@ func TestWM_WithMultiplesClients(t *testing.T) {
 	assert.Nil(err)
 
 	confg := transport.DefaultConfig()
-	prov := &MockProvider{serverAddr}
-	client1, err := transport.NewWorkerClient(confg, prov)
+	prov := &MockProvider{serverAddr, serverAddr}
+	client1, err := transport.NewWorkerClient(confg, prov, prov)
 	assert.Nil(err)
-	client2, err := transport.NewWorkerClient(confg, prov)
+	client2, err := transport.NewWorkerClient(confg, prov, prov)
 	assert.Nil(err)
 
 	pair1 := &domain.Pairing{ID: "1", TourId: "1", Player1: &domain.Player{Id: "1"}, Player2: &domain.Player{Id: "2"}}

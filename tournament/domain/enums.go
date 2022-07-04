@@ -19,5 +19,7 @@ const (
 )
 
 var (
-	BaseWhaitTime = time.Second * 3
+	BaseWhaitTime         = time.Second * 3
+	WhaitTimeBetweenRetry = time.Second * 2
+	MaxRetryTimes         = 3
 )

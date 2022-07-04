@@ -3,17 +3,24 @@ package transport
 import (
 	"time"
 
+	// grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc"
 )
 
 type Config struct {
-	Addr string
+	ServAddr string
 
 	ServerOpts []grpc.ServerOption
 	DialOpts   []grpc.DialOption
 
 	Timeout time.Duration
 	MaxIdle time.Duration
+}
+
+func DefaultCfgAddr(addr string) *Config {
+	n := DefaultConfig()
+	n.ServAddr = addr
+	return n
 }
 
 func DefaultConfig() *Config {

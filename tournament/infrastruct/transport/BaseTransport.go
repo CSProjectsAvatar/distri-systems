@@ -27,7 +27,7 @@ type BaseTransport struct {
 }
 
 func NewBaseTransport(config *Config) (*BaseTransport, error) {
-	listener, err := net.Listen("tcp", config.Addr)
+	listener, err := net.Listen("tcp", config.ServAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -117,6 +117,7 @@ func (t *BaseTransport) Stop() error {
 
 func (t *BaseTransport) listen() {
 	t.server.Serve(t.sock)
+
 }
 
 // Closes old connections

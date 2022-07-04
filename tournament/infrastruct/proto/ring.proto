@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package pb_ring;
+
+option go_package = "../pb_ring";
+
+service Ring {
+    rpc SendMessage(ElectionMsgReq) returns (ElectionMsgResp);
+    rpc GetLeader(GetLeaderReq) returns (GetLeaderResp);
+}
+
+message ElectionMsgReq {
+    uint32 type = 1;
+    repeated string on_it = 2;
+}
+message ElectionMsgResp { }
+
+message GetLeaderReq {}
+message GetLeaderResp {
+    string leaderAddr = 1;
+}

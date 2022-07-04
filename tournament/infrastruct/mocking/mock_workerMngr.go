@@ -60,3 +60,10 @@ func (wm *MockWorkerMngr) DeliverMatch(match *do.Pairing) {
 func (wm *MockWorkerMngr) NotificationChannel() <-chan *do.Pairing {
 	return wm.notificationChannel
 }
+
+func (wm *MockWorkerMngr) Start() error {
+	return nil
+}
+func (wm *MockWorkerMngr) Stop() error {
+	return nil
+}

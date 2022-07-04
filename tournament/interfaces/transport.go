@@ -4,22 +4,29 @@ import (
 	. "github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 )
 
-type RingTransport interface { // Used on Election
+type ITransportSrvr interface {
+	Start() error
+	Stop() error
+}
+
+type IElectTransport interface { // Used on Election
 	// Client
-	SendToSuccessor(msg *ElectionMsg)
-	GetLeaderFromSuccessor() string
+	SendToSuccessor(msg *ElectionMsg) error
+	GetLeaderFromSuccessor() (string, error)
 	// Server
 	MsgNotification() <-chan *ElectionMsg
 }
 
 // Responsible for get the matchs for running  them, located in the worker
 type IWorkerTransport interface { // Used on Work Client
-	GetMatchToRun() *Pairing
+	ITransportSrvr
+	GetMatchToRun() (*Pairing, error)
 	SendResults(match *Pairing) error
 }
 
 // Responsible for managing the workers, located in the Leader, server
 type IWorkerMngr interface {
+	ITransportSrvr
 	// Gets a worker running the match
 	DeliverMatch(match *Pairing)
 	// Returns a channel where will be all the results
@@ -28,4 +35,8 @@ type IWorkerMngr interface {
 
 type ILeaderProvider interface {
 	GetLeader() string
+}
+
+type ISuccProvider interface {
+	GetSuccessor() string
 }

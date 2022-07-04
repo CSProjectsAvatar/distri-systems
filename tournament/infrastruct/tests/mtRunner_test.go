@@ -4,7 +4,9 @@ import (
 	"log"
 	"sync"
 	"testing"
+	"time"
 
+	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	inf "github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
 	mock "github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/mocking"
 	use "github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
@@ -71,5 +73,6 @@ func Init() (*mock.MockWorkerMngr, *use.TournMngr, *inf.MTRunner) {
 	dm := &mock.CentDataManager{}
 	tMngr := use.NewRndTour(dm)
 	runner := inf.NewMTRunner(wm, dm)
+	domain.BaseWhaitTime = 1 * time.Second
 	return wm, tMngr, runner
 }
