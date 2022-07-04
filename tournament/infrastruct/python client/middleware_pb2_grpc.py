@@ -6,9 +6,7 @@ import middleware_pb2 as middleware__pb2
 
 
 class MiddlewareStub(object):
-    """proto for sending files to the server corresponding to the game
-
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
         """Constructor.
@@ -17,21 +15,24 @@ class MiddlewareStub(object):
             channel: A grpc.Channel.
         """
         self.UploadTournament = channel.unary_unary(
-                '/middleware.Middleware/UploadTournament',
+                '/pb.Middleware/UploadTournament',
                 request_serializer=middleware__pb2.TournamentReq.SerializeToString,
                 response_deserializer=middleware__pb2.TournamentResp.FromString,
                 )
         self.RunTournament = channel.unary_stream(
-                '/middleware.Middleware/RunTournament',
+                '/pb.Middleware/RunTournament',
                 request_serializer=middleware__pb2.RunReq.SerializeToString,
                 response_deserializer=middleware__pb2.RunResp.FromString,
+                )
+        self.GetStats = channel.unary_unary(
+                '/pb.Middleware/GetStats',
+                request_serializer=middleware__pb2.StatsReq.SerializeToString,
+                response_deserializer=middleware__pb2.StatsResp.FromString,
                 )
 
 
 class MiddlewareServicer(object):
-    """proto for sending files to the server corresponding to the game
-
-    """
+    """Missing associated documentation comment in .proto file."""
 
     def UploadTournament(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -40,6 +41,12 @@ class MiddlewareServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def RunTournament(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetStats(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -58,17 +65,20 @@ def add_MiddlewareServicer_to_server(servicer, server):
                     request_deserializer=middleware__pb2.RunReq.FromString,
                     response_serializer=middleware__pb2.RunResp.SerializeToString,
             ),
+            'GetStats': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetStats,
+                    request_deserializer=middleware__pb2.StatsReq.FromString,
+                    response_serializer=middleware__pb2.StatsResp.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'middleware.Middleware', rpc_method_handlers)
+            'pb.Middleware', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
 class Middleware(object):
-    """proto for sending files to the server corresponding to the game
-
-    """
+    """Missing associated documentation comment in .proto file."""
 
     @staticmethod
     def UploadTournament(request,
@@ -81,7 +91,7 @@ class Middleware(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/middleware.Middleware/UploadTournament',
+        return grpc.experimental.unary_unary(request, target, '/pb.Middleware/UploadTournament',
             middleware__pb2.TournamentReq.SerializeToString,
             middleware__pb2.TournamentResp.FromString,
             options, channel_credentials,
@@ -98,8 +108,25 @@ class Middleware(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/middleware.Middleware/RunTournament',
+        return grpc.experimental.unary_stream(request, target, '/pb.Middleware/RunTournament',
             middleware__pb2.RunReq.SerializeToString,
             middleware__pb2.RunResp.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetStats(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/pb.Middleware/GetStats',
+            middleware__pb2.StatsReq.SerializeToString,
+            middleware__pb2.StatsResp.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

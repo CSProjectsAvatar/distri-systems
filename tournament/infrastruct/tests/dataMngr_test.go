@@ -8,6 +8,7 @@ import (
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
+	"github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,9 +32,50 @@ func TestDhtTourMngr(t *testing.T) {
 	t.Run("no unfinished tournaments", SubTestNonUnfinished(mngr))
 	t.Run("matches", SubTestMatches(mngr))
 	t.Run("files", SubTestFiles(mngr))
+	t.Run("creator", SubTestTournCreator(mngr))
 
 	for _, n := range nodes {
 		require.Nil(t, n.Stop())
+	}
+}
+
+func SubTestTournCreator(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
+	return func(t *testing.T) {
+		f1 := &interfaces.TournFile{
+			Name:   "player1.py",
+			Data:   []byte(`print("habla matador")`),
+			IsGame: false,
+		}
+		f2 := &interfaces.TournFile{
+			Name:   "player2.py",
+			Data:   []byte(`print("escucha matador")`),
+			IsGame: false,
+		}
+		f3 := &interfaces.TournFile{
+			Name:   "chess.py",
+			Data:   []byte(`print("mira matador")`),
+			IsGame: true,
+		}
+		info, err := interfaces.SaveTournament("all-vs-all", domain.All_vs_All, []*interfaces.TournFile{f1, f2, f3}, mngr)
+		require.Nil(t, err)
+
+		assert.Equal(t, "chess.py", info.Name)
+
+		f1Content, err := mngr.File(info.ID, "player1.py")
+		require.Nil(t, err)
+		assert.Equal(t, `print("habla matador")`, f1Content)
+
+		f2Content, err := mngr.File(info.ID, "player2.py")
+		require.Nil(t, err)
+		assert.Equal(t, `print("escucha matador")`, f2Content)
+
+		f3Content, err := mngr.File(info.ID, "chess.py")
+		require.Nil(t, err)
+		assert.Equal(t, `print("mira matador")`, f3Content)
+
+		savedInfo, err := mngr.GetTournInfo(info.ID)
+		require.Nil(t, err)
+		assert.Equal(t, *info, *savedInfo)
 	}
 }
 
@@ -71,7 +113,7 @@ func SubTestMatches(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
 		p4 := &domain.Player{"celedonio"}
 
 		m1 := &domain.Pairing{
-			Winner:  domain.Draw,
+			Winner:  domain.Player1Wins,
 			ID:      "m1",
 			TourId:  "tour-1",
 			Player1: p1,
@@ -79,7 +121,7 @@ func SubTestMatches(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
 		}
 
 		m2 := &domain.Pairing{
-			Winner:  domain.Draw,
+			Winner:  domain.Player2Wins,
 			ID:      "m2",
 			TourId:  "tour-1",
 			Player1: p1,
@@ -93,13 +135,34 @@ func SubTestMatches(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
 			Player1: p4,
 			Player2: p2,
 		}
+
+		m4 := &domain.Pairing{
+			Winner:  domain.Player1Wins,
+			ID:      "m4",
+			TourId:  "tour-1",
+			Player1: p2,
+			Player2: p4,
+		}
 		require.Nil(t, mngr.SaveMatch(m1))
 		require.Nil(t, mngr.SaveMatch(m2))
 		require.Nil(t, mngr.SaveMatch(m3))
+		require.Nil(t, mngr.SaveMatch(m4))
 
 		ms, err := mngr.Matches("tour-1")
 		require.Nil(t, err)
-		assert.Equal(t, []*domain.Pairing{m1, m2, m3}, ms)
+		assert.Equal(t, []*domain.Pairing{m1, m2, m3, m4}, ms)
+
+		stats, err := usecases.GetStats("tour-1", mngr)
+		require.Nil(t, err)
+		expected := usecases.Stats{
+			BestPlayer: "omar",
+			Victories: map[string]uint{
+				"andy": 1,
+				"omar": 2,
+			},
+			Matches: 4,
+		}
+		assert.Equal(t, expected, *stats)
 	}
 }
 
@@ -133,7 +196,8 @@ func SubTestTournInfos(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
 		require.Nil(t, err)
 		require.Equal(t, *inf2, *inf)
 
-		val, _ := mngr.UnfinishedTourn()
+		val, err := mngr.UnfinishedTourn()
+		require.Nil(t, err)
 		assert.Equal(t, "tour-1", val)
 	}
 }
@@ -162,7 +226,8 @@ func SubTestNonUnfinished(mngr *usecases.DhtTourDataMngr) func(*testing.T) {
 		require.Nil(t, mngr.SetTournInfo(inf1))
 		require.Nil(t, mngr.SetTournInfo(inf2))
 
-		val, _ := mngr.UnfinishedTourn()
+		val, err := mngr.UnfinishedTourn()
+		require.Nil(t, err)
 		assert.Equal(t, "", val)
 	}
 }

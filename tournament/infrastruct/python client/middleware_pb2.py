@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10middleware.proto\x12\nmiddleware\"3\n\x04\x46ile\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\x12\x0f\n\x07is_game\x18\x03 \x01(\x08\"h\n\rTournamentReq\x12\x0c\n\x04name\x18\x01 \x01(\t\x12(\n\ttour_type\x18\x02 \x01(\x0e\x32\x15.middleware.TournType\x12\x1f\n\x05\x66iles\x18\x03 \x03(\x0b\x32\x10.middleware.File\"\x1d\n\x0eTournamentResp\x12\x0b\n\x03msg\x18\x01 \x01(\t\"\x16\n\x06RunReq\x12\x0c\n\x04name\x18\x01 \x01(\t\",\n\x07RunResp\x12!\n\x06matchs\x18\x01 \x03(\x0b\x32\x11.middleware.Match\"^\n\x05Match\x12\x0f\n\x07players\x18\x01 \x03(\t\x12 \n\x05state\x18\x02 \x01(\x0e\x32\x11.middleware.State\x12\"\n\x06result\x18\x03 \x01(\x0e\x32\x12.middleware.Result*3\n\x05State\x12\x0f\n\x0bNOT_STARTED\x10\x00\x12\x0b\n\x07STARTED\x10\x01\x12\x0c\n\x08\x46INISHED\x10\x02*8\n\x06Result\x12\x0b\n\x07NOT_RUN\x10\x00\x12\x0b\n\x07P1_WINS\x10\x01\x12\x0b\n\x07P2_WINS\x10\x02\x12\x07\n\x03TIE\x10\x03*-\n\tTournType\x12\x10\n\x0c\x46irst_Defeat\x10\x00\x12\x0e\n\nAll_vs_All\x10\x01\x32\x97\x01\n\nMiddleware\x12K\n\x10UploadTournament\x12\x19.middleware.TournamentReq\x1a\x1a.middleware.TournamentResp\"\x00\x12<\n\rRunTournament\x12\x12.middleware.RunReq\x1a\x13.middleware.RunResp\"\x00\x30\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10middleware.proto\x12\x02pb\" \n\x08StatsReq\x12\x14\n\x0ctournamentId\x18\x01 \x01(\t\"\x93\x01\n\tStatsResp\x12\x0f\n\x07matches\x18\x01 \x01(\r\x12/\n\tvictories\x18\x02 \x03(\x0b\x32\x1c.pb.StatsResp.VictoriesEntry\x12\x12\n\nbestPlayer\x18\x03 \x01(\t\x1a\x30\n\x0eVictoriesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\r:\x02\x38\x01\"3\n\x04\x46ile\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\x12\x0f\n\x07is_game\x18\x03 \x01(\x08\"X\n\rTournamentReq\x12\x0c\n\x04name\x18\x01 \x01(\t\x12 \n\ttour_type\x18\x02 \x01(\x0e\x32\r.pb.TournType\x12\x17\n\x05\x66iles\x18\x03 \x03(\x0b\x32\x08.pb.File\"\x1d\n\x0eTournamentResp\x12\x0b\n\x03msg\x18\x01 \x01(\t\"\x16\n\x06RunReq\x12\x0c\n\x04name\x18\x01 \x01(\t\"$\n\x07RunResp\x12\x19\n\x06matchs\x18\x01 \x03(\x0b\x32\t.pb.Match\"N\n\x05Match\x12\x0f\n\x07players\x18\x01 \x03(\t\x12\x18\n\x05state\x18\x02 \x01(\x0e\x32\t.pb.State\x12\x1a\n\x06result\x18\x03 \x01(\x0e\x32\n.pb.Result*3\n\x05State\x12\x0f\n\x0bNOT_STARTED\x10\x00\x12\x0b\n\x07STARTED\x10\x01\x12\x0c\n\x08\x46INISHED\x10\x02*8\n\x06Result\x12\x0b\n\x07NOT_RUN\x10\x00\x12\x0b\n\x07P1_WINS\x10\x01\x12\x0b\n\x07P2_WINS\x10\x02\x12\x07\n\x03TIE\x10\x03*-\n\tTournType\x12\x10\n\x0c\x46irst_Defeat\x10\x00\x12\x0e\n\nAll_vs_All\x10\x01\x32\xa2\x01\n\nMiddleware\x12;\n\x10UploadTournament\x12\x11.pb.TournamentReq\x1a\x12.pb.TournamentResp\"\x00\x12,\n\rRunTournament\x12\n.pb.RunReq\x1a\x0b.pb.RunResp\"\x00\x30\x01\x12)\n\x08GetStats\x12\x0c.pb.StatsReq\x1a\r.pb.StatsResp\"\x00\x42\x0bZ\t../pb_midb\x06proto3')
 
 _STATE = DESCRIPTOR.enum_types_by_name['State']
 State = enum_type_wrapper.EnumTypeWrapper(_STATE)
@@ -34,51 +34,76 @@ First_Defeat = 0
 All_vs_All = 1
 
 
+_STATSREQ = DESCRIPTOR.message_types_by_name['StatsReq']
+_STATSRESP = DESCRIPTOR.message_types_by_name['StatsResp']
+_STATSRESP_VICTORIESENTRY = _STATSRESP.nested_types_by_name['VictoriesEntry']
 _FILE = DESCRIPTOR.message_types_by_name['File']
 _TOURNAMENTREQ = DESCRIPTOR.message_types_by_name['TournamentReq']
 _TOURNAMENTRESP = DESCRIPTOR.message_types_by_name['TournamentResp']
 _RUNREQ = DESCRIPTOR.message_types_by_name['RunReq']
 _RUNRESP = DESCRIPTOR.message_types_by_name['RunResp']
 _MATCH = DESCRIPTOR.message_types_by_name['Match']
+StatsReq = _reflection.GeneratedProtocolMessageType('StatsReq', (_message.Message,), {
+  'DESCRIPTOR' : _STATSREQ,
+  '__module__' : 'middleware_pb2'
+  # @@protoc_insertion_point(class_scope:pb.StatsReq)
+  })
+_sym_db.RegisterMessage(StatsReq)
+
+StatsResp = _reflection.GeneratedProtocolMessageType('StatsResp', (_message.Message,), {
+
+  'VictoriesEntry' : _reflection.GeneratedProtocolMessageType('VictoriesEntry', (_message.Message,), {
+    'DESCRIPTOR' : _STATSRESP_VICTORIESENTRY,
+    '__module__' : 'middleware_pb2'
+    # @@protoc_insertion_point(class_scope:pb.StatsResp.VictoriesEntry)
+    })
+  ,
+  'DESCRIPTOR' : _STATSRESP,
+  '__module__' : 'middleware_pb2'
+  # @@protoc_insertion_point(class_scope:pb.StatsResp)
+  })
+_sym_db.RegisterMessage(StatsResp)
+_sym_db.RegisterMessage(StatsResp.VictoriesEntry)
+
 File = _reflection.GeneratedProtocolMessageType('File', (_message.Message,), {
   'DESCRIPTOR' : _FILE,
   '__module__' : 'middleware_pb2'
-  # @@protoc_insertion_point(class_scope:middleware.File)
+  # @@protoc_insertion_point(class_scope:pb.File)
   })
 _sym_db.RegisterMessage(File)
 
 TournamentReq = _reflection.GeneratedProtocolMessageType('TournamentReq', (_message.Message,), {
   'DESCRIPTOR' : _TOURNAMENTREQ,
   '__module__' : 'middleware_pb2'
-  # @@protoc_insertion_point(class_scope:middleware.TournamentReq)
+  # @@protoc_insertion_point(class_scope:pb.TournamentReq)
   })
 _sym_db.RegisterMessage(TournamentReq)
 
 TournamentResp = _reflection.GeneratedProtocolMessageType('TournamentResp', (_message.Message,), {
   'DESCRIPTOR' : _TOURNAMENTRESP,
   '__module__' : 'middleware_pb2'
-  # @@protoc_insertion_point(class_scope:middleware.TournamentResp)
+  # @@protoc_insertion_point(class_scope:pb.TournamentResp)
   })
 _sym_db.RegisterMessage(TournamentResp)
 
 RunReq = _reflection.GeneratedProtocolMessageType('RunReq', (_message.Message,), {
   'DESCRIPTOR' : _RUNREQ,
   '__module__' : 'middleware_pb2'
-  # @@protoc_insertion_point(class_scope:middleware.RunReq)
+  # @@protoc_insertion_point(class_scope:pb.RunReq)
   })
 _sym_db.RegisterMessage(RunReq)
 
 RunResp = _reflection.GeneratedProtocolMessageType('RunResp', (_message.Message,), {
   'DESCRIPTOR' : _RUNRESP,
   '__module__' : 'middleware_pb2'
-  # @@protoc_insertion_point(class_scope:middleware.RunResp)
+  # @@protoc_insertion_point(class_scope:pb.RunResp)
   })
 _sym_db.RegisterMessage(RunResp)
 
 Match = _reflection.GeneratedProtocolMessageType('Match', (_message.Message,), {
   'DESCRIPTOR' : _MATCH,
   '__module__' : 'middleware_pb2'
-  # @@protoc_insertion_point(class_scope:middleware.Match)
+  # @@protoc_insertion_point(class_scope:pb.Match)
   })
 _sym_db.RegisterMessage(Match)
 
@@ -86,24 +111,33 @@ _MIDDLEWARE = DESCRIPTOR.services_by_name['Middleware']
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _STATE._serialized_start=388
-  _STATE._serialized_end=439
-  _RESULT._serialized_start=441
-  _RESULT._serialized_end=497
-  _TOURNTYPE._serialized_start=499
-  _TOURNTYPE._serialized_end=544
-  _FILE._serialized_start=32
-  _FILE._serialized_end=83
-  _TOURNAMENTREQ._serialized_start=85
-  _TOURNAMENTREQ._serialized_end=189
-  _TOURNAMENTRESP._serialized_start=191
-  _TOURNAMENTRESP._serialized_end=220
-  _RUNREQ._serialized_start=222
-  _RUNREQ._serialized_end=244
-  _RUNRESP._serialized_start=246
-  _RUNRESP._serialized_end=290
-  _MATCH._serialized_start=292
-  _MATCH._serialized_end=386
-  _MIDDLEWARE._serialized_start=547
-  _MIDDLEWARE._serialized_end=698
+  DESCRIPTOR._serialized_options = b'Z\t../pb_mid'
+  _STATSRESP_VICTORIESENTRY._options = None
+  _STATSRESP_VICTORIESENTRY._serialized_options = b'8\001'
+  _STATE._serialized_start=524
+  _STATE._serialized_end=575
+  _RESULT._serialized_start=577
+  _RESULT._serialized_end=633
+  _TOURNTYPE._serialized_start=635
+  _TOURNTYPE._serialized_end=680
+  _STATSREQ._serialized_start=24
+  _STATSREQ._serialized_end=56
+  _STATSRESP._serialized_start=59
+  _STATSRESP._serialized_end=206
+  _STATSRESP_VICTORIESENTRY._serialized_start=158
+  _STATSRESP_VICTORIESENTRY._serialized_end=206
+  _FILE._serialized_start=208
+  _FILE._serialized_end=259
+  _TOURNAMENTREQ._serialized_start=261
+  _TOURNAMENTREQ._serialized_end=349
+  _TOURNAMENTRESP._serialized_start=351
+  _TOURNAMENTRESP._serialized_end=380
+  _RUNREQ._serialized_start=382
+  _RUNREQ._serialized_end=404
+  _RUNRESP._serialized_start=406
+  _RUNRESP._serialized_end=442
+  _MATCH._serialized_start=444
+  _MATCH._serialized_end=522
+  _MIDDLEWARE._serialized_start=683
+  _MIDDLEWARE._serialized_end=845
 # @@protoc_insertion_point(module_scope)

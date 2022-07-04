@@ -2,12 +2,24 @@ syntax = "proto3";
 
 package pb;
 
-option go_package = "../go server/pb";
+option go_package = "../pb_mid";
 // proto for sending files to the server corresponding to the game
 
 service Middleware {
     rpc UploadTournament(TournamentReq) returns (TournamentResp) {}
     rpc RunTournament(RunReq) returns (stream RunResp) {}
+    rpc GetStats(StatsReq) returns (StatsResp) {}
+}
+
+// GetStats
+message StatsReq {
+    string tournamentId = 1;
+}
+
+message StatsResp {
+    uint32 matches = 1;
+    map<string, uint32> victories = 2;
+    string bestPlayer = 3;
 }
 
 // UploadTournament
