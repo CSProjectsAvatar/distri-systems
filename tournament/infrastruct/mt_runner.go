@@ -1,11 +1,12 @@
 package infrastruct
 
 import (
-	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	"log"
 	"math"
 	"sync"
 	"time"
+
+	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
@@ -45,10 +46,8 @@ func (runner *MTRunner) Run(tm interfaces.Runnable) {
 		} else { // Send the match to the worker pool
 			runner.matchPool <- match
 		}
-
-		time.Sleep(time.Second * 2)
 	}
-	log.Println("Finished")
+	log.Println("Finished Tour")
 }
 
 func (r *MTRunner) deliverMatchs() { // WatchDog

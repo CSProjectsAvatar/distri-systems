@@ -24,6 +24,9 @@ func (dm *CentDataManager) File(tourId string, fileName string) (string, error) 
 	return "", nil
 }
 
+func (dm *CentDataManager) FileGroup(tourId string, files []string) (map[string]string, error) {
+	return nil, nil
+}
 func (dm *CentDataManager) SaveMatch(match *domain.Pairing) error {
 	return nil
 }

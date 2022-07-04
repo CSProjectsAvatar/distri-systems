@@ -34,6 +34,21 @@ func (tnode *TourNode) SetChildrens(children []*TourNode) {
 	}
 }
 
+func (tnode *TourNode) SetProvider(prov iMatchProvider) {
+	tnode.provider = prov
+	for _, child := range tnode.Children {
+		child.SetProvider(prov)
+	}
+}
+
+// Pass the joinF to the Subtree
+func (tnode *TourNode) SetJoinFunc(f JoinFunc) {
+	tnode.joinF = f
+	for _, child := range tnode.Children {
+		child.SetJoinFunc(f)
+	}
+}
+
 func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player, prov iMatchProvider) []*MatchToRun {
 	winnerSlice := make([]*Player, 0)
 	for len(winnerSlice) < cap(childWinners) {

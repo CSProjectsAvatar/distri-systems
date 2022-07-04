@@ -3,15 +3,14 @@ package tests
 import (
 	"testing"
 
-	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/mocking"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTwoMatchWithSamePairing(t *testing.T) {
 	assert := assert.New(t)
-	dm := &mocking.CentDataManager{}
-	tm := usecases.NewRndTour(dm)
+	// dm := &mocking.CentDataManager{}
+	tm := usecases.NewMockTourMngr()
 
 	p1 := tm.TInfo.Players[0]
 	p2 := tm.TInfo.Players[1]

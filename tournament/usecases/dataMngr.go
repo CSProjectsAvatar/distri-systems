@@ -29,7 +29,9 @@ type DataMngr interface {
 	SetTournInfo(info *domain.TournInfo) error
 
 	// UnfinishedTourn Loads a tournament not finished. Returns its ID.
+	// If there is no unfinished tournament, returns ErrNoUnfinishedTourn.
 	UnfinishedTourn() (string, error)
 }
 
 var ErrInfoNotFound = errors.New("info not found")
+var ErrNotAnyUnfTournmnt = errors.New("no unfinished tournament")

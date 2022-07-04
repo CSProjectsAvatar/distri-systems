@@ -36,19 +36,20 @@ func TestDrownedAndRetryFunction(t *testing.T) {
 	for id, drowned := range workerMngr.DrownedMatchs {
 		assert.Equal(workerMngr.RunedMatchs[id], drowned+1, "Expected %d times, got %d", drowned+1, workerMngr.RunedMatchs[id])
 	}
-	assert.NotNil(tourMngr.Winner, "Expected a winner, got nil")
+	assert.NotNil(tourMngr.TInfo.Winner, "Expected a winner, got nil")
 }
 
 func TestThreeTournamentsAtTheSameTime(t *testing.T) {
 	log.Println("> TestThreeTournamentsAtTheSameTime <")
 	wm, tourMngr, runner := Init()
 	wm.DrownedProb = 0.1
-	tourMngr2 := use.NewRndTour(&mock.CentDataManager{})
-	tourMngr3 := use.NewRndTour(&mock.CentDataManager{})
+	tourMngr2 := use.NewMockTourMngr()
+	tourMngr3 := use.NewMockTourMngr()
 
 	//wait groug
 	wg := &sync.WaitGroup{}
 	wg.Add(3)
+	//wg.Add(2)
 	go func() {
 		runner.Run(tourMngr)
 		wg.Done()
@@ -63,7 +64,8 @@ func TestThreeTournamentsAtTheSameTime(t *testing.T) {
 	}()
 
 	wg.Wait()
-	if tourMngr.Winner == nil || tourMngr2.Winner == nil || tourMngr3.Winner == nil {
+	if tourMngr.TInfo.Winner == nil || tourMngr2.TInfo.Winner == nil || tourMngr3.TInfo.Winner == nil {
+		//if tourMngr.TInfo.Winner == nil || tourMngr2.TInfo.Winner == nil {
 		t.Errorf("Expected a winner, got nil")
 	}
 }
@@ -71,7 +73,7 @@ func TestThreeTournamentsAtTheSameTime(t *testing.T) {
 func Init() (*mock.MockWorkerMngr, *use.TournMngr, *inf.MTRunner) {
 	wm := mock.NewMockWorkerMngr()
 	dm := &mock.CentDataManager{}
-	tMngr := use.NewRndTour(dm)
+	tMngr := use.NewMockTourMngr()
 	runner := inf.NewMTRunner(wm, dm)
 	domain.BaseWhaitTime = 1 * time.Second
 	return wm, tMngr, runner

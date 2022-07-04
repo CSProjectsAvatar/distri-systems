@@ -64,19 +64,22 @@ func (m *MainRoutine) WorkDay() {
 
 // Beguins the control of the flow as a leader
 func (m *MainRoutine) MngrDay() {
-	// Initialize a Runner
 
 	// Ask for an Unfinished tournament and Create a TournMngr from it
-	tournMngr := NewRndTour(m.DM)
-	if tournMngr == nil {
-		log.Error("Error Creating a TournMngr")
-	} else {
-
-	}
+	// tournMngr := NewRndTour(m.DM)
+	// if tournMngr == nil {
+	// 	log.Error("Error Creating a TournMngr")
+	// } else {
+	// 	m.TRunner.Run(tournMngr)
+	// }
 	// Run the tournaments
 }
 
-// func NewMainRoutine(addr string) *MainRoutine {
+//func NewMainRoutine(addr string) *MainRoutine {
+//dataMngr_test.1
+//remote node, ip y port
+//
+//}
 
 // cfg := tr.DefaultCfgAddr(addr)
 
