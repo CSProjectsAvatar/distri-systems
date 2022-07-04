@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package pb;
 
-option go_package = "../go server/pb";
+option go_package = "../pb_mid";
 // proto for sending files to the server corresponding to the game
 
 service Middleware {
