@@ -8,6 +8,18 @@ option go_package = "../go server/pb";
 service Middleware {
     rpc UploadTournament(TournamentReq) returns (TournamentResp) {}
     rpc RunTournament(RunReq) returns (stream RunResp) {}
+    rpc GetStats(StatsReq) returns (StatsResp) {}
+}
+
+// GetStats
+message StatsReq {
+    string tournamentId = 1;
+}
+
+message StatsResp {
+    uint32 matches = 1;
+    map<string, uint32> victories = 2;
+    string bestPlayer = 3;
 }
 
 // UploadTournament

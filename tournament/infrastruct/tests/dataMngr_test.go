@@ -112,7 +112,7 @@ func SubTestMatches(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
 		p4 := &domain.Player{"celedonio"}
 
 		m1 := &domain.Pairing{
-			Winner:  domain.Draw,
+			Winner:  domain.Player1Wins,
 			ID:      "m1",
 			TourId:  "tour-1",
 			Player1: p1,
@@ -120,7 +120,7 @@ func SubTestMatches(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
 		}
 
 		m2 := &domain.Pairing{
-			Winner:  domain.Draw,
+			Winner:  domain.Player2Wins,
 			ID:      "m2",
 			TourId:  "tour-1",
 			Player1: p1,
@@ -134,13 +134,34 @@ func SubTestMatches(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
 			Player1: p4,
 			Player2: p2,
 		}
+
+		m4 := &domain.Pairing{
+			Winner:  domain.Player1Wins,
+			ID:      "m4",
+			TourId:  "tour-1",
+			Player1: p2,
+			Player2: p4,
+		}
 		require.Nil(t, mngr.SaveMatch(m1))
 		require.Nil(t, mngr.SaveMatch(m2))
 		require.Nil(t, mngr.SaveMatch(m3))
+		require.Nil(t, mngr.SaveMatch(m4))
 
 		ms, err := mngr.Matches("tour-1")
 		require.Nil(t, err)
-		assert.Equal(t, []*domain.Pairing{m1, m2, m3}, ms)
+		assert.Equal(t, []*domain.Pairing{m1, m2, m3, m4}, ms)
+
+		stats, err := usecases.GetStats("tour-1", mngr)
+		require.Nil(t, err)
+		expected := usecases.Stats{
+			BestPlayer: "omar",
+			Victories: map[string]uint{
+				"andy": 1,
+				"omar": 2,
+			},
+			Matches: 4,
+		}
+		assert.Equal(t, expected, *stats)
 	}
 }
 
