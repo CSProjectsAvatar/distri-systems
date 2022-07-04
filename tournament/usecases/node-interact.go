@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
-	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
 	"github.com/CSProjectsAvatar/distri-systems/utils"
 	"hash"
 	"time"
@@ -102,23 +101,15 @@ func ensureFtable(node *chord.Node, m uint) {
 }
 
 type Dht[T any] struct {
-	chord *chord.Node
-	hash  func() hash.Hash
-	m     uint
+	remote *chord.RemoteNode
+	hash   func() hash.Hash
+	m      uint
 
 	// How many extra (key, value) pairs will be inserted.
 	replicas uint
-}
 
-var port uint = 8001
-
-func NewTestDht[T any](replicas uint) *Dht[T] {
-	return NewDhtBuilder[T]().
-		Ring(infrastruct.NewRingApi()).
-		Data(infrastruct.NewNamedDataInteract(fmt.Sprintf("bunt-8001-%v", time.Now()))).
-		Log(infrastruct.NewLogger().ToFile()).
-		Replicas(replicas).
-		Build()
+	ring chord.RingApi
+	log  domain.Logger
 }
 
 // NewDht creates a DHT. A port is automatically designated for serving
@@ -128,9 +119,7 @@ func NewTestDht[T any](replicas uint) *Dht[T] {
 func NewDht[T any](ring chord.RingApi, data chord.DataInteract, log domain.Logger) *Dht[T] {
 	return NewDhtBuilder[T]().
 		Ring(ring).
-		Data(data).
 		Log(log).
-		DateInNodeId().
 		Build()
 }
 
@@ -144,9 +133,9 @@ func (dht *Dht[T]) Get(key string) (T, error) {
 		bkey := utils.Sha1Sized(k, dht.hash, dht.m)
 		hexKey := hex.EncodeToString(bkey)
 
-		owner, err := dht.chord.FindSuccessor(bkey)
+		owner, err := dht.ring.FindSuccessor(dht.remote, bkey)
 		if err != nil {
-			dht.chord.Log.Error(
+			dht.log.Error(
 				"error when finding key owner",
 				domain.LogArgs{
 					"error":   err,
@@ -156,16 +145,16 @@ func (dht *Dht[T]) Get(key string) (T, error) {
 			lastErr = err
 			continue
 		}
-		dht.chord.Log.Info(
+		dht.log.Info(
 			"Getting value...",
 			domain.LogArgs{
 				"str-key": k,
 				"hex-key": hexKey,
 				"owner":   owner.Addr(),
 			})
-		val, err := owner.GetValue(bkey, dht.chord.Ring)
+		val, err := owner.GetValue(bkey, dht.ring)
 		if err != nil {
-			dht.chord.Log.Error(
+			dht.log.Error(
 				"error when getting key value",
 				domain.LogArgs{
 					"error":   err,
@@ -199,7 +188,7 @@ func (dht *Dht[T]) Set(key string, value T) error {
 	for k := range dht.withReplicas(key) {
 		bkey := utils.Sha1Sized(k, dht.hash, dht.m)
 
-		owner, err := dht.chord.FindSuccessor(bkey)
+		owner, err := dht.ring.FindSuccessor(dht.remote, bkey)
 		if err != nil {
 			return err
 		}
@@ -209,7 +198,7 @@ func (dht *Dht[T]) Set(key string, value T) error {
 			return err
 		}
 
-		dht.chord.Log.Info(
+		dht.log.Info(
 			"Setting value...",
 			domain.LogArgs{
 				"str-key": k,
@@ -217,15 +206,11 @@ func (dht *Dht[T]) Set(key string, value T) error {
 				"value":   string(bvalue),
 				"owner":   owner.Addr(),
 			})
-		if err := owner.SetValue(bkey, string(bvalue), dht.chord.Ring); err != nil {
+		if err := owner.SetValue(bkey, string(bvalue), dht.ring); err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func (dht *Dht[T]) Stop() error {
-	return dht.chord.Stop()
 }
 
 // RingList returns the ring in a clockwise list of node addresses.
@@ -242,11 +227,15 @@ func (dht *Dht[T]) RingList() ([]string, error) {
 }
 
 func (dht *Dht[T]) allNodes() ([]*chord.RemoteNode, error) {
-	ans := []*chord.RemoteNode{dht.chord.RemoteNode}
-	for node := dht.chord.GetSuccessor(); bytes.Compare(node.Id, dht.chord.Id) != 0; {
+	ans := []*chord.RemoteNode{dht.remote}
+	node, err := dht.ring.GetSuccessor(dht.remote)
+	if err != nil {
+		return nil, err
+	}
+	for bytes.Compare(node.Id, dht.remote.Id) != 0 {
 		ans = append(ans, node)
 
-		succ, err := dht.chord.Ring.GetSuccessor(node)
+		succ, err := dht.ring.GetSuccessor(node)
 		if err != nil {
 			return nil, err
 		}
@@ -260,15 +249,22 @@ func (dht *Dht[T]) allNodes() ([]*chord.RemoteNode, error) {
 
 type DhtBuilder[T any] struct {
 	ring     chord.RingApi
-	data     chord.DataInteract
 	log      domain.Logger
-	date     bool
 	replicas uint
+	remote   *chord.RemoteNode
+	hashGen  func() hash.Hash
+	m        uint
 }
 
 // NewDhtBuilder returns a Dht struct builder when value type is T.
+// Defaults:
+// m = 56,
+// hashGen = sha1.New
 func NewDhtBuilder[T any]() *DhtBuilder[T] {
-	return &DhtBuilder[T]{}
+	return &DhtBuilder[T]{
+		m:       56,
+		hashGen: sha1.New,
+	}
 }
 
 func (builder *DhtBuilder[T]) Ring(ring chord.RingApi) *DhtBuilder[T] {
@@ -276,18 +272,8 @@ func (builder *DhtBuilder[T]) Ring(ring chord.RingApi) *DhtBuilder[T] {
 	return builder
 }
 
-func (builder *DhtBuilder[T]) Data(data chord.DataInteract) *DhtBuilder[T] {
-	builder.data = data
-	return builder
-}
-
 func (builder *DhtBuilder[T]) Log(log domain.Logger) *DhtBuilder[T] {
 	builder.log = log
-	return builder
-}
-
-func (builder *DhtBuilder[T]) DateInNodeId() *DhtBuilder[T] {
-	builder.date = true
 	return builder
 }
 
@@ -298,33 +284,29 @@ func (builder *DhtBuilder[T]) Replicas(replicas uint) *DhtBuilder[T] {
 	return builder
 }
 
+// M returns a builder with the m field set. This is the size of the hash in bits.
+func (builder *DhtBuilder[T]) M(m uint) *DhtBuilder[T] {
+	builder.m = m
+	return builder
+}
+
+func (builder *DhtBuilder[T]) HashGen(hashGen func() hash.Hash) *DhtBuilder[T] {
+	builder.hashGen = hashGen
+	return builder
+}
+
+func (builder *DhtBuilder[T]) Remote(remote *chord.RemoteNode) *DhtBuilder[T] {
+	builder.remote = remote
+	return builder
+}
+
 func (builder *DhtBuilder[T]) Build() *Dht[T] {
-	var entry *chord.RemoteNode = nil // result of discovering policy
-	hashGen := sha1.New
-	m := uint(56)
-
-	node, err := NewNode(
-		&chord.Config{
-			Ip:          "127.0.0.1",
-			Port:        port,
-			Hash:        hashGen,
-			Ring:        builder.ring,
-			Data:        builder.data,
-			M:           m,
-			IncludeDate: builder.date,
-		},
-		entry,
-		builder.log)
-
-	if err != nil {
-		panic(err)
-	}
-	port++
-
 	return &Dht[T]{
-		chord:    node,
-		hash:     hashGen,
-		m:        m,
+		remote:   builder.remote,
+		hash:     builder.hashGen,
+		m:        builder.m,
+		ring:     builder.ring,
+		log:      builder.log,
 		replicas: builder.replicas,
 	}
 }

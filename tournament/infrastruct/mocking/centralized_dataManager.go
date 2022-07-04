@@ -11,12 +11,17 @@ import (
 type CentDataManager struct {
 }
 
+func (dm *CentDataManager) SetTournInfo(info *domain.TournInfo) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (dm *CentDataManager) SaveFiles(tour_name string, files *map[string]string) error {
 	return nil
 }
 
-func (dm *CentDataManager) File(tour_name string, file_name string) string {
-	return ""
+func (dm *CentDataManager) File(tourId string, fileName string) (string, error) {
+	return "", nil
 }
 
 func (dm *CentDataManager) SaveMatch(match *domain.Pairing) error {
@@ -27,8 +32,8 @@ func (dm *CentDataManager) SaveMatch(match *domain.Pairing) error {
 // 	return nil
 // }
 
-func (dm *CentDataManager) Matches(tour_name string) []*domain.Pairing {
-	return nil
+func (dm *CentDataManager) Matches(tourId string) ([]*domain.Pairing, error) {
+	return nil, nil
 }
 
 func (dm *CentDataManager) SaveTournTree(tour_name string, tree *domain.TourNode) error {
@@ -40,25 +45,25 @@ func (dm *CentDataManager) SaveTournTree(tour_name string, tree *domain.TourNode
 //	return GetMockTree()
 //}
 
-func (dm *CentDataManager) UnfinishedTourn() string {
+func (dm *CentDataManager) UnfinishedTourn() (string, error) {
 	random := rand.Int()
-	return "tour_" + strconv.Itoa(random)
+	return "tour_" + strconv.Itoa(random), nil
 }
 
-func (dm *CentDataManager) GetTournInfo(tour_name string) *domain.TournInfo {
+func (dm *CentDataManager) GetTournInfo(tourId string) (*domain.TournInfo, error) {
 	// @todo Mock
 	player1 := domain.Player{Id: "Player1"}
 	player2 := domain.Player{Id: "Player2"}
 	//player3 := domain.Player{Id: "Player3"}
 
 	return &domain.TournInfo{
-		Name: "tour_" + tour_name,
+		Name: "tour_" + tourId,
 		Players: []*domain.Player{
 			&player1,
 			&player2,
 			//&player3,
 		},
 		Type_: domain.All_vs_All,
-		ID:    utils.Hash(tour_name + string(domain.All_vs_All)),
-	}
+		ID:    utils.Hash(tourId + string(domain.All_vs_All)),
+	}, nil
 }

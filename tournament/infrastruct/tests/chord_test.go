@@ -24,7 +24,7 @@ func localConfig(port uint) *chord.Config {
 		Ip:   "127.0.0.1",
 		Port: port,
 		Hash: sha1.New,
-		Ring: infrastruct.NewRingApi(),
+		Ring: infrastruct.NewRingApi(&chord.RemoteNode{Ip: "127.0.0.1", Port: port}),
 		Data: infrastruct.NewNamedDataInteract(
 			fmt.Sprintf("bunt-%d-%v", port, time.Now())),
 		M:           IdLength,
@@ -238,30 +238,32 @@ func TestValueSetAndGet(t *testing.T) {
 	log := infrastruct.NewLogger().ToFile()
 	logTest := infrastruct.NewLogger()
 
-	dht := usecases.NewDht[string](
-		infrastruct.NewRingApi(),
-		infrastruct.NewNamedDataInteract(fmt.Sprintf("bunt-8000-%v", time.Now())),
-		log)
+	entry, err := usecases.NewNode(
+		localConfig(8001),
+		nil,
+		log,
+	)
+	require.Nil(t, err)
 
-	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
+	dht := infrastruct.NewTestDht[string](0, entry.RemoteNode)
 
 	ring1, err := usecases.NewNode(
 		manualId("1", localConfig(8002)),
-		entry,
+		entry.RemoteNode,
 		log,
 	)
 	require.Nil(t, err)
 
 	ring2, err := usecases.NewNode(
 		manualId("11", localConfig(8003)),
-		entry,
+		entry.RemoteNode,
 		log,
 	)
 	require.Nil(t, err)
 
 	ring3, err := usecases.NewNode(
 		manualId("21", localConfig(8004)),
-		entry,
+		entry.RemoteNode,
 		log,
 	)
 	require.Nil(t, err)
@@ -278,7 +280,7 @@ func TestValueSetAndGet(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, "world", val)
 
-	require.Nil(t, dht.Stop())
+	require.Nil(t, entry.Stop())
 	require.Nil(t, ring1.Stop())
 	require.Nil(t, ring2.Stop())
 	require.Nil(t, ring3.Stop())
@@ -294,18 +296,21 @@ func TestRingDhtOfTestStruct(t *testing.T) {
 	os.Remove("logrus.log") // so log file doesn't increase its size
 	log := infrastruct.NewLogger().ToFile()
 
-	dht := usecases.NewDht[test](
-		infrastruct.NewRingApi(),
-		infrastruct.NewNamedDataInteract(fmt.Sprintf("bunt-8001-%v", time.Now())),
-		log)
-	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
+	entry, err := usecases.NewNode(
+		localConfig(8001),
+		nil,
+		log,
+	)
+	require.Nil(t, err)
+
+	dht := infrastruct.NewTestDht[test](0, entry.RemoteNode)
 
 	var others []*chord.Node
 	othersNum := 4
 	for i := 0; i < othersNum; i++ {
 		o, err := usecases.NewNode(
 			localConfig(uint(8002+i)),
-			entry,
+			entry.RemoteNode,
 			log,
 		)
 		require.Nil(t, err)
@@ -323,7 +328,7 @@ func TestRingDhtOfTestStruct(t *testing.T) {
 	t.Run("set and get", SubTestStructSetAndGet(dht))
 	t.Run("many savings", SubTestManySavings(dht))
 
-	require.Nil(t, dht.Stop())
+	require.Nil(t, entry.Stop())
 	for _, o := range others {
 		require.Nil(t, o.Stop())
 	}
@@ -381,7 +386,14 @@ func TestMigrationOnJoin(t *testing.T) {
 	log := infrastruct.NewLogger().ToFile()
 	logTest := infrastruct.NewLogger()
 
-	dht := usecases.NewTestDht[string](0)
+	node1, err := usecases.NewNode(
+		localConfig(8001),
+		nil,
+		log,
+	)
+	require.Nil(t, err)
+
+	dht := infrastruct.NewTestDht[string](0, node1.RemoteNode)
 
 	data := map[string]string{
 		"habla-matador": "tun tu tun",
@@ -393,11 +405,9 @@ func TestMigrationOnJoin(t *testing.T) {
 		require.Nil(t, dht.Set(k, v))
 	}
 
-	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
-
 	node2, err := usecases.NewNode(
 		manualId("Z", localConfig(8002)),
-		entry,
+		node1.RemoteNode,
 		log,
 	)
 	require.Nil(t, err)
@@ -415,26 +425,26 @@ func TestMigrationOnJoin(t *testing.T) {
 	_, err = dht.Get("nombre")
 	require.Nil(t, err)
 
-	require.Nil(t, dht.Stop())
+	require.Nil(t, node1.Stop())
 	require.Nil(t, node2.Stop())
 }
 
-func SubTestReplicasDown(dht *usecases.Dht[test], others []*chord.Node) func(*testing.T) {
+// Last element of nodes is the entry point.
+func SubTestReplicasDown(dht *usecases.Dht[test], nodes []*chord.Node) func(*testing.T) {
 	return func(t *testing.T) {
 		k, v := "replica", test{F1: "valorcito, mami, valorcito"}
 		require.Nil(t, dht.Set(k, v))
 
-		require.Nil(t, others[0].Stop())
+		require.Nil(t, nodes[0].Stop())
 		time.Sleep(time.Second * 3)
-		require.Nil(t, others[1].Stop())
+		require.Nil(t, nodes[1].Stop())
 
 		vget, err := dht.Get(k)
 		require.Nil(t, err)
 		require.Equal(t, v, vget)
 
-		require.Nil(t, dht.Stop())
-		for i := 2; i < len(others); i++ {
-			require.Nil(t, others[i].Stop())
+		for i := 2; i < len(nodes); i++ {
+			require.Nil(t, nodes[i].Stop())
 		}
 	}
 }
@@ -443,32 +453,40 @@ func TestRingWithReplica(t *testing.T) {
 	os.Remove("logrus.log") // so log file doesn't increase its size
 	removeDbs()
 
-	dht := usecases.NewTestDht[test](6)
-	entry := &chord.RemoteNode{Ip: "127.0.0.1", Port: 8001}
-
-	var others []*chord.Node
-	othersNum := 7
 	log := infrastruct.NewLogger().ToFile()
-	for i := 0; i < othersNum; i++ {
+
+	entry, err := usecases.NewNode(
+		localConfig(8001),
+		nil,
+		log,
+	)
+	require.Nil(t, err)
+
+	dht := infrastruct.NewTestDht[test](6, entry.RemoteNode)
+
+	var nodesList []*chord.Node
+	nodes := 7
+	for i := 0; i < nodes; i++ {
 		o, err := usecases.NewNode(
 			//manualId(fmt.Sprintf("node%d", i), localConfig(uint(8002+i))),
 			localConfig(uint(8002+i)),
-			entry,
+			entry.RemoteNode,
 			log,
 		)
 		require.Nil(t, err)
-		others = append(others, o)
+		nodesList = append(nodesList, o)
 	}
+	nodesList = append(nodesList, entry)
 
 	log.Info("waiting for ring to stabilize...", nil)
-	time.Sleep(time.Second * time.Duration((othersNum+1)*5))
+	time.Sleep(time.Second * time.Duration(nodes*5))
 	log.Info("waiting done", nil)
 
 	l, err := dht.RingList()
 	require.Nil(t, err)
 	log.Info("ring", domain.LogArgs{"sequence": l})
 
-	t.Run("replicas", SubTestReplicasDown(dht, others))
+	t.Run("replicas", SubTestReplicasDown(dht, nodesList))
 }
 
 func removeDbs() {
