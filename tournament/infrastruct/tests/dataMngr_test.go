@@ -1,15 +1,16 @@
 package tests
 
 import (
+	"os"
+	"testing"
+	"time"
+
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
-	"testing"
-	"time"
 )
 
 func TestDhtTourMngr(t *testing.T) {
@@ -132,7 +133,8 @@ func SubTestTournInfos(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
 		require.Nil(t, err)
 		require.Equal(t, *inf2, *inf)
 
-		assert.Equal(t, "tour-1", mngr.UnfinishedTourn())
+		val, _ := mngr.UnfinishedTourn()
+		assert.Equal(t, "tour-1", val)
 	}
 }
 
@@ -160,7 +162,8 @@ func SubTestNonUnfinished(mngr *usecases.DhtTourDataMngr) func(*testing.T) {
 		require.Nil(t, mngr.SetTournInfo(inf1))
 		require.Nil(t, mngr.SetTournInfo(inf2))
 
-		assert.Equal(t, "", mngr.UnfinishedTourn())
+		val, _ := mngr.UnfinishedTourn()
+		assert.Equal(t, "", val)
 	}
 }
 

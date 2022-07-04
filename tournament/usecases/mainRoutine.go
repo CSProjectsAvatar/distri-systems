@@ -19,7 +19,10 @@ type MainRoutine struct {
 	Elect   inter.IElectionPolicy
 	WClient inter.IWorkerTransport
 	WMngr   inter.IWorkerMngr
-	DM      inter.DataMngr
+	DM      DataMngr
+	Runner  inter.Runner
+
+	node
 }
 
 func (m *MainRoutine) WorkDay() {
@@ -58,17 +61,18 @@ func (m *MainRoutine) WorkDay() {
 }
 
 // Beguins the control of the flow as a leader
-// func (m *MainRoutine) MngrDay() {
-// 	// Ask for an Unfinished tournament and Create a TournMngr from it
-// 	tourID, err := m.DM.UnfinishedTourn()
-// 	if err != nil {
-// 		log.Error(err)
-// 	}
-// 	tInfo := m.DM.GetTournInfo(tourID)
-// 	tMngr := domain.NewTournMngr(tInfo)
-// 	// Initialize a Runner
-// 	// Run the tournaments
-// }
+func (m *MainRoutine) MngrDay() {
+	// Initialize a Runner
+
+	// Ask for an Unfinished tournament and Create a TournMngr from it
+	tournMngr := NewRndTour(m.DM)
+	if tournMngr == nil {
+		log.Error("Error Creating a TournMngr")
+	} else {
+
+	}
+	// Run the tournaments
+}
 
 // func NewMainRoutine(addr string) *MainRoutine {
 

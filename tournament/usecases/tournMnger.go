@@ -1,25 +1,18 @@
 package usecases
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 
 	. "github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 )
 
 type TournMngr struct {
-	TInfo  *TournInfo
-	Winner *Player
+	TInfo *TournInfo
 
 	dm               DataMngr
 	tourTree         *TourNode
 	matchsPerPairing map[string]int
-}
-
-func NewTournMngr(tInfo *TournInfo) {
-	tm := &TournMngr{
-		TInfo: tInfo,
-	}
-	tm.tourTree = tm.Tree()
+	matchsResult     map[string]MatchResult
 }
 
 func (tm *TournMngr) Tree() *TourNode {
@@ -65,11 +58,28 @@ func NewRndTour(dm DataMngr) *TournMngr {
 	tm := &TournMngr{
 		dm:               dm,
 		matchsPerPairing: make(map[string]int),
+		matchsResult:     make(map[string]MatchResult),
 	}
 
 	// Initialize the Tournament
-	name, _ := dm.UnfinishedTourn()
-	tm.TInfo, _ = dm.GetTournInfo(name) // @todo check error
+	name, err := dm.UnfinishedTourn()
+	if err != nil {
+		log.Errorf("Error getting unfinished tournament: %s", err)
+		return nil
+	}
+	tm.TInfo, err = dm.GetTournInfo(name) // @todo check error
+	if err != nil {
+		log.Errorf("Error getting tournament info: %s", err)
+		return nil
+	}
+
+	runMatches, err := dm.Matches(tm.TInfo.ID)
+	if err != nil {
+		log.Errorf("Error getting matches: %s", err)
+		return nil
+	}
+	tm.fillMap(runMatches)
+
 	tm.tourTree = tm.Tree()
 
 	return tm
@@ -81,16 +91,19 @@ func (tm *TournMngr) GetMatches() <-chan *MatchToRun {
 
 	go func() {
 		tm.tourTree.PlayNode(runnerCh, winnerCh)
-		tm.Winner = <-winnerCh
+		tm.TInfo.Winner = <-winnerCh
 		close(runnerCh)
-		log.Println("The Winner of the", tm.TInfo.Name, "Tournament is", tm.Winner)
-	}() // @audit exception here
+		log.Println("The Winner of the", tm.TInfo.Name, "Tournament is", tm.TInfo.Winner.Id)
+	}()
 
 	return runnerCh
 
 }
 
-func (tm *TournMngr) AlreadyRun(match *Pairing) (bool, MatchResult) { // @audit implement
+func (tm *TournMngr) AlreadyRun(match *Pairing) (bool, MatchResult) {
+	if res, ok := tm.matchsResult[match.ID]; ok {
+		return true, res
+	}
 	return false, NotPlayed
 }
 
@@ -102,4 +115,10 @@ func (tm *TournMngr) GetMatch(pi, pj *Player) *MatchToRun {
 		tm.matchsPerPairing[pi.Id+pj.Id] = 1
 	}
 	return NewMatchToRun(tm.TInfo.ID, pi, pj, timesPlayed)
+}
+
+func (tm *TournMngr) fillMap(matches []*Pairing) {
+	for _, mtch := range matches {
+		tm.matchsResult[mtch.ID] = mtch.Winner
+	}
 }
