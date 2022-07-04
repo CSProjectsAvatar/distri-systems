@@ -68,7 +68,9 @@ func (data *DhtTourDataMngr) SaveMatch(match *domain.Pairing) error {
 
 func (data *DhtTourDataMngr) Matches(tourId string) ([]*domain.Pairing, error) {
 	ans, err := data.DhtMatches.Get(matchesKey(tourId))
-	if err != nil {
+	if err == chord.ErrKeyNotFound {
+		return []*domain.Pairing{}, nil
+	} else if err != nil {
 		return nil, err
 	}
 	return ans, nil

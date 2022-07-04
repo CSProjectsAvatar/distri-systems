@@ -4,6 +4,7 @@ import (
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
+	"github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -30,9 +31,50 @@ func TestDhtTourMngr(t *testing.T) {
 	t.Run("no unfinished tournaments", SubTestNonUnfinished(mngr))
 	t.Run("matches", SubTestMatches(mngr))
 	t.Run("files", SubTestFiles(mngr))
+	t.Run("creator", SubTestTournCreator(mngr))
 
 	for _, n := range nodes {
 		require.Nil(t, n.Stop())
+	}
+}
+
+func SubTestTournCreator(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
+	return func(t *testing.T) {
+		f1 := &interfaces.TournFile{
+			Name:   "player1.py",
+			Data:   []byte(`print("habla matador")`),
+			IsGame: false,
+		}
+		f2 := &interfaces.TournFile{
+			Name:   "player2.py",
+			Data:   []byte(`print("escucha matador")`),
+			IsGame: false,
+		}
+		f3 := &interfaces.TournFile{
+			Name:   "chess.py",
+			Data:   []byte(`print("mira matador")`),
+			IsGame: true,
+		}
+		info, err := interfaces.SaveTournament("all-vs-all", domain.All_vs_All, []*interfaces.TournFile{f1, f2, f3}, mngr)
+		require.Nil(t, err)
+
+		assert.Equal(t, "chess.py", info.Name)
+
+		f1Content, err := mngr.File(info.ID, "player1.py")
+		require.Nil(t, err)
+		assert.Equal(t, `print("habla matador")`, f1Content)
+
+		f2Content, err := mngr.File(info.ID, "player2.py")
+		require.Nil(t, err)
+		assert.Equal(t, `print("escucha matador")`, f2Content)
+
+		f3Content, err := mngr.File(info.ID, "chess.py")
+		require.Nil(t, err)
+		assert.Equal(t, `print("mira matador")`, f3Content)
+
+		savedInfo, err := mngr.GetTournInfo(info.ID)
+		require.Nil(t, err)
+		assert.Equal(t, *info, *savedInfo)
 	}
 }
 
@@ -132,7 +174,9 @@ func SubTestTournInfos(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
 		require.Nil(t, err)
 		require.Equal(t, *inf2, *inf)
 
-		assert.Equal(t, "tour-1", mngr.UnfinishedTourn())
+		val, err := mngr.UnfinishedTourn()
+		require.Nil(t, err)
+		assert.Equal(t, "tour-1", val)
 	}
 }
 
@@ -160,7 +204,9 @@ func SubTestNonUnfinished(mngr *usecases.DhtTourDataMngr) func(*testing.T) {
 		require.Nil(t, mngr.SetTournInfo(inf1))
 		require.Nil(t, mngr.SetTournInfo(inf2))
 
-		assert.Equal(t, "", mngr.UnfinishedTourn())
+		val, err := mngr.UnfinishedTourn()
+		require.Nil(t, err)
+		assert.Equal(t, "", val)
 	}
 }
 
