@@ -71,4 +71,5 @@ type TournInfo struct {
 	Name    string
 	Type_   TourType
 	Players []*Player
+	Winner  *Player
 }

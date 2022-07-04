@@ -1,4 +1,5 @@
 /example/
+*.log
 venv/
 .idea/
 __pycache__/

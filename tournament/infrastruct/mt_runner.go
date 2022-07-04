@@ -1,6 +1,7 @@
 package infrastruct
 
 import (
+	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	"log"
 	"math"
 	"sync"
@@ -12,7 +13,7 @@ import (
 
 type MTRunner struct {
 	WorkerMngr interfaces.IWorkerMngr
-	DataMngr   interfaces.DataMngr // @todo for not repeat the games
+	DataMngr   usecases.DataMngr // @todo for not repeat the games
 
 	matchPool      chan *domain.MatchToRun
 	pairingResults <-chan *domain.Pairing
@@ -21,7 +22,7 @@ type MTRunner struct {
 	waitList *sync.RWMutex
 }
 
-func NewMTRunner(workerMngr interfaces.IWorkerMngr, dataMngr interfaces.DataMngr) *MTRunner {
+func NewMTRunner(workerMngr interfaces.IWorkerMngr, dataMngr usecases.DataMngr) *MTRunner {
 	runner := &MTRunner{
 		WorkerMngr:     workerMngr,
 		DataMngr:       dataMngr,

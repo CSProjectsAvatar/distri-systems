@@ -4,14 +4,13 @@ import (
 	"log"
 
 	. "github.com/CSProjectsAvatar/distri-systems/tournament/domain"
-	"github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
 )
 
 type TournMngr struct {
 	TInfo  *TournInfo
 	Winner *Player
 
-	dm               interfaces.DataMngr
+	dm               DataMngr
 	tourTree         *TourNode
 	matchsPerPairing map[string]int
 }
@@ -45,9 +44,9 @@ func SetMockTree(tm *TournMngr) {
 	chP3 := &TourNode{Winner: &player3}
 	chP4 := &TourNode{Winner: &player4}
 
-	root := NewNode(tm, DefNodeFunc)
+	root := NewTourNode(tm, DefNodeFunc)
 
-	rch := NewNode(tm, DefNodeFunc)
+	rch := NewTourNode(tm, DefNodeFunc)
 	rch.SetChildrens([]*TourNode{chP3, chP4})
 	root.SetChildrens([]*TourNode{chP1, chP2, rch})
 
@@ -62,15 +61,15 @@ func SetMockTree(tm *TournMngr) {
 //}
 
 // Returns the name of a Random Unfinished Tournament
-func NewRndTour(dm interfaces.DataMngr) *TournMngr {
+func NewRndTour(dm DataMngr) *TournMngr {
 	tm := &TournMngr{
 		dm:               dm,
 		matchsPerPairing: make(map[string]int),
 	}
 
 	// Initialize the Tournament
-	name := dm.UnfinishedTourn()
-	tm.TInfo = dm.GetTournInfo(name)
+	name, _ := dm.UnfinishedTourn()
+	tm.TInfo, _ = dm.GetTournInfo(name) // @todo check error
 	tm.tourTree = tm.Tree()
 
 	return tm

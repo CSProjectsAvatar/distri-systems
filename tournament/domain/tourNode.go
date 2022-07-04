@@ -24,7 +24,7 @@ type TourNode struct {
 	joinF JoinFunc
 }
 
-func NewNode(prov iMatchProvider, f JoinFunc) *TourNode {
+func NewTourNode(prov iMatchProvider, f JoinFunc) *TourNode {
 	return &TourNode{provider: prov, joinF: f}
 }
 func (tnode *TourNode) SetChildrens(children []*TourNode) {

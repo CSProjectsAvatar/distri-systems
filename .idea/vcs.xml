@@ -2,5 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/docs/clean-architecture/go-clean-architecture-web-application-boilerplate" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tournament/example" vcs="Git" />
   </component>
 </project>
