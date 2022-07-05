@@ -3,6 +3,7 @@ package transport
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"sync"
 	"time"
@@ -54,7 +55,8 @@ func (t *BaseTransport) isShutdown() bool {
 }
 
 // Gets an outbound connection to an address
-func (t *BaseTransport) getConn(addr string) (*remoteCn, error) {
+func (t *BaseTransport) getConn(ip string, port uint32) (*remoteCn, error) {
+	addr := net.JoinHostPort(ip, fmt.Sprintf("%d", port))
 	t.pool.RLock()
 
 	if t.isShutdown() { // If we are shutting down, return an error

@@ -5,42 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2aab411-3aa7-4a82-9cff-bb88229e79e0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tournament/infrastruct/builder.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tournament/infrastruct/tests/mainRoutine_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/midServer.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tournament/usecases/succWrapper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/repo.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tournament/domain/enums.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/domain/enums.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/buntdb.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/buntdb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/informer.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/mocking/centralized_dataManager.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/mocking/centralized_dataManager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/mocking/mock_mainRoutine.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/mocking/mock_mainRoutine.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/pb_mid/middleware.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/pb_mid/middleware.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/pb_mid/middleware_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/pb_mid/middleware_grpc.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/builder.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/builder.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/mainRoutine.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/mainRoutine.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tournament/infrastruct/proto/middleware.proto" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/proto/middleware.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/providers.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/providers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/python client/middleware_pb2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/python client/middleware_pb2_grpc.py" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/python client/middleware_pb2_grpc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/tests/dataMngr_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/tests/dataMngr_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/tests/workerClient_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/tests/workerClient_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/tests/workerMngr_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/tests/workerMngr_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tournament/infrastruct/transport/BaseTransport.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/BaseTransport.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/transport/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/transport/constructors.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/constructors.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/transport/workerClient.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/workerClient.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/transport/workerMngr.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/workerMngr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/init.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/interfaces/transport.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/interfaces/transport.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/usecases/dataMngr.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/usecases/dataMngr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/usecases/dht-tour-data-mngr.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/usecases/dht-tour-data-mngr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/usecases/informer.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/usecases/informer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/usecases/mainRoutine.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/mainRoutine.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tournament/usecases/tournMnger.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/usecases/tournMnger.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -91,8 +61,8 @@
       <recent name="D:\OMAR\Omar_Alejandro\Docs\@Archive\2022\distri-systems\tournament" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestWMGiveMeWork_Integration in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests (1)">
-    <configuration name="TestMainRoutInit in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.TestCreateGroupsTree in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests">
+    <configuration name="TestCreateAllvsAllTree in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="distri-systems" />
       <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
       <root_directory value="$PROJECT_DIR$" />
@@ -101,10 +71,34 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestMainRoutInit\E$" />
+      <pattern value="^\QTestCreateAllvsAllTree\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestMainRoutInit in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestCreateFirstDefeat in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="distri-systems" />
+      <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestCreateFirstDefeat\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestCreateGroupsTree in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="distri-systems" />
+      <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestCreateGroupsTree\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestMainRoutInit in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="distri-systems" />
       <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
       <root_directory value="$PROJECT_DIR$" />
@@ -128,37 +122,13 @@
       <pattern value="^\QTestWMGiveMeWork_Integration\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestWMGiveMeWork_Integration in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="distri-systems" />
-      <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestWMGiveMeWork_Integration\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestWM_WithMultiplesClients in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="distri-systems" />
-      <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestWM_WithMultiplesClients\E$" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestCreateGroupsTree in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
+        <item itemvalue="Go Test.TestCreateAllvsAllTree in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
+        <item itemvalue="Go Test.TestCreateFirstDefeat in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
         <item itemvalue="Go Test.TestWMGiveMeWork_Integration in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests (1)" />
         <item itemvalue="Go Test.TestMainRoutInit in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests (1)" />
-        <item itemvalue="Go Test.TestMainRoutInit in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
-        <item itemvalue="Go Test.TestWM_WithMultiplesClients in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
-        <item itemvalue="Go Test.TestWMGiveMeWork_Integration in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
       </list>
     </recent_temporary>
   </component>
@@ -218,7 +188,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/tournament/infrastruct/builder.go</url>
-          <line>78</line>
+          <line>80</line>
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
@@ -228,5 +198,11 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="GoTestRunConfiguration">
+        <watch expression="tree.Children[0].Children[0].Winner.Id" language="go" />
+        <watch expression="tree.Children[0].Children[1].Winner.Id" language="go" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

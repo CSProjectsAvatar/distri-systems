@@ -1,20 +1,22 @@
 package infrastruct
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/transport"
 	inter "github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	log "github.com/sirupsen/logrus"
-	"strconv"
-	"strings"
 )
 
 // Build Chord Node
-func BuildChordNode(ip string, remote *chord.RemoteNode, logger domain.Logger) *chord.Node {
+func BuildChordNode(remote *chord.RemoteNode, logger domain.Logger) *chord.Node {
+	localIp := "127.0.0.1"
 	entry, err := usecases.NewNode(
-		ChordConfig(ip, domain.ChordPort),
+		ChordConfig(localIp, domain.ChordPort),
 		remote,
 		logger)
 	if err != nil {
