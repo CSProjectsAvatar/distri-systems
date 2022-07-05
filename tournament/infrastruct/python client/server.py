@@ -1,13 +1,26 @@
 import logging
+from random import randint
 import middleware_pb2 as mid
 import middleware_pb2_grpc as mid_grpc
 import grpc
 from concurrent import futures
 
 class Middleware(mid_grpc.MiddlewareServicer):
+    def __init__(self):
+        self.tourIds = []
+
     def UploadTournament(self, request, context):
         print('Received : ', request)
-        return mid.TournamentResp(msg='OK')
+        id = str(randint(0, 100))
+        self.tourIds.append(id)
+        print('id:', id)
+        return mid.TournamentResp(tourId=id)
+
+    def GetAllIds(self, request, context):
+        print('Received : ', request)
+        resp: mid.AllIdsResp = mid.AllIdsResp(tourIds=self.tourIds)
+        return resp
+
 
 
 def serve():

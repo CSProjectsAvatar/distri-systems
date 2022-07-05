@@ -5,7 +5,6 @@ import (
 
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
 	tr "github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/transport"
-	use "github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 )
 
 type MockSuccProvider struct {
@@ -24,16 +23,17 @@ func (m *MockSuccProvider) SetSuccessor(succ string) {
 
 type MockMainRoutine struct {
 	succProvider *MockSuccProvider
-	use.MainRoutine
+
+	infrastruct.MainRoutine
 }
 
 func NewMockRoutine(addr string, succ string) *MockMainRoutine {
 	succProv := &MockSuccProvider{succ}
 	cfg := tr.DefaultCfgAddr(addr)
 
-	mainR := &use.MainRoutine{}
-	mainR.Elect = infrastruct.NewElectionRingAlgo(addr)           // Election Initialized
-	client, err := tr.NewWorkerClient(cfg, mainR.Elect, succProv) // Worker Client Initialized
+	mainR := &infrastruct.MainRoutine{}
+	mainR.Elect = infrastruct.NewElectionRingAlgo(addr)            // Election Initialized
+	client, err := tr.NewWorkerClient(*cfg, mainR.Elect, succProv) // Worker Client Initialized
 	if err != nil {
 		log.Fatal(err) // @audit Fatal?
 	}

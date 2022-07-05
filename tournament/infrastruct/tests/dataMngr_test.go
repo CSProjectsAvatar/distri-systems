@@ -156,7 +156,7 @@ func SubTestMatches(mngr *usecases.DhtTourDataMngr) func(t *testing.T) {
 		require.Nil(t, err)
 		expected := usecases.Stats{
 			BestPlayer: "omar",
-			Victories: map[string]uint{
+			Victories: map[string]uint32{
 				"andy": 1,
 				"omar": 2,
 			},

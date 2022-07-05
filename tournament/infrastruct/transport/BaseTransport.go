@@ -15,19 +15,18 @@ import (
 type BaseTransport struct {
 	config *Config
 
-	sock *net.TCPListener
+	sock   *net.TCPListener
+	server *grpc.Server
 
 	connPool map[string]*remoteCn
 	pool     *sync.RWMutex
-
-	server *grpc.Server
 
 	shutdownCtx        context.Context
 	shutdownCancelFunc context.CancelFunc
 }
 
 func NewBaseTransport(config *Config) (*BaseTransport, error) {
-	listener, err := net.Listen("tcp", config.ServAddr)
+	listener, err := net.Listen("tcp", config.Addr())
 	if err != nil {
 		return nil, err
 	}

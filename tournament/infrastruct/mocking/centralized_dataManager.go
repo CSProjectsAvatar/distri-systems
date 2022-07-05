@@ -70,3 +70,8 @@ func (dm *CentDataManager) GetTournInfo(tourId string) (*domain.TournInfo, error
 		ID:    utils.Hash(tourId + string(domain.All_vs_All)),
 	}, nil
 }
+
+//GetAllIds
+func (dm *CentDataManager) GetAllIds() ([]string, error) {
+	return nil, nil
+}

@@ -33,6 +33,10 @@ type IWorkerMngr interface {
 	NotificationChannel() <-chan *Pairing
 }
 
+type IMiddleware interface {
+	ITransportSrvr
+}
+
 type ILeaderProvider interface {
 	GetLeader() string
 }

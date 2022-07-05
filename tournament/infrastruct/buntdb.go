@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/tidwall/buntdb"
+	"log"
 )
 
 type BuntDb struct {
@@ -13,6 +14,7 @@ type BuntDb struct {
 func NewBuntDb(name string) *BuntDb {
 	db, err := buntdb.Open(fmt.Sprintf("%s.db", name))
 	if err != nil {
+		log.Print(err)
 		panic(err)
 	}
 	return &BuntDb{DB: db}

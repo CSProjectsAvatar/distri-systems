@@ -1,6 +1,10 @@
 package transport
 
 import (
+	"strconv"
+	"strings"
+
+	//"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
 	"time"
 
 	// grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
@@ -8,7 +12,8 @@ import (
 )
 
 type Config struct {
-	ServAddr string
+	Ip   string
+	Port uint64
 
 	ServerOpts []grpc.ServerOption
 	DialOpts   []grpc.DialOption
@@ -17,9 +22,16 @@ type Config struct {
 	MaxIdle time.Duration
 }
 
+func (c *Config) Addr() string {
+	return c.Ip + ":" + strconv.Itoa(int(c.Port))
+}
 func DefaultCfgAddr(addr string) *Config {
 	n := DefaultConfig()
-	n.ServAddr = addr
+	// slice addr
+	n.Ip = addr[:strings.Index(addr, ":")]
+	port := addr[strings.Index(addr, ":")+1:]
+	// convert to uint32
+	n.Port, _ = strconv.ParseUint(port, 10, 32)
 	return n
 }
 

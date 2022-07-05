@@ -2,6 +2,7 @@ package transport
 
 import (
 	"context"
+	//"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
 
 	. "github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	pb_r "github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/pb_ring"
@@ -19,11 +20,11 @@ type WorkerTransport struct {
 	msgsChan chan *ElectionMsg
 }
 
-func NewWorkerClient(config *Config, leadProv ILeaderProvider, sucProv ISuccProvider) (*WorkerTransport, error) {
-	t, err := NewBaseTransport(config)
+func NewWorkerClient(config Config, leadProv ILeaderProvider, sucProv ISuccProvider) (*WorkerTransport, error) {
+	config.Port = WClientPort
+	t, err := NewBaseTransport(&config)
 	if err != nil {
-		log.Fatal(err)
-		return nil, err
+		log.Fatal("Couldn't create base transport", err)
 	}
 	wT := &WorkerTransport{
 		BaseTransport: *t,

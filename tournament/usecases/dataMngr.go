@@ -31,6 +31,9 @@ type DataMngr interface {
 	// UnfinishedTourn Loads a tournament not finished. Returns its ID.
 	// If there is no unfinished tournament, returns ErrNoUnfinishedTourn.
 	UnfinishedTourn() (string, error)
+
+	// Returns the ids of all the tournaments.
+	GetAllIds() ([]string, error)
 }
 
 var ErrInfoNotFound = errors.New("info not found")

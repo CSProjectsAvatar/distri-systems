@@ -2,6 +2,7 @@ package transport
 
 import (
 	. "github.com/CSProjectsAvatar/distri-systems/tournament/domain"
+	pb_m "github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/pb_mid"
 	pb_r "github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/pb_ring"
 	pb_w "github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/pb_workerMngr"
 	. "github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
@@ -32,4 +33,16 @@ func FromMatchResp(match *pb_w.MatchResp) *Pairing {
 		Player1: &Player{Id: match.FstPlayerID},
 		Player2: &Player{Id: match.SndPlayerID},
 	}
+}
+
+func ToTournFiles(files []*pb_m.File) []*TournFile {
+	var tournFiles []*TournFile
+	for _, file := range files {
+		tournFiles = append(tournFiles, &TournFile{
+			Name:   file.Name,
+			Data:   file.Data,
+			IsGame: file.IsGame,
+		})
+	}
+	return tournFiles
 }

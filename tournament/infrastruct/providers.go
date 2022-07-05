@@ -1,10 +1,13 @@
 package infrastruct
 
 import (
+	"crypto/sha1"
+	"fmt"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 func NewLogger() domain.Logger {
@@ -33,4 +36,20 @@ func NewRingApi(client *chord.RemoteNode) chord.RingApi {
 		client: client,
 		log:    NewLogger(),
 	}
+}
+
+func ChordConfig(ip string, port uint) *chord.Config {
+	return &chord.Config{
+		Ip:   ip,
+		Port: port,
+		Hash: sha1.New,
+		Ring: NewRingApi(&chord.RemoteNode{Ip: ip, Port: port}),
+		Data: NewNamedDataInteract(
+			fmt.Sprintf("bunt-%d-%v", port, time.Now().UnixMilli())),
+		M:           domain.IdLength,
+		IncludeDate: true,
+	}
+}
+func LocalChordConfig(port uint) *chord.Config {
+	return ChordConfig("127.0.0.1", port)
 }

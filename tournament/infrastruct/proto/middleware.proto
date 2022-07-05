@@ -7,19 +7,22 @@ option go_package = "../pb_mid";
 
 service Middleware {
     rpc UploadTournament(TournamentReq) returns (TournamentResp) {}
-    rpc RunTournament(RunReq) returns (stream RunResp) {}
     rpc GetStats(StatsReq) returns (StatsResp) {}
+    rpc GetAllIds(AllIdsReq) returns (AllIdsResp) {}
+//    rpc RunTournament(RunReq) returns (stream RunResp) {}
 }
 
 // GetStats
 message StatsReq {
-    string tournamentId = 1;
+    string tourId = 1;
 }
 
 message StatsResp {
     uint32 matches = 1;
     map<string, uint32> victories = 2;
     string bestPlayer = 3;
+    string winner = 4;
+    string tourName = 5;
 }
 
 // UploadTournament
@@ -34,22 +37,28 @@ message TournamentReq {
     repeated File files = 3;
 }
 message TournamentResp {
-    string msg = 1;
+    string tourId = 1;
+}
+
+message AllIdsReq {
+}
+message AllIdsResp {
+    repeated string tourIds = 1;
 }
 
 // RunTournament
-message RunReq {
-    string name = 1;
-}
-
-message RunResp {
-    repeated Match matchs = 1;
-}
-message Match {
-    repeated string players = 1;
-    State state = 2;
-    Result result = 3;
-}
+//message RunReq {
+//    string name = 1;
+//}
+//
+//message RunResp {
+//    repeated Match matchs = 1;
+//}
+//message Match {
+//    repeated string players = 1;
+//    State state = 2;
+//    Result result = 3;
+//}
 
 enum State 
 {

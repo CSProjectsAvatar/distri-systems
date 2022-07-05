@@ -23,3 +23,11 @@ var (
 	WhaitTimeBetweenRetry = time.Second * 2
 	MaxRetryTimes         = 3
 )
+
+const IdLength = 56
+const ReplicaNumber = 4
+
+const ChordPort = 9090
+const WMngrPort = 8080
+const WClientPort = 8081
+const MiddPort = 8082

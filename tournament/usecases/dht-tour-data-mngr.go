@@ -115,3 +115,15 @@ func (data *DhtTourDataMngr) UnfinishedTourn() (string, error) {
 	}
 	return "", ErrNotAnyUnfTournmnt
 }
+
+func (data *DhtTourDataMngr) GetAllIds() ([]string, error) {
+	infos, err := data.DhtInfos.Get(tourInfosKey())
+	if err != nil {
+		return nil, err
+	}
+	ans := []string{}
+	for _, inf := range infos {
+		ans = append(ans, inf.ID)
+	}
+	return ans, nil
+}

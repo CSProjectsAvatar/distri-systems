@@ -3,13 +3,18 @@ package usecases
 import "github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 
 type Stats struct {
-	Matches uint
+	Matches uint32
 
 	// Victories per player.
-	Victories map[string]uint
+	Victories map[string]uint32
 
 	// Player with more victories.
 	BestPlayer string
+
+	// Winner of the tournament.
+	Winner string
+
+	Name string
 }
 
 func GetStats(tournId string, dataMngr DataMngr) (*Stats, error) {
@@ -17,13 +22,19 @@ func GetStats(tournId string, dataMngr DataMngr) (*Stats, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	stats := &Stats{
-		Matches:   uint(len(matches)),
-		Victories: make(map[string]uint),
+	tInfo, err := dataMngr.GetTournInfo(tournId)
+	if err != nil {
+		return nil, err
 	}
 
-	var bestVictories uint
+	stats := &Stats{
+		Matches:   uint32(len(matches)),
+		Victories: make(map[string]uint32),
+		Winner:    tInfo.Winner.Id,
+		Name:      tInfo.Name,
+	}
+
+	var bestVictories uint32
 	for _, match := range matches {
 		player := ""
 		if match.Winner == domain.Player1Wins {

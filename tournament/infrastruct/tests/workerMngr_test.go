@@ -14,6 +14,7 @@ func TestWMGiveMeWork(t *testing.T) {
 	assert := assert.New(t)
 	addr := "localhost:50051"
 	mngr, err := transport.NewWorkerMngr(addr)
+	mngr.Start()
 	if err != nil {
 		assert.Nil(err)
 	}
@@ -29,12 +30,14 @@ func TestWMGiveMeWork(t *testing.T) {
 	resp, err = mngr.GiveMeWork(context.Background(), &pb.MatchReq{})
 	assert.Nil(err)
 	assert.Equal(pair2.ID, resp.MatchId)
+	mngr.Stop()
 }
 
 func TestWMCatchReq(t *testing.T) {
 	assert := assert.New(t)
 	addr := "localhost:50052"
 	mngr, err := transport.NewWorkerMngr(addr)
+	mngr.Start()
 	if err != nil {
 		assert.Nil(err)
 	}
@@ -82,4 +85,5 @@ func TestWMCatchReq(t *testing.T) {
 
 	assert.Equal(resReq2.MatchId, res2.ID)
 	assert.Equal(domain.MatchResult(resReq2.Winner), res2.Winner)
+	mngr.Stop()
 }

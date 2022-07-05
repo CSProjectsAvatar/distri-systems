@@ -17,6 +17,9 @@ import (
 type WorkerMngr struct {
 	UnimplementedWorkerMngrServer
 
+	sock   *net.TCPListener
+	server *grpc.Server
+
 	matchesToRun chan *Pairing
 	results      chan *Pairing
 }
@@ -26,17 +29,27 @@ func NewWorkerMngr(addr string) (*WorkerMngr, error) {
 		matchesToRun: make(chan *Pairing),
 		results:      make(chan *Pairing, 10),
 	}
-	// Start the server
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Error("failed to listen: %v", err)
 		return nil, err
 	}
-	s := grpc.NewServer()
-	RegisterWorkerMngrServer(s, mngr)
-	go s.Serve(lis)
+	mngr.sock = lis.(*net.TCPListener)
+	mngr.server = grpc.NewServer()
 
+	RegisterWorkerMngrServer(mngr.server, mngr)
 	return mngr, nil
+}
+
+func (wm *WorkerMngr) Start() error {
+	go wm.server.Serve(wm.sock)
+	return nil
+}
+
+func (wm *WorkerMngr) Stop() error {
+	wm.server.Stop()
+	wm.sock.Close()
+	return nil
 }
 
 func (mngr *WorkerMngr) GiveMeWork(ctx context.Context, in *MatchReq) (*MatchResp, error) {
@@ -66,6 +79,6 @@ func (mngr *WorkerMngr) CatchResult(ctx context.Context, in *ResultReq) (*Result
 func (mngr *WorkerMngr) DeliverMatch(match *Pairing) {
 	mngr.matchesToRun <- match
 }
-func (mngr *WorkerMngr) NotificationChannel() chan *Pairing {
+func (mngr *WorkerMngr) NotificationChannel() <-chan *Pairing {
 	return mngr.results
 }

@@ -3,8 +3,10 @@ from distutils import filelist
 import enum
 from fileinput import filelineno
 from logging import PlaceHolder
+from random import randint
 from time import sleep
 from turtle import onclick
+from scipy import rand
 import streamlit as st
 import io
 import pandas as pd
@@ -25,110 +27,124 @@ st.title("Tournament Manager")
 if 'node' not in st.session_state:
     st.session_state.node = client.grpcNode()
     st.session_state.tourNames = []
-    st.session_state.t_ids = []
+    st.session_state.tourIds = {}
+    # st.session_state.t_ids = []
 
 node = st.session_state.node
 tourNames = st.session_state.tourNames
-tourn_ids = st.session_state.t_ids
+# tourn_ids = st.session_state.t_ids
+tour_ids = st.session_state.tourIds
 
 # Input 'Tournament Name' with button to create a new tournament
 new_t_name = st.text_input("Tournament Name", placeholder='Chez Tournament')
 
 if new_t_name != '' and new_t_name not in tourNames:
+    tour_ids[new_t_name] = ''
     tourNames.append(new_t_name)
 
 st.write(tourNames)
+st.write(tour_ids)
 
 # Tournaments Expanders
-for i, t_name in enumerate(tourNames):
+for t_name in tourNames:
+    t_id = tour_ids[t_name]
+    st.write(t_id)
     # Create a new tournament
-    with st.expander(t_name):
-        files_placeholder = st.empty()
-        with files_placeholder.container():
-            file_list = []
-            # input for get the game
-            game = st.file_uploader('Bring the game', ['py'], key='game_' + t_name)
-            if game is not None:
-                # To read file as bytes:
-                bytes_data = game.getvalue()
-                # grpc game File
-                game_file = mid.File(name='game', data=bytes_data)
+    if t_id != '':
+        st.write(t_name + " Uploaded")
 
-                # MOCK
-                game_file = 'game.py'
-                st.write(game_file)
-                file_list.append(game_file)
-                st.write(file_list)
+    else:
+        with st.expander(t_name):
+            files_placeholder = st.empty()
+            with files_placeholder.container():
+                file_list = []
+                # input for get the game
+                game = st.file_uploader('Bring the game', ['py'], key='game_' + t_name)
+                if game is not None:
+                    # To read file as bytes:
+                    bytes_data = game.getvalue()
+                    # grpc game File
+                    game_file = mid.File(name='game', data=bytes_data)
 
-            # input for get the players
-            players_files = st.file_uploader("Bring the Players", ['py'], accept_multiple_files=True,
-                                             key='players_' + t_name)
+                    # MOCK
+                    game_file = 'game.py'
+                    st.write(game_file)
+                    file_list.append(game_file)
+                    st.write(file_list)
 
-            for i, player in enumerate(players_files):
-                # To read file as bytes:
-                bytes_data = player.getvalue()
-                # grpc player File
-                player_file = mid.File(name=f'player{i}-{player.name}', data=bytes_data)
-                file_list.append(player_file)
+                # input for get the players
+                players_files = st.file_uploader("Bring the Players", ['py'], accept_multiple_files=True,
+                                                key='players_' + t_name)
 
-            selected = st.selectbox('Type of tournament', tour_type, key='tour_type_' + t_name)
-            st.write(tour_type[selected])
+                for i, player in enumerate(players_files):
+                    # To read file as bytes:
+                    bytes_data = player.getvalue()
+                    # grpc player File
+                    player_file = mid.File(name=f'player{i}-{player.name}', data=bytes_data)
+                    file_list.append(player_file)
 
-            t_id = tourn_ids[i] if i < len(tourn_ids) else None
+                selected = st.selectbox('Type of tournament', tour_type, key='tour_type_' + t_name)
+                st.write(tour_type[selected])
 
-            if st.button("Upload", key='upBttn_' + t_name):
-                # request for the game and players
-                # if game is None or len(players_files) < 2:
-                #     st.error("Please upload the game and players")
-                # else:
-                # MOCK TOURNAMENT
-                t_name = 'Chez Tournament'
-                selected = "First Defeat"
-                file_list = [
-                    mid.File(name='game', data=b'game.py'),
-                    mid.File(name='player0', data=b'player0.py'),
-                    mid.File(name='player1', data=b'player1.py'),
-                ]
+                # t_id = tourn_ids[i] if i < len(tourn_ids) else None
 
-                t_id = node.upload_tournment(t_name, tour_type[selected], file_list).id
-                if i < len(tourn_ids):
-                    tourn_ids[i] = t_id
-                else:
-                    tourn_ids.append(t_id)
+                if st.button("Upload & Run", key='upBttn_' + t_name):
+                    # request for the game and players
+                    # if game is None or len(players_files) < 2:
+                    #     st.error("Please upload the game and players")
+                    # else:
+                    # MOCK TOURNAMENT
+                    selected = "First Defeat"
+                    file_list = [
+                        mid.File(name='game', data=b'game.py'),
+                        mid.File(name='player0', data=b'player0.py'),
+                        mid.File(name='player1', data=b'player1.py'),
+                    ]
 
-            run_bttn = st.button("Run", key='runBttn_' + t_name)
-            st.write(tour_type[selected])
-            st.write(file_list)
+                    resp = node.upload_tournment(t_name, tour_type[selected], file_list)
+                    files_placeholder.empty()
+                    # st.write(resp)
 
-        if run_bttn:
-            files_placeholder.empty()
-            st.write("Running the tournament")
-            # @todo you must t_id in order to run the tournament
+                    # t_id = randint(0, 100)
+                    # tour_ids[t_name] = t_id
+                    # if i < len(tourn_ids):
+                    #     tourn_ids[i] = t_id
+                    # else:
+                    #     tourn_ids.append(t_id)
 
-            for_run = 20
-            running = 5
-            already_run = 2
+                # run_bttn = st.button("Run", key='runBttn_' + t_name)
+                # st.write(tour_type[selected])
+                # st.write(file_list)
 
-            while True:
-                placeholder = st.empty()
-                with placeholder.container():
-                    col1, col2, col3 = st.columns(3)
-                    col1.metric("For Run", str(for_run) + 'Pcs', "1.2 °F")
-                    col2.metric("Running", str(running) + 'Pcs', "-8%")
-                    col3.metric("Already Run", str(already_run) + 'Pcs', "4%")
+        # if run_bttn:
+        #     files_placeholder.empty()
+        #     st.write("Running the tournament")
+        #     # @todo you must t_id in order to run the tournament
 
-                    # sleep 2 seconds
-                    for_run += 1
-                    running += 1
-                    already_run += 2
-                    sleep(3)
+        #     for_run = 20
+        #     running = 5
+        #     already_run = 2
 
-                placeholder.empty()
+        #     while True:
+        #         placeholder = st.empty()
+        #         with placeholder.container():
+        #             col1, col2, col3 = st.columns(3)
+        #             col1.metric("For Run", str(for_run) + 'Pcs', "1.2 °F")
+        #             col2.metric("Running", str(running) + 'Pcs', "-8%")
+        #             col3.metric("Already Run", str(already_run) + 'Pcs', "4%")
 
-        if st.button('Stats', key='statsBttn'+t_id):
-            # @todo call GetStats() rpc method taking t_id into account
-            ...
+        #             # sleep 2 seconds
+        #             for_run += 1
+        #             running += 1
+        #             already_run += 2
+        #             sleep(3)
 
+        #         placeholder.empty()
+
+# if st.button('Stats', key='statsBttn' + t_id):
+
+    # @todo call GetStats() rpc method taking t_id into account
+    ...
 # # seleccionar el tipo de torneo
 
 # # resultados y estadisticas

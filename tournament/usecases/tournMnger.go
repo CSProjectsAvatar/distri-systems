@@ -127,13 +127,11 @@ func NewRndTour(dm DataMngr) (*TournMngr, error) {
 		log.Errorf("Error getting unfinished tournament: %s", err)
 		return nil, err
 	}
-
 	tm.TInfo, err = dm.GetTournInfo(name) // @todo check error
 	if err != nil {
 		log.Errorf("Error getting tournament info: %s", err)
 		return nil, err
 	}
-
 	runMatches, err := dm.Matches(tm.TInfo.ID)
 	if err != nil {
 		log.Errorf("Error getting matches: %s", err)

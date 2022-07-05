@@ -19,15 +19,15 @@ class MiddlewareStub(object):
                 request_serializer=middleware__pb2.TournamentReq.SerializeToString,
                 response_deserializer=middleware__pb2.TournamentResp.FromString,
                 )
-        self.RunTournament = channel.unary_stream(
-                '/pb.Middleware/RunTournament',
-                request_serializer=middleware__pb2.RunReq.SerializeToString,
-                response_deserializer=middleware__pb2.RunResp.FromString,
-                )
         self.GetStats = channel.unary_unary(
                 '/pb.Middleware/GetStats',
                 request_serializer=middleware__pb2.StatsReq.SerializeToString,
                 response_deserializer=middleware__pb2.StatsResp.FromString,
+                )
+        self.GetAllIds = channel.unary_unary(
+                '/pb.Middleware/GetAllIds',
+                request_serializer=middleware__pb2.AllIdsReq.SerializeToString,
+                response_deserializer=middleware__pb2.AllIdsResp.FromString,
                 )
 
 
@@ -40,13 +40,13 @@ class MiddlewareServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def RunTournament(self, request, context):
+    def GetStats(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetStats(self, request, context):
+    def GetAllIds(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -60,15 +60,15 @@ def add_MiddlewareServicer_to_server(servicer, server):
                     request_deserializer=middleware__pb2.TournamentReq.FromString,
                     response_serializer=middleware__pb2.TournamentResp.SerializeToString,
             ),
-            'RunTournament': grpc.unary_stream_rpc_method_handler(
-                    servicer.RunTournament,
-                    request_deserializer=middleware__pb2.RunReq.FromString,
-                    response_serializer=middleware__pb2.RunResp.SerializeToString,
-            ),
             'GetStats': grpc.unary_unary_rpc_method_handler(
                     servicer.GetStats,
                     request_deserializer=middleware__pb2.StatsReq.FromString,
                     response_serializer=middleware__pb2.StatsResp.SerializeToString,
+            ),
+            'GetAllIds': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAllIds,
+                    request_deserializer=middleware__pb2.AllIdsReq.FromString,
+                    response_serializer=middleware__pb2.AllIdsResp.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -98,23 +98,6 @@ class Middleware(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def RunTournament(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/pb.Middleware/RunTournament',
-            middleware__pb2.RunReq.SerializeToString,
-            middleware__pb2.RunResp.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
     def GetStats(request,
             target,
             options=(),
@@ -128,5 +111,22 @@ class Middleware(object):
         return grpc.experimental.unary_unary(request, target, '/pb.Middleware/GetStats',
             middleware__pb2.StatsReq.SerializeToString,
             middleware__pb2.StatsResp.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetAllIds(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/pb.Middleware/GetAllIds',
+            middleware__pb2.AllIdsReq.SerializeToString,
+            middleware__pb2.AllIdsResp.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
