@@ -30,7 +30,7 @@ type MainRoutine struct {
 func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 	m := &MainRoutine{}
 
-	logger := NewLogger().ToFile()
+	logger := NewLogger()
 	m.ChordSrv = BuildChordNode(remote, logger) // Chord
 
 	m.DM = BuildDataMngr(m.ChordSrv.Ip, m.ChordSrv.Port) // DataMngr
@@ -62,6 +62,7 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 }
 
 func (m *MainRoutine) WorkDay() {
+	leaderNotf := m.Elect.OnLeaderChange()
 	count := 0
 	for {
 		match, err := m.WClient.GetMatchToRun() // Subscribe this Worker to Leader
@@ -70,15 +71,16 @@ func (m *MainRoutine) WorkDay() {
 				count++
 
 				if count > domain.MaxRetryTimes {
+					utils.Consume(leaderNotf) // leave the notification chan empty
 					m.Elect.CreateElection()
-					<-m.Elect.OnLeaderChange() // Wait for Leader Change
+					<-leaderNotf // Wait for Leader Change
 
 					// Run The Mngr if I Am the leader
 					if m.IamTheLeader() {
+						log.Println("I am the Leader, Initating Mngr Service...")
 						go m.MngrDay() // Init the Leader Mode
 						break
 					}
-
 				} else {
 					time.Sleep(domain.WhaitTimeBetweenRetry)
 				}
@@ -110,12 +112,14 @@ func (m *MainRoutine) MngrDay() {
 		// Ask for an Unfinished tournament and Create a TournMngr from it
 		tourn, err := usecases.NewRndTour(m.DM)
 		if err != nil {
-			log.Error("Error Creating a TournMngr")
+			if usecases.ErrNotAnyUnfTournmnt != err { // error different from NotUnifishedTourn
+				log.Error("Error Creating a TournMngr")
+			}
 		} else if !runT[tourn.TInfo.ID] { // if I am not running this tournament
 			runT[tourn.TInfo.ID] = true
 			go m.TRunner.Run(tourn)
 		}
-		time.Sleep(5)
+		time.Sleep(5 * time.Second)
 		// If I am not longer the leader wet back to work
 		if !m.IamTheLeader() {
 			go m.WorkDay()

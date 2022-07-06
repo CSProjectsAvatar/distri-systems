@@ -2,6 +2,7 @@ package infrastruct
 
 import (
 	. "github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
+	"github.com/CSProjectsAvatar/distri-systems/utils"
 	ut "github.com/CSProjectsAvatar/distri-systems/utils"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"
@@ -10,21 +11,24 @@ import (
 type ElectionRing struct {
 	leader string
 
-	me            string
-	coordFlag     bool
-	transp        IElectTransport
-	notifChn      <-chan *ElectionMsg
-	leaderChanged chan struct{}
+	me               string
+	coordFlag        bool
+	transp           IElectTransport
+	notifChn         <-chan *ElectionMsg
+	leaderChangedIn  chan<- struct{}
+	leaderChangedOut <-chan struct{}
 
 	notNumber int
 }
 
 func NewElectionRingAlgo(me string) *ElectionRing {
+	in, out := utils.MakeInf[struct{}]()
 	ring := &ElectionRing{
-		me:            me,
-		leader:        me, // for working for the one-node ring
-		coordFlag:     false,
-		leaderChanged: make(chan struct{}, 1),
+		me:               me,
+		leader:           me, // for working for the one-node ring
+		coordFlag:        false,
+		leaderChangedIn:  in,
+		leaderChangedOut: out,
 	}
 	return ring
 }
@@ -67,7 +71,7 @@ func (ring *ElectionRing) ElectionMsg(msg *ElectionMsg) {
 
 	case COORDINATOR:
 		ring.leader = ut.Max_in(msg.OnTheRing) // Set leader as the bigger one
-		ring.leaderChanged <- struct{}{}       // Notify that the leader changed
+		ring.leaderChangedIn <- struct{}{}     // Notify that the leader changed
 		ring.coordFlag = !ring.coordFlag       // Change flag
 		if !ring.coordFlag {                   // Stop? (The flag was Up?)
 			return
@@ -86,5 +90,5 @@ func (ring *ElectionRing) CreateElection() {
 
 // Returns a Channel that gets a notification when the leader changes
 func (ring *ElectionRing) OnLeaderChange() <-chan struct{} {
-	return ring.leaderChanged
+	return ring.leaderChangedOut
 }

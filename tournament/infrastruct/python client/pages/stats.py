@@ -30,29 +30,27 @@ tourn_ids = st.session_state.tourIds
 
 while True:
 
-    prevStats = {}
+    prevMatches = {}
     placeholder = st.empty()
     with placeholder.container():
-        node.get_all_stats()
+        # node.get_all_stats()
+        node.get_rand_stats()
         # st.write(node.tourStats)
 
         # for _, stat in enumerate(node.tourStats):
         for id, stat in node.tourStats.items():
+            prevMatchAmm = prevMatches.get(id, 0)
             statis: mid.StatsResp = stat
-            statis.matches
-            statis.tourName
-            statis.bestPlayer
-            statis.winner
 
-            for_run = randint(0,10)
-            running = True
-            already_run = randint(for_run, for_run+10)
             cont = st.empty()
             with cont.container():
-                col1, col2, col3 = st.columns(3)
-                col1.metric("For Run", str(for_run) + 'Pcs', "1.2")
-                col2.metric("Running", str(running) + 'Pcs', "-8%")
-                col3.metric("Already Run", str(already_run) + 'Pcs', "4%")
+                col1, col2, col3, col4 = st.columns(4)
+                col1.metric("TourName", str(statis.tourName))
+                col2.metric("Matches", str(statis.matches) + 'mths', str(statis.matches - prevMatchAmm))
+                col3.metric("Best Player", str(statis.bestPlayer))
+                col4.metric("Winner", str(statis.winner))
+
+
         sleep(5)
         placeholder.empty()
 

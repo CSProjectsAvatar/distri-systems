@@ -103,7 +103,8 @@ func (data *DhtTourDataMngr) GetTournInfo(tourId string) (*domain.TournInfo, err
 
 func (data *DhtTourDataMngr) UnfinishedTourn() (string, error) {
 	infos, err := data.DhtInfos.Get(tourInfosKey())
-	if err == chord.ErrKeyNotFound {
+
+	if err.Error() == chord.ErrKeyNotFound.Error() {
 		return "", ErrNotAnyUnfTournmnt
 	} else if err != nil {
 		return "", err

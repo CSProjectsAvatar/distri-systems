@@ -64,6 +64,9 @@ func (db *BuntDb) Get(key []byte) (string, error) {
 		return err
 	})
 	if err != nil {
+		if err.Error() == "not found" {
+			return "", chord.ErrKeyNotFound
+		}
 		return "", err
 	}
 	return val, nil

@@ -18,7 +18,7 @@ import middleware_pb2_grpc as mid_grpc
 class grpcNode:
     def __init__(self) -> None:
         self.tourStats = {} 
-        self.remote_ip = 'localhost:50051'
+        self.remote_ip = 'localhost:8082'
         pass
 
     def upload_tournment(self, tour_name, tourn_type, file_list):
@@ -78,7 +78,18 @@ class grpcNode:
                 print(self.tourStats[id])
                 # print(resp)
 
+    def get_rand_stats(self):
+        with grpc.insecure_channel(self.remote_ip) as channel:
+            stub = mid_grpc.MiddlewareStub(channel)
+            print('Calling GetRandStat')
 
+            req = mid.StatsReq(tourId='1')
+            resp = stub.GetRndStats
+            print(resp)
+            resp = stub.GetRndStats(req)
+            self.tourStats[1] = resp
+            print(resp)
+            return resp
 
 
 if __name__ == '__main__':
