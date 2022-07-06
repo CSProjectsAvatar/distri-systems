@@ -78,4 +78,5 @@ enum Result
 enum TournType {
     First_Defeat = 0;
     All_vs_All = 1;
+    Groups = 2;
 }

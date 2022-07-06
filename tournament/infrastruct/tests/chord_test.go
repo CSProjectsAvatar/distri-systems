@@ -26,7 +26,7 @@ func localConfig(port uint) *chord.Config {
 		Hash: sha1.New,
 		Ring: infrastruct.NewRingApi(&chord.RemoteNode{Ip: "127.0.0.1", Port: port}),
 		Data: infrastruct.NewNamedDataInteract(
-			fmt.Sprintf("bunt-%d-%v", port, time.Now())),
+			fmt.Sprintf("bunt-%d-%v", port, time.Now().UnixMilli())),
 		M:           IdLength,
 		IncludeDate: true,
 	}

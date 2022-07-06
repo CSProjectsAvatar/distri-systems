@@ -13,7 +13,7 @@ type CentDataManager struct {
 
 func (dm *CentDataManager) SetTournInfo(info *domain.TournInfo) error {
 	//TODO implement me
-	panic("implement me")
+	return nil
 }
 
 func (dm *CentDataManager) SaveFiles(tour_name string, files *map[string]string) error {

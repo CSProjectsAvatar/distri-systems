@@ -2,8 +2,8 @@ package infrastruct
 
 import (
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
-	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/transport"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
+	"github.com/CSProjectsAvatar/distri-systems/utils"
 
 	"time"
 
@@ -31,16 +31,14 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 	m := &MainRoutine{}
 
 	logger := NewLogger().ToFile()
-	m.ChordSrv = BuildChordNode("127.0.0.1", remote, logger) // Chord
+	m.ChordSrv = BuildChordNode(remote, logger) // Chord
 
 	m.DM = BuildDataMngr(m.ChordSrv.Ip, m.ChordSrv.Port) // DataMngr
 	sucProv := usecases.NewSuccWrapper(m.ChordSrv)
 
-	addr := m.ChordSrv.Addr()
-	cfg := transport.DefaultCfgAddr(addr)
-
-	m.Elect = NewElectionRingAlgo(addr)                // Election
-	client := BuildWorkerClient(cfg, m.Elect, sucProv) // WorkerClient
+	myIP := utils.GetIPString()
+	m.Elect = NewElectionRingAlgo(myIP)           // Election
+	client := BuildWorkerClient(m.Elect, sucProv) // WorkerClient
 
 	m.WClient = client // WClient Set
 	err := m.WClient.Start()
@@ -50,8 +48,8 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 
 	m.Elect.SetTransport(client)
 
-	m.WMngr = BuildWorkerMngr(addr)      // WorkerMngr
-	m.Midd = BuildMiddleware(addr, m.DM) // Middleware
+	m.WMngr = BuildWorkerMngr()    // WorkerMngr
+	m.Midd = BuildMiddleware(m.DM) // Middleware
 
 	m.TRunner = NewMTRunner(m.WMngr, m.DM) // Runner
 	m.MatchRunner = NewWorkerRunner(m.DM)  // MatchRunner
@@ -107,13 +105,15 @@ func (m *MainRoutine) IamTheLeader() bool {
 
 // Beguins the control of the flow as a leader
 func (m *MainRoutine) MngrDay() {
+	runT := make(map[string]bool)
 	for {
 		// Ask for an Unfinished tournament and Create a TournMngr from it
-		tournMngr, err := usecases.NewRndTour(m.DM)
+		tourn, err := usecases.NewRndTour(m.DM)
 		if err != nil {
 			log.Error("Error Creating a TournMngr")
-		} else {
-			go m.TRunner.Run(tournMngr)
+		} else if !runT[tourn.TInfo.ID] { // if I am not running this tournament
+			runT[tourn.TInfo.ID] = true
+			go m.TRunner.Run(tourn)
 		}
 		time.Sleep(5)
 		// If I am not longer the leader wet back to work
@@ -123,29 +123,3 @@ func (m *MainRoutine) MngrDay() {
 		}
 	}
 }
-
-//func NewMainRoutine(addr string) *MainRoutine {
-//dataMngr_test.1
-//remote node, ip y port
-//
-//}
-
-// cfg := tr.DefaultCfgAddr(addr)
-
-// mainR := &use.MainRoutine{}
-// mainR.Elect = infra.NewElectionRingAlgo(addr)           // Election Initialized
-// client, err := tr.NewWorkerClient(cfg, mainR.Elect, succProv) // Worker Client Initialized
-// if err != nil {
-// 	log.Fatal(err) // @audit Fatal?
-// }
-// mainR.WClient = client // WClient Setted
-// err = mainR.WClient.Start()
-
-// mainR.Elect.SetTransport(client)
-// if err != nil {
-// 	log.Fatal(err)
-// }
-// 	elect := NewElectionRingAlgo(addr)
-// 	wClient := NewWorkerClient(addr, elect, succProv)
-
-// }

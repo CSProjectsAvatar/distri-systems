@@ -8,13 +8,13 @@ import (
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	log "github.com/sirupsen/logrus"
 	"strconv"
-	"strings"
 )
 
 // Build Chord Node
-func BuildChordNode(ip string, remote *chord.RemoteNode, logger domain.Logger) *chord.Node {
+func BuildChordNode(remote *chord.RemoteNode, logger domain.Logger) *chord.Node {
+	localIp := "127.0.0.1"
 	entry, err := usecases.NewNode(
-		ChordConfig(ip, domain.ChordPort),
+		ChordConfig(localIp, domain.ChordPort),
 		remote,
 		logger)
 	if err != nil {
@@ -44,11 +44,12 @@ func BuildDataMngr(chordSrvIp string, chordSrvPort uint) usecases.DataMngr {
 
 // Build Worker Client
 func BuildWorkerClient(
-	cfg *transport.Config,
 	elect inter.IElectionPolicy,
 	sucProv inter.ISuccProvider) *transport.WorkerTransport {
 
-	client, err := transport.NewWorkerClient(*cfg, elect, sucProv)
+	addr := "127.0.0.1:" + strconv.Itoa(domain.WClientPort)
+	cfg := transport.DefaultCfgAddr(addr)
+	client, err := transport.NewWorkerClient(cfg, elect, sucProv)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,10 +57,8 @@ func BuildWorkerClient(
 }
 
 // Build Worker Mngr
-func BuildWorkerMngr(addr string) *transport.WorkerMngr {
-	// swap port by the one on domain
-	addr = SwapPort(addr, domain.WMngrPort)
-
+func BuildWorkerMngr() *transport.WorkerMngr {
+	addr := "localhost:" + strconv.Itoa(domain.WMngrPort)
 	mngr, err := transport.NewWorkerMngr(addr)
 	if err != nil {
 		log.Fatal("Couldn't intialize worker mngr", err)
@@ -68,13 +67,13 @@ func BuildWorkerMngr(addr string) *transport.WorkerMngr {
 }
 
 // Build Middleware
-func BuildMiddleware(addr string, dm usecases.DataMngr) inter.IMiddleware {
-	addr = SwapPort(addr, domain.MiddPort)
+func BuildMiddleware(dm usecases.DataMngr) inter.IMiddleware {
+	addr := "localhost:" + strconv.Itoa(domain.MiddPort)
 	mid := transport.NewMidServer(addr, dm)
 	return mid
 }
 
-func SwapPort(addr string, port uint32) string {
-	addr = addr[:strings.Index(addr, ":")] + ":" + strconv.Itoa(int(port))
-	return addr
-}
+//func SwapPort(addr string, port uint32) string {
+//	addr = addr[:strings.Index(addr, ":")] + ":" + strconv.Itoa(int(port))
+//	return addr
+//}

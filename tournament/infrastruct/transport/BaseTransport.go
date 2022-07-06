@@ -27,6 +27,7 @@ type BaseTransport struct {
 
 func NewBaseTransport(config *Config) (*BaseTransport, error) {
 	listener, err := net.Listen("tcp", config.Addr())
+	log.Println("listening on:", config.Addr())
 	if err != nil {
 		return nil, err
 	}

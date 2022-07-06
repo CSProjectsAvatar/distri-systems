@@ -1,11 +1,13 @@
 package usecases
 
 import (
-	"github.com/CSProjectsAvatar/distri-systems/utils"
-	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"strconv"
+	"sync"
 	"time"
+
+	"github.com/CSProjectsAvatar/distri-systems/utils"
+	log "github.com/sirupsen/logrus"
 
 	. "github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 )
@@ -17,44 +19,62 @@ type TournMngr struct {
 	tourTree         *TourNode
 	matchsPerPairing map[string]int
 	matchsResult     map[string]MatchResult
+
+	dmMtx *sync.Mutex
 }
 
 func (tm *TournMngr) Tree() *TourNode {
+	// shuffle players
+	shufflePlayers(tm.TInfo.Players)
+
 	switch tm.TInfo.Type_ {
 	case First_Defeat:
-		return tm.BuildFirstDefeat()
+		return FirstDefeat(tm.TInfo.Players)
 	case All_vs_All:
-		return tm.BuildAllVsAll()
+		return BuildAllVsAll(tm.TInfo.Players)
+	case Groups:
+		return ForGroups(4, tm.TInfo.Players)
 	}
 	return nil
 }
 
-func (tm *TournMngr) BuildFirstDefeat() *TourNode {
-	var tourNodes []*TourNode
-
-	for i := 0; i < len(tm.TInfo.Players); i++ {
-		tourNodes = append(tourNodes, &TourNode{Children: nil, Winner: tm.TInfo.Players[i]})
-	}
-
-	for len(tourNodes) > 1 {
-		for j := 0; j < len(tourNodes); j += 2 {
-			right := tourNodes[j]
-			left := tourNodes[j+1]
-			children := []*TourNode{left, right}
-			tourNode := &TourNode{Children: children, Winner: &Player{}}
-			var tourNodes1 = append(tourNodes[0:j], tourNode)
-			tourNodes = append(tourNodes1, tourNodes[j+2:]...)
+func FirstDefeat(players []*Player) *TourNode {
+	if len(players) == 1 {
+		return &TourNode{
+			Winner: players[0],
 		}
 	}
-
-	return tourNodes[0]
+	leftChildren := FirstDefeat(players[:len(players)/2])
+	rightChildren := FirstDefeat(players[len(players)/2:])
+	return &TourNode{
+		Children: []*TourNode{leftChildren, rightChildren},
+	}
 }
 
-func (tm *TournMngr) BuildAllVsAll() *TourNode {
+func ForGroups(groupCard int, players []*Player) *TourNode {
+	if len(players) <= groupCard {
+		return BuildAllVsAll(players)
+	}
+	leftCh := ForGroups(groupCard, players[:len(players)/2])
+	rightCh := ForGroups(groupCard, players[len(players)/2:])
+	return &TourNode{
+		Children: []*TourNode{leftCh, rightCh},
+	}
+}
+
+func shufflePlayers(players []*Player) {
+	rand.Seed(time.Now().UnixNano())
+
+	rand.Shuffle(len(players), func(i, j int) {
+		players[i], players[j] = players[j], players[i]
+	})
+}
+
+func BuildAllVsAll(players []*Player) *TourNode {
 	var children []*TourNode
 	var root *TourNode = &TourNode{Children: children, Winner: &Player{}}
-	for i := 0; i < len(tm.TInfo.Players); i++ {
-		var child *TourNode = &TourNode{Children: nil, Winner: tm.TInfo.Players[i]}
+	for i := 0; i < len(players); i++ {
+		var child *TourNode = &TourNode{Children: nil, Winner: players[i]}
 		root.Children = append(root.Children, child)
 	}
 	return root
@@ -71,10 +91,13 @@ func (tm *TournMngr) SetTree(tree *TourNode) {
 	tm.tourTree.SetProvider(tm)
 }
 
+func (tm *TournMngr) SetDM(dm DataMngr) {
+	tm.dm = dm
+}
 func NewMockTourMngr() *TournMngr {
 	// dm := &mocking.CentDataManager{}
 	tm := &TournMngr{
-		// dm:               dm,
+		//dm:               dm,
 		matchsPerPairing: make(map[string]int),
 		matchsResult:     make(map[string]MatchResult),
 		TInfo: &TournInfo{
@@ -83,6 +106,7 @@ func NewMockTourMngr() *TournMngr {
 			Type_:   First_Defeat,
 			Players: []*Player{&Player{Id: "1"}, &Player{Id: "2"}, &Player{Id: "3"}, &Player{Id: "4"}},
 		},
+		dmMtx: &sync.Mutex{},
 	}
 	SetMockTree(tm)
 	return tm
@@ -119,9 +143,11 @@ func NewRndTour(dm DataMngr) (*TournMngr, error) {
 		dm:               dm,
 		matchsPerPairing: make(map[string]int),
 		matchsResult:     make(map[string]MatchResult),
+		dmMtx:            &sync.Mutex{},
 	}
 
 	// Initialize the Tournament
+	tm.dmMtx.Lock()
 	name, err := dm.UnfinishedTourn()
 	if err != nil {
 		log.Errorf("Error getting unfinished tournament: %s", err)
@@ -133,6 +159,8 @@ func NewRndTour(dm DataMngr) (*TournMngr, error) {
 		return nil, err
 	}
 	runMatches, err := dm.Matches(tm.TInfo.ID)
+
+	tm.dmMtx.Unlock()
 	if err != nil {
 		log.Errorf("Error getting matches: %s", err)
 		// return nil // @audit Not Critical Error
@@ -153,12 +181,17 @@ func (tm *TournMngr) GetMatches() <-chan *MatchToRun {
 		tm.TInfo.Winner = <-winnerCh
 		close(runnerCh)
 		// @audit save winner in db
+		tm.dmMtx.Lock()
+		err := tm.dm.SetTournInfo(tm.TInfo)
+		tm.dmMtx.Unlock()
+		if err != nil {
+			log.Errorf("Error saving tournament info: %s", err)
+		}
 
 		log.Println("The Winner of the", tm.TInfo.Name, "Tournament is", tm.TInfo.Winner.Id)
 	}()
 
 	return runnerCh
-
 }
 
 func (tm *TournMngr) AlreadyRun(match *Pairing) (bool, MatchResult) {

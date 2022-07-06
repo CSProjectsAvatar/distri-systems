@@ -2,6 +2,9 @@ package transport
 
 import (
 	"context"
+	"regexp"
+	"strconv"
+
 	//"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
 
 	. "github.com/CSProjectsAvatar/distri-systems/tournament/domain"
@@ -20,9 +23,9 @@ type WorkerTransport struct {
 	msgsChan chan *ElectionMsg
 }
 
-func NewWorkerClient(config Config, leadProv ILeaderProvider, sucProv ISuccProvider) (*WorkerTransport, error) {
-	config.Port = WClientPort
-	t, err := NewBaseTransport(&config)
+func NewWorkerClient(config *Config, leadProv ILeaderProvider, sucProv ISuccProvider) (*WorkerTransport, error) {
+	//config.Port = WClientPort
+	t, err := NewBaseTransport(config)
 	if err != nil {
 		log.Fatal("Couldn't create base transport", err)
 	}
@@ -65,7 +68,7 @@ func (wT *WorkerTransport) SendResults(match *Pairing) error {
 }
 
 func (wT *WorkerTransport) GetMatchToRun() (*Pairing, error) {
-	addr := wT.leadProv.GetLeader()
+	addr := AssureSrvAddress(wT.leadProv.GetLeader())
 	client, err := wT.getConnWM(addr)
 	if err != nil {
 		return nil, err
@@ -94,7 +97,7 @@ func (wT *WorkerTransport) getConnRng(addr string) (pb_r.RingClient, error) {
 
 // Client
 func (wT *WorkerTransport) SendToSuccessor(msg *ElectionMsg) error {
-	addr := wT.sucProv.GetSuccessor()
+	addr := AssureCltAddress(wT.sucProv.GetSuccessor())
 	client, err := wT.getConnRng(addr)
 	if err != nil {
 		return err
@@ -109,7 +112,7 @@ func (wT *WorkerTransport) SendToSuccessor(msg *ElectionMsg) error {
 }
 
 func (wT *WorkerTransport) GetLeaderFromSuccessor() (string, error) {
-	addr := wT.sucProv.GetSuccessor()
+	addr := AssureCltAddress(wT.sucProv.GetSuccessor())
 	client, err := wT.getConnRng(addr)
 	if err != nil {
 		return "", err
@@ -122,6 +125,30 @@ func (wT *WorkerTransport) GetLeaderFromSuccessor() (string, error) {
 		return "", err
 	}
 	return resp.LeaderAddr, nil
+}
+
+func AssureSrvAddress(address string) string {
+	if itsFullAddress(address) {
+		return address
+	}
+	return address + ":" + strconv.Itoa(WMngrPort)
+}
+
+func AssureCltAddress(address string) string {
+	if itsFullAddress(address) {
+		return address
+	}
+	return address + ":" + strconv.Itoa(WClientPort)
+}
+
+// if its the full address like *:*
+func itsFullAddress(address string) bool {
+	// if address has : return it, else atach it the port
+	regex := `^(.*):(\d+)$`
+	if matched, _ := regexp.MatchString(regex, address); matched {
+		return true
+	}
+	return false
 }
 
 // Server
