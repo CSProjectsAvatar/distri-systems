@@ -5,6 +5,7 @@ import (
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct"
+	"github.com/CSProjectsAvatar/distri-systems/utils"
 	"os"
 	"os/signal"
 )
@@ -21,10 +22,14 @@ func main() {
 		entry = &chord.RemoteNode{Ip: os.Args[1], Port: port}
 		log.Debug("entry set", domain.LogArgs{"entry": *entry})
 	}
-	//infrastruct.NewMainRoutine(entry)
+	infrastruct.NewMainRoutine(entry)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
-	log.Info("worker up; stop it by pressing Ctrl+C", nil) // @todo show ip
+	log.Info(
+		"worker up; stop it by pressing Ctrl+C",
+		domain.LogArgs{
+			"IP": utils.GetIPString(),
+		})
 	<-c
 }
