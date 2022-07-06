@@ -30,6 +30,7 @@ tourn_ids = st.session_state.tourIds
 
 while True:
 
+    prevStats = {}
     placeholder = st.empty()
     with placeholder.container():
         node.get_all_stats()
@@ -37,8 +38,11 @@ while True:
 
         # for _, stat in enumerate(node.tourStats):
         for id, stat in node.tourStats.items():
-            st.write(stat)
-            st.write()
+            statis: mid.StatsResp = stat
+            statis.matches
+            statis.tourName
+            statis.bestPlayer
+            statis.winner
 
             for_run = randint(0,10)
             running = True

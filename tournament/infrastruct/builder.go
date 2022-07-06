@@ -47,7 +47,7 @@ func BuildWorkerClient(
 	elect inter.IElectionPolicy,
 	sucProv inter.ISuccProvider) *transport.WorkerTransport {
 
-	addr := "127.0.0.1:" + strconv.Itoa(domain.WMngrPort)
+	addr := "127.0.0.1:" + strconv.Itoa(domain.WClientPort)
 	cfg := transport.DefaultCfgAddr(addr)
 	client, err := transport.NewWorkerClient(cfg, elect, sucProv)
 	if err != nil {
@@ -68,7 +68,7 @@ func BuildWorkerMngr() *transport.WorkerMngr {
 
 // Build Middleware
 func BuildMiddleware(dm usecases.DataMngr) inter.IMiddleware {
-	addr := "localhost:" + strconv.Itoa(domain.WMngrPort)
+	addr := "localhost:" + strconv.Itoa(domain.MiddPort)
 	mid := transport.NewMidServer(addr, dm)
 	return mid
 }
