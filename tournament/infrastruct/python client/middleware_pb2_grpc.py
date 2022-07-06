@@ -29,6 +29,11 @@ class MiddlewareStub(object):
                 request_serializer=middleware__pb2.AllIdsReq.SerializeToString,
                 response_deserializer=middleware__pb2.AllIdsResp.FromString,
                 )
+        self.GetRndStats = channel.unary_unary(
+                '/pb.Middleware/GetRndStats',
+                request_serializer=middleware__pb2.StatsReq.SerializeToString,
+                response_deserializer=middleware__pb2.StatsResp.FromString,
+                )
 
 
 class MiddlewareServicer(object):
@@ -52,6 +57,12 @@ class MiddlewareServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetRndStats(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_MiddlewareServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -69,6 +80,11 @@ def add_MiddlewareServicer_to_server(servicer, server):
                     servicer.GetAllIds,
                     request_deserializer=middleware__pb2.AllIdsReq.FromString,
                     response_serializer=middleware__pb2.AllIdsResp.SerializeToString,
+            ),
+            'GetRndStats': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetRndStats,
+                    request_deserializer=middleware__pb2.StatsReq.FromString,
+                    response_serializer=middleware__pb2.StatsResp.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -128,5 +144,22 @@ class Middleware(object):
         return grpc.experimental.unary_unary(request, target, '/pb.Middleware/GetAllIds',
             middleware__pb2.AllIdsReq.SerializeToString,
             middleware__pb2.AllIdsResp.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetRndStats(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/pb.Middleware/GetRndStats',
+            middleware__pb2.StatsReq.SerializeToString,
+            middleware__pb2.StatsResp.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

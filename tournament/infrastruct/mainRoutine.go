@@ -30,7 +30,7 @@ type MainRoutine struct {
 func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 	m := &MainRoutine{}
 
-	logger := NewLogger().ToFile()
+	logger := NewLogger()
 	m.ChordSrv = BuildChordNode(remote, logger) // Chord
 
 	m.DM = BuildDataMngr(m.ChordSrv.Ip, m.ChordSrv.Port) // DataMngr
@@ -77,11 +77,10 @@ func (m *MainRoutine) WorkDay() {
 
 					// Run The Mngr if I Am the leader
 					if m.IamTheLeader() {
-						log.Println("I am the leader")
+						log.Println("I am the Leader, Initating Mngr Service...")
 						go m.MngrDay() // Init the Leader Mode
 						break
 					}
-
 				} else {
 					time.Sleep(domain.WhaitTimeBetweenRetry)
 				}
@@ -120,7 +119,7 @@ func (m *MainRoutine) MngrDay() {
 			runT[tourn.TInfo.ID] = true
 			go m.TRunner.Run(tourn)
 		}
-		time.Sleep(5)
+		time.Sleep(5 * time.Second)
 		// If I am not longer the leader wet back to work
 		if !m.IamTheLeader() {
 			go m.WorkDay()

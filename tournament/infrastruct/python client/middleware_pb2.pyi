@@ -70,11 +70,13 @@ class _TournTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._Enum
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     First_Defeat: _TournType.ValueType  # 0
     All_vs_All: _TournType.ValueType  # 1
+    Groups: _TournType.ValueType  # 2
 class TournType(_TournType, metaclass=_TournTypeEnumTypeWrapper):
     pass
 
 First_Defeat: TournType.ValueType  # 0
 All_vs_All: TournType.ValueType  # 1
+Groups: TournType.ValueType  # 2
 global___TournType = TournType
 
 

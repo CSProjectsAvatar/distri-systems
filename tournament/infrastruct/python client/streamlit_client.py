@@ -20,6 +20,7 @@ import middleware_pb2_grpc as mid_grpc
 tour_type = {
     'First Defeat': 0,
     'All vs All': 1,
+    'For Groups': 2
 }
 
 st.title("Tournament Manager")

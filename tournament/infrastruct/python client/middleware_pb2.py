@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10middleware.proto\x12\x02pb\"\x1a\n\x08StatsReq\x12\x0e\n\x06tourId\x18\x01 \x01(\t\"\xb5\x01\n\tStatsResp\x12\x0f\n\x07matches\x18\x01 \x01(\r\x12/\n\tvictories\x18\x02 \x03(\x0b\x32\x1c.pb.StatsResp.VictoriesEntry\x12\x12\n\nbestPlayer\x18\x03 \x01(\t\x12\x0e\n\x06winner\x18\x04 \x01(\t\x12\x10\n\x08tourName\x18\x05 \x01(\t\x1a\x30\n\x0eVictoriesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\r:\x02\x38\x01\"3\n\x04\x46ile\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\x12\x0f\n\x07is_game\x18\x03 \x01(\x08\"X\n\rTournamentReq\x12\x0c\n\x04name\x18\x01 \x01(\t\x12 \n\ttour_type\x18\x02 \x01(\x0e\x32\r.pb.TournType\x12\x17\n\x05\x66iles\x18\x03 \x03(\x0b\x32\x08.pb.File\" \n\x0eTournamentResp\x12\x0e\n\x06tourId\x18\x01 \x01(\t\"\x0b\n\tAllIdsReq\"\x1d\n\nAllIdsResp\x12\x0f\n\x07tourIds\x18\x01 \x03(\t*3\n\x05State\x12\x0f\n\x0bNOT_STARTED\x10\x00\x12\x0b\n\x07STARTED\x10\x01\x12\x0c\n\x08\x46INISHED\x10\x02*8\n\x06Result\x12\x0b\n\x07NOT_RUN\x10\x00\x12\x0b\n\x07P1_WINS\x10\x01\x12\x0b\n\x07P2_WINS\x10\x02\x12\x07\n\x03TIE\x10\x03*-\n\tTournType\x12\x10\n\x0c\x46irst_Defeat\x10\x00\x12\x0e\n\nAll_vs_All\x10\x01\x32\xa2\x01\n\nMiddleware\x12;\n\x10UploadTournament\x12\x11.pb.TournamentReq\x1a\x12.pb.TournamentResp\"\x00\x12)\n\x08GetStats\x12\x0c.pb.StatsReq\x1a\r.pb.StatsResp\"\x00\x12,\n\tGetAllIds\x12\r.pb.AllIdsReq\x1a\x0e.pb.AllIdsResp\"\x00\x42\x0bZ\t../pb_midb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10middleware.proto\x12\x02pb\"\x1a\n\x08StatsReq\x12\x0e\n\x06tourId\x18\x01 \x01(\t\"\xb5\x01\n\tStatsResp\x12\x0f\n\x07matches\x18\x01 \x01(\r\x12/\n\tvictories\x18\x02 \x03(\x0b\x32\x1c.pb.StatsResp.VictoriesEntry\x12\x12\n\nbestPlayer\x18\x03 \x01(\t\x12\x0e\n\x06winner\x18\x04 \x01(\t\x12\x10\n\x08tourName\x18\x05 \x01(\t\x1a\x30\n\x0eVictoriesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\r:\x02\x38\x01\"3\n\x04\x46ile\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\x12\x0f\n\x07is_game\x18\x03 \x01(\x08\"X\n\rTournamentReq\x12\x0c\n\x04name\x18\x01 \x01(\t\x12 \n\ttour_type\x18\x02 \x01(\x0e\x32\r.pb.TournType\x12\x17\n\x05\x66iles\x18\x03 \x03(\x0b\x32\x08.pb.File\" \n\x0eTournamentResp\x12\x0e\n\x06tourId\x18\x01 \x01(\t\"\x0b\n\tAllIdsReq\"\x1d\n\nAllIdsResp\x12\x0f\n\x07tourIds\x18\x01 \x03(\t*3\n\x05State\x12\x0f\n\x0bNOT_STARTED\x10\x00\x12\x0b\n\x07STARTED\x10\x01\x12\x0c\n\x08\x46INISHED\x10\x02*8\n\x06Result\x12\x0b\n\x07NOT_RUN\x10\x00\x12\x0b\n\x07P1_WINS\x10\x01\x12\x0b\n\x07P2_WINS\x10\x02\x12\x07\n\x03TIE\x10\x03*9\n\tTournType\x12\x10\n\x0c\x46irst_Defeat\x10\x00\x12\x0e\n\nAll_vs_All\x10\x01\x12\n\n\x06Groups\x10\x02\x32\xd0\x01\n\nMiddleware\x12;\n\x10UploadTournament\x12\x11.pb.TournamentReq\x1a\x12.pb.TournamentResp\"\x00\x12)\n\x08GetStats\x12\x0c.pb.StatsReq\x1a\r.pb.StatsResp\"\x00\x12,\n\tGetAllIds\x12\r.pb.AllIdsReq\x1a\x0e.pb.AllIdsResp\"\x00\x12,\n\x0bGetRndStats\x12\x0c.pb.StatsReq\x1a\r.pb.StatsResp\"\x00\x42\x0bZ\t../pb_midb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'middleware_pb2', globals())
@@ -28,7 +28,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _RESULT._serialized_start=510
   _RESULT._serialized_end=566
   _TOURNTYPE._serialized_start=568
-  _TOURNTYPE._serialized_end=613
+  _TOURNTYPE._serialized_end=625
   _STATSREQ._serialized_start=24
   _STATSREQ._serialized_end=50
   _STATSRESP._serialized_start=53
@@ -45,6 +45,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ALLIDSREQ._serialized_end=424
   _ALLIDSRESP._serialized_start=426
   _ALLIDSRESP._serialized_end=455
-  _MIDDLEWARE._serialized_start=616
-  _MIDDLEWARE._serialized_end=778
+  _MIDDLEWARE._serialized_start=628
+  _MIDDLEWARE._serialized_end=836
 # @@protoc_insertion_point(module_scope)

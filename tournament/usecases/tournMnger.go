@@ -150,10 +150,10 @@ func NewRndTour(dm DataMngr) (*TournMngr, error) {
 	tm.dmMtx.Lock()
 	name, err := dm.UnfinishedTourn()
 	if err != nil {
-		log.Errorf("Error getting unfinished tournament: %s", err)
+		//log.Infof("Not found unfinished tournament: %s", err)
 		return nil, err
 	}
-	tm.TInfo, err = dm.GetTournInfo(name) // @todo check error
+	tm.TInfo, err = dm.GetTournInfo(name)
 	if err != nil {
 		log.Errorf("Error getting tournament info: %s", err)
 		return nil, err
@@ -162,7 +162,7 @@ func NewRndTour(dm DataMngr) (*TournMngr, error) {
 
 	tm.dmMtx.Unlock()
 	if err != nil {
-		log.Errorf("Error getting matches: %s", err)
+		log.Infof("Not found any runned matches: %s", err)
 		// return nil // @audit Not Critical Error
 	}
 	tm.fillMap(runMatches)

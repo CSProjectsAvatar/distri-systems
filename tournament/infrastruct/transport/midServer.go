@@ -2,6 +2,7 @@ package transport
 
 import (
 	"context"
+	"math/rand"
 	"net"
 
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
@@ -84,4 +85,12 @@ func (mid *MidServer) GetAllIds(ctx context.Context, in *pb_m.AllIdsReq) (*pb_m.
 	}, nil
 }
 
-//GetStats(ctx context.Context, in *StatsReq, opts ...grpc.CallOption) (*StatsResp, error)
+func (mid *MidServer) GetRndStats(ctx context.Context, in *pb_m.StatsReq) (*pb_m.StatsResp, error) {
+	rndStat := &pb_m.StatsResp{
+		// rand betwen 0 and 15
+		Matches:    uint32(rand.Intn(15)),
+		BestPlayer: "Player2",
+		TourName:   "Chez",
+	}
+	return rndStat, nil
+}
