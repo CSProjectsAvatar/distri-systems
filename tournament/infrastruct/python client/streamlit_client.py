@@ -43,8 +43,8 @@ if new_t_name != '' and new_t_name not in tourNames:
     tour_ids[new_t_name] = ''
     tourNames.append(new_t_name)
 
-st.write(tourNames)
-st.write(tour_ids)
+# st.write(tourNames)
+# st.write(tour_ids)
 
 # Tournaments Expanders
 for t_name in tourNames:
@@ -85,7 +85,7 @@ for t_name in tourNames:
                     file_list.append(player_file)
 
                 selected = st.selectbox('Type of tournament', tour_type, key='tour_type_' + t_name)
-                st.write(tour_type[selected])
+                # st.write(tour_type[selected])
 
                 # t_id = tourn_ids[i] if i < len(tourn_ids) else None
 
@@ -97,7 +97,7 @@ for t_name in tourNames:
                     # MOCK TOURNAMENT
                     selected = "First Defeat"
                     file_list = [
-                        mid.File(name='game', data=b'game.py'),
+                        mid.File(name='game', data=b'import random as r\nexit(r.randint(1, 3))'),
                         mid.File(name='player0', data=b'player0.py'),
                         mid.File(name='player1', data=b'player1.py'),
                     ]

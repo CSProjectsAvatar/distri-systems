@@ -57,6 +57,7 @@ func (mngr *WorkerMngr) GiveMeWork(ctx context.Context, in *MatchReq) (*MatchRes
 	case <-ctx.Done():
 		return nil, status.Error(codes.Canceled, "The client canceled the request")
 	case match := <-mngr.matchesToRun:
+		log.Println("Send match %v to worker", match.ID)
 		return &MatchResp{
 			MatchId:     match.ID,
 			TourId:      match.TourId,
@@ -67,6 +68,7 @@ func (mngr *WorkerMngr) GiveMeWork(ctx context.Context, in *MatchReq) (*MatchRes
 }
 
 func (mngr *WorkerMngr) CatchResult(ctx context.Context, in *ResultReq) (*ResultResp, error) {
+	log.Println("Received result %v", in.MatchId)
 	mngr.results <- &Pairing{
 		ID:      in.MatchId,
 		TourId:  in.TourId,

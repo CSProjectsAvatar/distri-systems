@@ -52,6 +52,7 @@ func (mid *MidServer) Stop() error {
 
 // Saves the tournament files
 func (mid *MidServer) UploadTournament(ctx context.Context, in *pb_m.TournamentReq) (*pb_m.TournamentResp, error) {
+	log.Println("Received UploadTournament, tourName: ", in.Name)
 	tInfo, err := interfaces.SaveTournament(in.Name, domain.TourType(in.TourType), ToTournFiles(in.Files), mid.dm)
 	if err != nil {
 		return nil, err
@@ -61,6 +62,7 @@ func (mid *MidServer) UploadTournament(ctx context.Context, in *pb_m.TournamentR
 	}, nil
 }
 func (mid *MidServer) GetStats(ctx context.Context, in *pb_m.StatsReq) (*pb_m.StatsResp, error) {
+	log.Println("Received GetStats")
 	stats, err := usecases.GetStats(in.TourId, mid.dm)
 	if err != nil {
 		return nil, err
@@ -76,6 +78,7 @@ func (mid *MidServer) GetStats(ctx context.Context, in *pb_m.StatsReq) (*pb_m.St
 
 //get all ids of tournaments
 func (mid *MidServer) GetAllIds(ctx context.Context, in *pb_m.AllIdsReq) (*pb_m.AllIdsResp, error) {
+	log.Println("Received GetAllIds")
 	ids, err := mid.dm.GetAllIds()
 	if err != nil {
 		return nil, err
@@ -86,6 +89,7 @@ func (mid *MidServer) GetAllIds(ctx context.Context, in *pb_m.AllIdsReq) (*pb_m.
 }
 
 func (mid *MidServer) GetRndStats(ctx context.Context, in *pb_m.StatsReq) (*pb_m.StatsResp, error) {
+	log.Println("Received GetRndStats")
 	rndStat := &pb_m.StatsResp{
 		// rand betwen 0 and 15
 		Matches:    uint32(rand.Intn(15)),
