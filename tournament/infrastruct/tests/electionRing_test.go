@@ -89,7 +89,9 @@ func TestCoordinatorArrive_SecondTime(t *testing.T) {
 	}
 	//--
 	electionR.ElectionMsg(electMsg)
+	<-electionR.OnLeaderChange()
 	electionR.ElectionMsg(electMsg2)
+	<-electionR.OnLeaderChange()
 
 	out := transp.lastMsgToSuccessor
 	assert.Equal(t, interfaces.COORDINATOR, out.Type)

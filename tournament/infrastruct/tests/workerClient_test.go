@@ -32,7 +32,7 @@ func TestWMGiveMeWork_Integration(t *testing.T) {
 
 	confg := transport.DefaultConfig()
 	prov := &MockProvider{serverAddr, serverAddr}
-	client, err := transport.NewWorkerClient(*confg, prov, prov)
+	client, err := transport.NewWorkerClient(confg, prov, prov)
 	assert.Nil(err)
 
 	pair1 := &domain.Pairing{ID: "1", TourId: "1", Player1: &domain.Player{Id: "1"}, Player2: &domain.Player{Id: "2"}}
@@ -71,7 +71,7 @@ func TestWMGiveMeWork_Integration(t *testing.T) {
 
 func TestWM_WithMultiplesClients(t *testing.T) {
 	assert := assert.New(t)
-	serverAddr := "localhost:50051"
+	serverAddr := "localhost:50551"
 
 	mngr, err := transport.NewWorkerMngr(serverAddr)
 	mngr.Start()
@@ -79,9 +79,9 @@ func TestWM_WithMultiplesClients(t *testing.T) {
 
 	confg := transport.DefaultConfig()
 	prov := &MockProvider{serverAddr, serverAddr}
-	client1, err := transport.NewWorkerClient(*confg, prov, prov)
+	client1, err := transport.NewWorkerClient(confg, prov, prov)
 	assert.Nil(err)
-	client2, err := transport.NewWorkerClient(*confg, prov, prov)
+	client2, err := transport.NewWorkerClient(confg, prov, prov)
 	assert.Nil(err)
 
 	pair1 := &domain.Pairing{ID: "1", TourId: "1", Player1: &domain.Player{Id: "1"}, Player2: &domain.Player{Id: "2"}}

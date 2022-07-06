@@ -3,6 +3,7 @@ package usecases
 import (
 	"math/rand"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/CSProjectsAvatar/distri-systems/utils"
@@ -18,6 +19,8 @@ type TournMngr struct {
 	tourTree         *TourNode
 	matchsPerPairing map[string]int
 	matchsResult     map[string]MatchResult
+
+	dmMtx *sync.Mutex
 }
 
 func (tm *TournMngr) Tree() *TourNode {
@@ -88,10 +91,13 @@ func (tm *TournMngr) SetTree(tree *TourNode) {
 	tm.tourTree.SetProvider(tm)
 }
 
+func (tm *TournMngr) SetDM(dm DataMngr) {
+	tm.dm = dm
+}
 func NewMockTourMngr() *TournMngr {
 	// dm := &mocking.CentDataManager{}
 	tm := &TournMngr{
-		// dm:               dm,
+		//dm:               dm,
 		matchsPerPairing: make(map[string]int),
 		matchsResult:     make(map[string]MatchResult),
 		TInfo: &TournInfo{
@@ -100,6 +106,7 @@ func NewMockTourMngr() *TournMngr {
 			Type_:   First_Defeat,
 			Players: []*Player{&Player{Id: "1"}, &Player{Id: "2"}, &Player{Id: "3"}, &Player{Id: "4"}},
 		},
+		dmMtx: &sync.Mutex{},
 	}
 	SetMockTree(tm)
 	return tm
@@ -136,9 +143,11 @@ func NewRndTour(dm DataMngr) (*TournMngr, error) {
 		dm:               dm,
 		matchsPerPairing: make(map[string]int),
 		matchsResult:     make(map[string]MatchResult),
+		dmMtx:            &sync.Mutex{},
 	}
 
 	// Initialize the Tournament
+	tm.dmMtx.Lock()
 	name, err := dm.UnfinishedTourn()
 	if err != nil {
 		log.Errorf("Error getting unfinished tournament: %s", err)
@@ -150,6 +159,8 @@ func NewRndTour(dm DataMngr) (*TournMngr, error) {
 		return nil, err
 	}
 	runMatches, err := dm.Matches(tm.TInfo.ID)
+
+	tm.dmMtx.Unlock()
 	if err != nil {
 		log.Errorf("Error getting matches: %s", err)
 		// return nil // @audit Not Critical Error
@@ -170,7 +181,9 @@ func (tm *TournMngr) GetMatches() <-chan *MatchToRun {
 		tm.TInfo.Winner = <-winnerCh
 		close(runnerCh)
 		// @audit save winner in db
+		tm.dmMtx.Lock()
 		err := tm.dm.SetTournInfo(tm.TInfo)
+		tm.dmMtx.Unlock()
 		if err != nil {
 			log.Errorf("Error saving tournament info: %s", err)
 		}
@@ -179,7 +192,6 @@ func (tm *TournMngr) GetMatches() <-chan *MatchToRun {
 	}()
 
 	return runnerCh
-
 }
 
 func (tm *TournMngr) AlreadyRun(match *Pairing) (bool, MatchResult) {

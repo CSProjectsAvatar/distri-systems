@@ -2,8 +2,8 @@ package infrastruct
 
 import (
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
-	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/transport"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
+	"github.com/CSProjectsAvatar/distri-systems/utils"
 
 	"time"
 
@@ -36,11 +36,9 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 	m.DM = BuildDataMngr(m.ChordSrv.Ip, m.ChordSrv.Port) // DataMngr
 	sucProv := usecases.NewSuccWrapper(m.ChordSrv)
 
-	addr := m.ChordSrv.Addr()
-	cfg := transport.DefaultCfgAddr(addr)
-
-	m.Elect = NewElectionRingAlgo(addr)                // Election
-	client := BuildWorkerClient(cfg, m.Elect, sucProv) // WorkerClient
+	myIP := utils.GetIPString()
+	m.Elect = NewElectionRingAlgo(myIP)           // Election
+	client := BuildWorkerClient(m.Elect, sucProv) // WorkerClient
 
 	m.WClient = client // WClient Set
 	err := m.WClient.Start()
@@ -50,8 +48,8 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 
 	m.Elect.SetTransport(client)
 
-	m.WMngr = BuildWorkerMngr(addr)      // WorkerMngr
-	m.Midd = BuildMiddleware(addr, m.DM) // Middleware
+	m.WMngr = BuildWorkerMngr()    // WorkerMngr
+	m.Midd = BuildMiddleware(m.DM) // Middleware
 
 	m.TRunner = NewMTRunner(m.WMngr, m.DM) // Runner
 	m.MatchRunner = NewWorkerRunner(m.DM)  // MatchRunner

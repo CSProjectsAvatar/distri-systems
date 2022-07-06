@@ -32,8 +32,8 @@ func NewMockRoutine(addr string, succ string) *MockMainRoutine {
 	cfg := tr.DefaultCfgAddr(addr)
 
 	mainR := &infrastruct.MainRoutine{}
-	mainR.Elect = infrastruct.NewElectionRingAlgo(addr)            // Election Initialized
-	client, err := tr.NewWorkerClient(*cfg, mainR.Elect, succProv) // Worker Client Initialized
+	mainR.Elect = infrastruct.NewElectionRingAlgo(addr)           // Election Initialized
+	client, err := tr.NewWorkerClient(cfg, mainR.Elect, succProv) // Worker Client Initialized
 	if err != nil {
 		log.Fatal(err) // @audit Fatal?
 	}

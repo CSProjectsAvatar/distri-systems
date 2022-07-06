@@ -15,7 +15,7 @@ import (
 
 func TestMTRunnerSimpleRun(t *testing.T) {
 	log.Println("> TestMTRunner_SimpleRun <")
-	workerMngr, tourMngr, runner := Init()
+	workerMngr, tourMngr, runner, _ := Init()
 	// workerMngr.DrownedProb = 1
 
 	runner.Run(tourMngr)
@@ -29,7 +29,7 @@ func TestMTRunnerSimpleRun(t *testing.T) {
 func TestDrownedAndRetryFunction(t *testing.T) {
 	assert := assert.New(t)
 	log.Println("> TestDrownedFunction <")
-	workerMngr, tourMngr, runner := Init()
+	workerMngr, tourMngr, runner, _ := Init()
 	runner.Run(tourMngr)
 
 	// check that every match call the workerMngr one time more than the times it drawned
@@ -41,11 +41,12 @@ func TestDrownedAndRetryFunction(t *testing.T) {
 
 func TestThreeTournamentsAtTheSameTime(t *testing.T) {
 	log.Println("> TestThreeTournamentsAtTheSameTime <")
-	wm, tourMngr, runner := Init()
+	wm, tourMngr, runner, dm := Init()
 	wm.DrownedProb = 0.1
 	tourMngr2 := use.NewMockTourMngr()
 	tourMngr3 := use.NewMockTourMngr()
-
+	tourMngr2.SetDM(dm)
+	tourMngr3.SetDM(dm)
 	//wait groug
 	wg := &sync.WaitGroup{}
 	wg.Add(3)
@@ -70,11 +71,12 @@ func TestThreeTournamentsAtTheSameTime(t *testing.T) {
 	}
 }
 
-func Init() (*mock.MockWorkerMngr, *use.TournMngr, *inf.MTRunner) {
+func Init() (*mock.MockWorkerMngr, *use.TournMngr, *inf.MTRunner, use.DataMngr) {
 	wm := mock.NewMockWorkerMngr()
 	dm := &mock.CentDataManager{}
 	tMngr := use.NewMockTourMngr()
+	tMngr.SetDM(dm)
 	runner := inf.NewMTRunner(wm, dm)
 	domain.BaseWhaitTime = 1 * time.Second
-	return wm, tMngr, runner
+	return wm, tMngr, runner, dm
 }
