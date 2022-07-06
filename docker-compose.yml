@@ -1,0 +1,7 @@
+services:
+  entry:
+    build: worker.dockerfile
+
+  join_node:
+    build: worker.dockerfile
+    command: WRITE_IP WRITE_PORT

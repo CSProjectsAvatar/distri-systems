@@ -4,170 +4,112 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2aab411-3aa7-4a82-9cff-bb88229e79e0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tournament/infrastruct/builder.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tournament/infrastruct/tests/mainRoutine_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/midServer.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tournament/usecases/succWrapper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/repo.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="3e1e6dd0-b2f5-4b04-8ced-840b275b73de" name="Changes" comment="build: worker docker file and system entry point&#10;&#10;Docker file for worker role. Docker-compose file.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/domain/enums.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/domain/enums.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/buntdb.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/buntdb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/informer.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/mocking/centralized_dataManager.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/mocking/centralized_dataManager.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/mocking/mock_mainRoutine.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/mocking/mock_mainRoutine.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/pb_mid/middleware.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/pb_mid/middleware.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/pb_mid/middleware_grpc.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/pb_mid/middleware_grpc.pb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/proto/middleware.proto" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/proto/middleware.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/providers.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/providers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/python client/middleware_pb2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/python client/middleware_pb2_grpc.py" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/python client/middleware_pb2_grpc.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/tests/dataMngr_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/tests/dataMngr_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/tests/workerClient_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/tests/workerClient_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/tests/workerMngr_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/tests/workerMngr_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/transport/BaseTransport.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/BaseTransport.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/transport/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/transport/constructors.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/constructors.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/transport/workerClient.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/workerClient.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/infrastruct/transport/workerMngr.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/transport/workerMngr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/init.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/interfaces/transport.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/interfaces/transport.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/usecases/dataMngr.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/usecases/dataMngr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/usecases/dht-tour-data-mngr.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/usecases/dht-tour-data-mngr.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/usecases/informer.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/usecases/informer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/usecases/mainRoutine.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/infrastruct/mainRoutine.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tournament/usecases/tournMnger.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/usecases/tournMnger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tournament/example/node.go" beforeDir="false" afterPath="$PROJECT_DIR$/tournament/example/node.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="GOROOT" url="file://C:/Program Files/Go" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file:///usr/local/go" />
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="dev" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2BURuWNsn2FJShPTuu8ePwvYOhp" />
+  <component name="ProjectId" id="2BXMjPbbFyw4uZ0HM3hbp30JEWM" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.vendoring.notification.had.been.shown&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/OMAR/Omar_Alejandro/Docs/@Archive/2022/distri-systems/tournament/infrastruct/tests&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "RunOnceActivity.go.vendoring.notification.had.been.shown": "true",
+    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "/home/javier",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm"
   }
-}</component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\OMAR\Omar_Alejandro\Docs\@Archive\2022\distri-systems\tournament\infrastruct\tests" />
-      <recent name="D:\OMAR\Omar_Alejandro\Docs\@Archive\2022\distri-systems\tournament\usecases" />
-      <recent name="D:\OMAR\Omar_Alejandro\Docs\@Archive\2022\distri-systems\tournament\infrastruct\transport" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\OMAR\Omar_Alejandro\Docs\@Archive\2022\distri-systems\tournament\infrastruct\python client" />
-      <recent name="D:\OMAR\Omar_Alejandro\Docs\@Archive\2022\distri-systems\tournament\infrastruct\transport" />
-      <recent name="D:\OMAR\Omar_Alejandro\Docs\@Archive\2022\distri-systems\tournament\infrastruct" />
-      <recent name="D:\OMAR\Omar_Alejandro\Docs\@Archive\2022\distri-systems\tournament" />
-    </key>
-  </component>
-  <component name="RunManager" selected="Go Test.TestWMGiveMeWork_Integration in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests (1)">
-    <configuration name="TestMainRoutInit in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="distri-systems" />
-      <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
-      <root_directory value="$PROJECT_DIR$" />
+}]]></component>
+  <component name="RunManager" selected="Go Build.go build worker.go">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="repo" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build github.com/CSProjectsAvatar/distri-systems/tournament" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="repo" />
+      <working_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
+      <package value="github.com/CSProjectsAvatar/distri-systems/tournament" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/tournament/worker.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build worker.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="repo" />
+      <working_directory value="$PROJECT_DIR$" />
+      <parameters value="localhost 8000" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/tournament/worker.go" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="repo" />
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="DIRECTORY" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestMainRoutInit\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestMainRoutInit in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="distri-systems" />
-      <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestMainRoutInit\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestWMGiveMeWork_Integration in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="distri-systems" />
-      <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestWMGiveMeWork_Integration\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestWMGiveMeWork_Integration in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="distri-systems" />
-      <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestWMGiveMeWork_Integration\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestWM_WithMultiplesClients in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="distri-systems" />
-      <working_directory value="$PROJECT_DIR$/tournament/infrastruct/tests" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestWM_WithMultiplesClients\E$" />
-      <method v="2" />
-    </configuration>
+    <list>
+      <item itemvalue="Go Build.go build github.com/CSProjectsAvatar/distri-systems/tournament" />
+      <item itemvalue="Go Build.go build worker.go" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestWMGiveMeWork_Integration in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests (1)" />
-        <item itemvalue="Go Test.TestMainRoutInit in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests (1)" />
-        <item itemvalue="Go Test.TestMainRoutInit in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
-        <item itemvalue="Go Test.TestWM_WithMultiplesClients in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
-        <item itemvalue="Go Test.TestWMGiveMeWork_Integration in github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/tests" />
+        <item itemvalue="Go Build.go build worker.go" />
+        <item itemvalue="Go Build.go build github.com/CSProjectsAvatar/distri-systems/tournament" />
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="UnknownFeatures">
-    <option featureType="com.intellij.fileTypeFactory" implementationName="*.log" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -180,6 +122,10 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="build: worker docker file and system entry point&#10;&#10;Docker file for worker role. Docker-compose file." />
+    <option name="LAST_COMMIT_MESSAGE" value="build: worker docker file and system entry point&#10;&#10;Docker file for worker role. Docker-compose file." />
+  </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
   </component>
@@ -187,44 +133,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/tournament/infrastruct/mainRoutine.go</url>
-          <line>33</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/tournament/infrastruct/tests/mainRoutine_test.go</url>
-          <line>10</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/tournament/infrastruct/mainRoutine.go</url>
-          <line>42</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/tournament/infrastruct/mainRoutine.go</url>
-          <line>52</line>
-          <option name="timeStamp" value="13" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/tournament/infrastruct/mainRoutine.go</url>
-          <line>41</line>
-          <option name="timeStamp" value="14" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/tournament/infrastruct/mainRoutine.go</url>
-          <line>45</line>
-          <option name="timeStamp" value="15" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/tournament/infrastruct/builder.go</url>
-          <line>78</line>
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/tournament/infrastruct/tests/mainRoutine_test.go</url>
-          <line>17</line>
-          <option name="timeStamp" value="18" />
+          <url>file://$PROJECT_DIR$/tournament/worker.go</url>
+          <line>13</line>
+          <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

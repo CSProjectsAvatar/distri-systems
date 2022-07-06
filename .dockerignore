@@ -1,0 +1,7 @@
+/.git/
+**/.idea/
+/cps/
+/docker-compose/
+/docs/
+/tournament/example
+**/.venv/
