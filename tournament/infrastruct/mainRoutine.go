@@ -61,7 +61,7 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 
 	go m.WorkDay()
 	// @audit for remove after tests
-	go m.MngrDay()
+	//go m.MngrDay()
 	return m
 }
 
@@ -87,7 +87,8 @@ func (m *MainRoutine) WorkDay() {
 						// break
 					}
 				} else {
-					time.Sleep(domain.WhaitTimeBetweenRetry)
+					//time.Sleep(domain.WhaitTimeBetweenRetry)
+					time.Sleep(1 * time.Second)
 				}
 			}
 		} else {

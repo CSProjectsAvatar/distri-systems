@@ -60,6 +60,7 @@ func (wT *WorkerTransport) SendResults(match *Pairing) error {
 	ctx, cancel := context.WithTimeout(context.Background(), wT.config.Timeout)
 	defer cancel()
 
+	log.Println("Cli:Sending results of the match", match.Player1, match.Player2)
 	_, err = client.CatchResult(ctx, NewResultReq(match))
 	if err != nil {
 		return err

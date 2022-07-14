@@ -44,6 +44,7 @@ func (runner *MTRunner) Run(tm interfaces.Runnable) {
 			log.Println("Match already run")
 			match.Result(result)
 		} else { // Send the match to the worker pool
+			log.Println("Sending match to the worker pool", match.Pairing.Player1, match.Pairing.Player2)
 			runner.matchPool <- match
 		}
 	}

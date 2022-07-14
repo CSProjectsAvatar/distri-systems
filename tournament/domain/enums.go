@@ -20,9 +20,9 @@ const (
 )
 
 var (
-	BaseWhaitTime         = time.Second * 9
-	WhaitTimeBetweenRetry = time.Second * 1
-	MaxRetryTimes         = 3
+	BaseWaitTime         = time.Second * 3
+	WaitTimeBetweenRetry = time.Second * 1
+	MaxRetryTimes        = 0
 )
 
 const IdLength = 56

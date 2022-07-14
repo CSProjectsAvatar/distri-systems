@@ -3,6 +3,7 @@ package usecases
 import (
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
+	"math/rand"
 )
 
 type DhtTourDataMngr struct {
@@ -110,12 +111,20 @@ func (data *DhtTourDataMngr) UnfinishedTourn() (string, error) {
 		}
 		return "", err
 	}
+	not_run_candidates := []*domain.TournInfo{}
 	for _, inf := range infos {
 		if inf.Winner == nil {
-			return inf.ID, nil
+			not_run_candidates = append(not_run_candidates, inf)
 		}
 	}
-	return "", ErrNotAnyUnfTournmnt
+	if len(not_run_candidates) == 0 {
+		return "", ErrNotAnyUnfTournmnt
+	}
+	// select a random tourmnt
+	idx := rand.Intn(len(not_run_candidates))
+	return not_run_candidates[idx].ID, nil
+
+	//return "", ErrNotAnyUnfTournmnt
 }
 
 func (data *DhtTourDataMngr) GetAllIds() ([]string, error) {
