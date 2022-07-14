@@ -65,18 +65,18 @@ class grpcNode:
             self.get_all_ids()
             for id in self.tourStats:
                 req = mid.StatsReq(tourId=id)
-                # resp = stub.GetStats(req)
-                # self.tourStats[id] = resp
+                resp = stub.GetStats(req)
+                self.tourStats[id] = resp
                 # mock
-                mockStat: mid.StatsResp = mid.StatsResp(
-                    tourName='test',
-                    winner='Player' + str(randint(0, 100)),
-                    bestPlayer='Player' + str(randint(0, 100)),
-                )
-                self.tourStats[id].append(mockStat)
-                print(mockStat)
-                self.tourStats[id] = {'name': 'tour' + str(id), 'stats': {'score': str(randint(0,100)), 'time': str(randint(0,100))}}
-                print(self.tourStats[id])
+                # mockStat: mid.StatsResp = mid.StatsResp(
+                #     tourName='test',
+                #     winner='Player' + str(randint(0, 100)),
+                #     bestPlayer='Player' + str(randint(0, 100)),
+                # )
+                self.tourStats[id] = resp
+                # print(mockStat)
+                # self.tourStats[id] = {'name': 'tour' + str(id), 'stats': {'score': str(randint(0,100)), 'time': str(randint(0,100))}}
+                # print(self.tourStats[id])
                 # print(resp)
 
     def get_rand_stats(self):

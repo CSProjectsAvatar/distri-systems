@@ -2,6 +2,7 @@ package infrastruct
 
 import (
 	"bytes"
+	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
@@ -36,7 +37,10 @@ func (wr *WorkerRunner) RunMatch(match *domain.Pairing) (domain.MatchResult, err
 	folderName := tInfo.Name + tInfo.ID
 	SaveFilesLocal(folderName, files)
 	// Run the match
-	return RunMatch(folderName, tInfo.Name, match.Player1.Id, match.Player2.Id)
+	//return RunMatch(folderName, tInfo.Name, match.Player1.Id, match.Player2.Id)
+	// rand in [1,3]
+	r := rand.Intn(3) + 1
+	return domain.MatchResult(r), nil
 }
 
 func SaveFilesLocal(folderName string, files map[string]string) error {

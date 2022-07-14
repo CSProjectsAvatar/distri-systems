@@ -52,7 +52,7 @@ func (wT *WorkerTransport) getConnWM(addr string) (pb_w.WorkerMngrClient, error)
 }
 
 func (wT *WorkerTransport) SendResults(match *Pairing) error {
-	addr := wT.leadProv.GetLeader()
+	addr := AssureSrvAddress(wT.leadProv.GetLeader())
 	client, err := wT.getConnWM(addr)
 	if err != nil {
 		return err

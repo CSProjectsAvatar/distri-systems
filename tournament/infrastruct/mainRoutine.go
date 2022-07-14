@@ -25,6 +25,8 @@ type MainRoutine struct {
 
 	TRunner     inter.Runner
 	MatchRunner inter.IMatchRunner
+
+	mngrUp bool
 }
 
 func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
@@ -58,6 +60,8 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 	go m.Midd.Start()
 
 	go m.WorkDay()
+	// @audit for remove after tests
+	go m.MngrDay()
 	return m
 }
 
@@ -76,10 +80,11 @@ func (m *MainRoutine) WorkDay() {
 					<-leaderNotf // Wait for Leader Change
 
 					// Run The Mngr if I Am the leader
-					if m.IamTheLeader() {
+					if m.IamTheLeader() && !m.mngrUp {
 						log.Println("I am the Leader, Initating Mngr Service...")
 						go m.MngrDay() // Init the Leader Mode
-						break
+						m.mngrUp = true
+						// break
 					}
 				} else {
 					time.Sleep(domain.WhaitTimeBetweenRetry)
@@ -107,6 +112,7 @@ func (m *MainRoutine) IamTheLeader() bool {
 
 // Beguins the control of the flow as a leader
 func (m *MainRoutine) MngrDay() {
+	m.WMngr.Start()
 	runT := make(map[string]bool)
 	for {
 		// Ask for an Unfinished tournament and Create a TournMngr from it
@@ -126,4 +132,5 @@ func (m *MainRoutine) MngrDay() {
 			break
 		}
 	}
+	m.WMngr.Stop()
 }
