@@ -52,7 +52,7 @@ func (runner *MTRunner) Run(tm interfaces.Runnable) {
 
 func (r *MTRunner) deliverMatchs() { // WatchDog
 	for match := range r.matchPool {
-		log.Println("Playing", match.Pairing.Player1, "and", match.Pairing.Player2)
+		log.Println("Trying to get Playing", match.Pairing.Player1, "and", match.Pairing.Player2)
 		r.WorkerMngr.DeliverMatch(match.Pairing) // send the match to the worker manager
 
 		r.waitList.Lock()                      // [+]

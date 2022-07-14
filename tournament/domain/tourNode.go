@@ -63,6 +63,9 @@ func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player, prov iMat
 		for j := i + 1; j < len(winnerSlice); j++ {
 			pj := winnerSlice[j]
 
+			if pi == nil || pj == nil {
+				//continue
+			}
 			matchToRun := prov.GetMatch(pi, pj)
 			matches = append(matches, matchToRun) // Add the match to the list of matches to run
 			wg.Add(1)                             // Add the match to the wait group
@@ -85,7 +88,7 @@ func DefNodeFunc(childWinners <-chan *Player, winnerCh chan<- *Player, prov iMat
 	}
 	// Send the best Winner to the winner channel
 	go func() {
-		defer close(winnerCh)
+		//defer close(winnerCh)
 		wg.Wait()
 		PassBestWinner(gamesWon, winnerSlice, winnerCh)
 	}()

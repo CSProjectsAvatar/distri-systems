@@ -58,7 +58,7 @@ func BuildWorkerClient(
 
 // Build Worker Mngr
 func BuildWorkerMngr() *transport.WorkerMngr {
-	addr := "localhost:" + strconv.Itoa(domain.WMngrPort)
+	addr := ":" + strconv.Itoa(domain.WMngrPort)
 	mngr, err := transport.NewWorkerMngr(addr)
 	if err != nil {
 		log.Fatal("Couldn't intialize worker mngr", err)
