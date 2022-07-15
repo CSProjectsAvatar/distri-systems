@@ -37,7 +37,7 @@ func DefaultCfgAddr(addr string) *Config {
 
 func DefaultConfig() *Config {
 	n := &Config{
-		Timeout: time.Second * 5,
+		Timeout: time.Second * 8,
 		MaxIdle: time.Second * 10,
 
 		ServerOpts: []grpc.ServerOption{},
