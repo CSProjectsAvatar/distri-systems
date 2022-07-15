@@ -42,6 +42,14 @@ func BuildDataMngr(chordSrvIp string, chordSrvPort uint) usecases.DataMngr {
 	return mngr
 }
 
+// Mock Lider Provider
+type MockLeaderProv struct {
+}
+
+func (m *MockLeaderProv) GetLeader() string {
+	return "192.168.122.219"
+}
+
 // Build Worker Client
 func BuildWorkerClient(
 	elect inter.IElectionPolicy,
@@ -49,7 +57,11 @@ func BuildWorkerClient(
 
 	addr := "127.0.0.1:" + strconv.Itoa(domain.WClientPort)
 	cfg := transport.DefaultCfgAddr(addr)
+	// @audit remove
+	//leadPr := &MockLeaderProv{}
+	// --
 	client, err := transport.NewWorkerClient(cfg, elect, sucProv)
+	//client, err := transport.NewWorkerClient(cfg, leadPr, sucProv)
 	if err != nil {
 		log.Fatal(err)
 	}

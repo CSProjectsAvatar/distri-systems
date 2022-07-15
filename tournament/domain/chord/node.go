@@ -2,9 +2,10 @@ package chord
 
 import (
 	"bytes"
+	"sync"
+
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/utils"
-	"sync"
 )
 
 type Node struct {
@@ -76,9 +77,9 @@ func (node *Node) Stabilize() {
 		node.Log.Info(
 			"Updating successor.",
 			domain.LogArgs{
-				"host":           node.RemoteNode.Addr(),
-				"prev successor": node.Successor.Addr(),
-				"new successor":  succPred.Addr()})
+				"host":           node.RemoteNode.ID(),
+				"prev successor": node.Successor.ID(),
+				"new successor":  succPred.ID()})
 		node.Successor = succPred
 		succ = succPred
 		node.SuccMtx.Unlock()
@@ -116,12 +117,14 @@ func (node *Node) Join(entry *RemoteNode) error {
 		return ErrNodeAlreadyExists
 	}
 	node.SuccMtx.Lock()
+
 	node.Log.Info(
 		"Updating successor.",
 		domain.LogArgs{
-			"host":           node.RemoteNode.Addr(),
-			"prev successor": node.Successor.Addr(),
-			"new successor":  succEntry.Addr()})
+			"host":           node.RemoteNode.ID(),
+			"prev successor": node.Successor.ID(),
+			"new successor":  succEntry.ID()})
+
 	node.Successor = succEntry
 	node.SuccMtx.Unlock()
 
@@ -263,10 +266,11 @@ func (node *Node) Notify(pred *RemoteNode) error {
 	if node.Predecessor == nil || utils.InInterval(pred.Id, node.Predecessor.Id, node.Id) {
 		node.Log.Info(
 			"Updating predecessor.",
+
 			domain.LogArgs{
-				"node":             node.Addr(),
-				"prev predecessor": node.Predecessor.Addr(),
-				"new predecessor":  pred.Addr()})
+				"node":             node.ID(),
+				"prev predecessor": node.Predecessor.ID(),
+				"new predecessor":  pred.ID()})
 		node.Predecessor = pred
 
 		node.SuccMtx.RLock()

@@ -1,6 +1,9 @@
 package chord
 
-import "fmt"
+import (
+	"encoding/hex"
+	"fmt"
+)
 
 type RemoteNode struct {
 	Id   []byte
@@ -34,6 +37,12 @@ func (node *RemoteNode) Addr() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("%s:%d", node.Ip, node.Port)
+}
+func (node *RemoteNode) ID() string {
+	if node == nil {
+		return "<nil>"
+	}
+	return hex.EncodeToString(node.Id)
 }
 
 func (node *RemoteNode) SetValue(key []byte, value string, ring RingApi) error {

@@ -84,7 +84,7 @@ func (m *MainRoutine) WorkDay() {
 						log.Println("I am the Leader, Initating Mngr Service...")
 						go m.MngrDay() // Init the Leader Mode
 						m.mngrUp = true
-						// break
+						//break
 					}
 				} else {
 					//time.Sleep(domain.WhaitTimeBetweenRetry)

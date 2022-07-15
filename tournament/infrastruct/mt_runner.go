@@ -60,7 +60,7 @@ func (r *MTRunner) deliverMatchs() { // WatchDog
 		r.matchWaitList[match.GetId()] = match // add the match to the wait list
 		addedT := time.Duration(math.Pow(2, float64(match.TimesRetry)))
 		addedT++
-		match.Expiration = time.Now().Add(domain.BaseWhaitTime * addedT)
+		match.Expiration = time.Now().Add(domain.BaseWaitTime * addedT)
 		r.waitList.Unlock() // [-]
 	}
 }
@@ -77,7 +77,7 @@ func (r *MTRunner) checkDrownedMatchs() { // WatchDog
 			}
 		}
 		r.waitList.RUnlock() // [-]
-		time.Sleep(domain.BaseWhaitTime)
+		time.Sleep(domain.BaseWaitTime)
 	}
 }
 

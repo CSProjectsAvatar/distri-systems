@@ -19,7 +19,7 @@ class grpcNode:
     def __init__(self) -> None:
         self.tourStats = {} 
         self.remote_ip = 'localhost:8082'
-        # self.remote_ip = '192.168.28.1:8082'
+        # self.remote_ip = '192.168.122.219:8082'
         pass
 
     def upload_tournment(self, tour_name, tourn_type, file_list):
