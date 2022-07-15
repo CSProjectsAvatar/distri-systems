@@ -3,6 +3,7 @@ package transport
 import (
 	"context"
 	"net"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -57,6 +58,8 @@ func (wm *WorkerMngr) Stop() error {
 
 func (mngr *WorkerMngr) GiveMeWork(ctx context.Context, in *MatchReq) (*MatchResp, error) {
 	select {
+	case <-time.Tick(3 * time.Second):
+		return &MatchResp{MatchId: ""}, nil
 	case <-ctx.Done():
 		return nil, status.Error(codes.Canceled, "The client canceled the request")
 	case match := <-mngr.matchesToRun:
