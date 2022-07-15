@@ -25,19 +25,19 @@ tour_type = {
 
 st.title("Tournament Manager")
 
-# if 'node' not in st.session_state:
-#     st.session_state.node = client.grpcNode()
-#     st.session_state.tourNames = []
-#     st.session_state.tourIds = {}
-    # st.session_state.t_ids = []
+if 'node' not in st.session_state:
+    st.session_state.node = client.grpcNode()
+    st.session_state.tourNames = []
+    st.session_state.tourIds = {}
+    st.session_state.t_ids = []
 
-# node = st.session_state.node
-# tourNames = st.session_state.tourNames
-node = client.grpcNode()
-tourNames = []
-tour_ids = {}
+node = st.session_state.node
+tourNames = st.session_state.tourNames
+tour_ids = st.session_state.tourIds
+# node = client.grpcNode()
+# tourNames = []
+# tour_ids = {}
 # tourn_ids = st.session_state.t_ids
-# tour_ids = st.session_state.tourIds
 
 # Input 'Tournament Name' with button to create a new tournament
 new_t_name = st.text_input("Tournament Name", placeholder='Chez Tournament')
@@ -82,7 +82,7 @@ for t_name in tourNames:
                     player_file = mid.File(name=f'{player.name}', data=bytes_data)
                     file_list.append(player_file)
 
-                selected = st.selectbox('Type of tournament', tour_type, key='tour_type_' + t_name)
+                selected = st.selectbox('Type of tournament', tour_type, index=1, key='tour_type_' + t_name)
                 # st.write(tour_type[selected])
 
                 # t_id = tourn_ids[i] if i < len(tourn_ids) else None
@@ -95,19 +95,21 @@ for t_name in tourNames:
                     # MOCK TOURNAMENT
                     # selected = "First Defeat"
                     # selected = "All vs All"
-                    file_list = [
-                        mid.File(name='game_' + str(randint(1,100)) + '.py', data=b'import random as r\nprint(r.randint(1, 3))', is_game=True),
-                        mid.File(name='player0', data=b'player0.py'),
+                    poss_file_lst = [
+                        mid.File(name= t_name, data=b'import random as r\nprint(r.randint(1, 3))', is_game=True),
                         mid.File(name='player1', data=b'player1.py'),
                         mid.File(name='player2', data=b'player1.py'),
-                       mid.File(name='player3', data=b'player1.py'),
-                       mid.File(name='player4', data=b'player1.py')
-                    #    mid.File(name='player5', data=b'player1.py'),
-                    #    mid.File(name='player6', data=b'player1.py'),
-                    #    mid.File(name='player7', data=b'player1.py'),
-                    #    mid.File(name='player8', data=b'player1.py'),
-                    #    mid.File(name='player9', data=b'player1.py')
+                        mid.File(name='player3', data=b'player1.py'),
+                        mid.File(name='player4', data=b'player1.py'),
+                        mid.File(name='player5', data=b'player1.py'),
+                        mid.File(name='player6', data=b'player1.py'),
+                        mid.File(name='player7', data=b'player1.py'),
+                        mid.File(name='player8', data=b'player1.py'),
+                        mid.File(name='player9', data=b'player1.py'),
+                        mid.File(name='player10', data=b'player1.py'),
                     ]
+                    player_number = randint(4, len(poss_file_lst)-2)
+                    file_list = poss_file_lst[:player_number+1]
 
                     resp = node.upload_tournment(t_name, tour_type[selected], file_list)
                     files_placeholder.empty()

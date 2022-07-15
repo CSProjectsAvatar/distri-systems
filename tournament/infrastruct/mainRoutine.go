@@ -60,8 +60,6 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 	go m.Midd.Start()
 
 	go m.WorkDay()
-	// @audit for remove after tests
-	//go m.MngrDay()
 	return m
 }
 

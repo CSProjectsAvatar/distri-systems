@@ -52,6 +52,9 @@ while True:
             prevMatchs = prevMatchesDict[id]
             newMatch = statis.matches
 
+            if statis.matches == 0:
+                continue
+            
             cont = st.empty()
             with cont.container():
                 col1, col2, col3, col4 = st.columns(4)
