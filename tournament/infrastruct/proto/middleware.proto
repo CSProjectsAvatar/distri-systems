@@ -10,6 +10,13 @@ service Middleware {
     rpc GetStats(StatsReq) returns (StatsResp) {}
     rpc GetAllIds(AllIdsReq) returns (AllIdsResp) {}
     rpc GetRndStats(StatsReq) returns (StatsResp) {}
+    rpc GetIPs(IpsReq) returns (IPsResp) {}
+}
+
+message IpsReq{
+}
+message IPsResp{
+    repeated string ips = 1;
 }
 
 // GetStats

@@ -26,6 +26,7 @@ type MiddlewareClient interface {
 	GetStats(ctx context.Context, in *StatsReq, opts ...grpc.CallOption) (*StatsResp, error)
 	GetAllIds(ctx context.Context, in *AllIdsReq, opts ...grpc.CallOption) (*AllIdsResp, error)
 	GetRndStats(ctx context.Context, in *StatsReq, opts ...grpc.CallOption) (*StatsResp, error)
+	GetIPs(ctx context.Context, in *IpsReq, opts ...grpc.CallOption) (*IPsResp, error)
 }
 
 type middlewareClient struct {
@@ -72,6 +73,15 @@ func (c *middlewareClient) GetRndStats(ctx context.Context, in *StatsReq, opts .
 	return out, nil
 }
 
+func (c *middlewareClient) GetIPs(ctx context.Context, in *IpsReq, opts ...grpc.CallOption) (*IPsResp, error) {
+	out := new(IPsResp)
+	err := c.cc.Invoke(ctx, "/pb.Middleware/GetIPs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MiddlewareServer is the server API for Middleware service.
 // All implementations must embed UnimplementedMiddlewareServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type MiddlewareServer interface {
 	GetStats(context.Context, *StatsReq) (*StatsResp, error)
 	GetAllIds(context.Context, *AllIdsReq) (*AllIdsResp, error)
 	GetRndStats(context.Context, *StatsReq) (*StatsResp, error)
+	GetIPs(context.Context, *IpsReq) (*IPsResp, error)
 	mustEmbedUnimplementedMiddlewareServer()
 }
 
@@ -98,6 +109,9 @@ func (UnimplementedMiddlewareServer) GetAllIds(context.Context, *AllIdsReq) (*Al
 }
 func (UnimplementedMiddlewareServer) GetRndStats(context.Context, *StatsReq) (*StatsResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRndStats not implemented")
+}
+func (UnimplementedMiddlewareServer) GetIPs(context.Context, *IpsReq) (*IPsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIPs not implemented")
 }
 func (UnimplementedMiddlewareServer) mustEmbedUnimplementedMiddlewareServer() {}
 
@@ -184,6 +198,24 @@ func _Middleware_GetRndStats_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Middleware_GetIPs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IpsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MiddlewareServer).GetIPs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Middleware/GetIPs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MiddlewareServer).GetIPs(ctx, req.(*IpsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Middleware_ServiceDesc is the grpc.ServiceDesc for Middleware service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +238,10 @@ var Middleware_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetRndStats",
 			Handler:    _Middleware_GetRndStats_Handler,
+		},
+		{
+			MethodName: "GetIPs",
+			Handler:    _Middleware_GetIPs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

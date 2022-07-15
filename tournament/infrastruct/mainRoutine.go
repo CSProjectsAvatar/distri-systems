@@ -91,7 +91,7 @@ func (m *MainRoutine) WorkDay() {
 					time.Sleep(1 * time.Second)
 				}
 			}
-		} else {
+		} else if match.ID != "" {
 			match.Winner, err = m.MatchRunner.RunMatch(match)
 			if err != nil {
 				log.Error(err)
