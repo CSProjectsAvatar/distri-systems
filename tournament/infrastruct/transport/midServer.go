@@ -88,6 +88,11 @@ func (mid *MidServer) GetAllIds(ctx context.Context, in *pb_m.AllIdsReq) (*pb_m.
 	}, nil
 }
 
+func (mid *MidServer) GetIPs(ctx context.Context, in *pb_m.IpsReq) (*pb_m.IPsResp, error) {
+	//... usa pa responder pb_m.IpsResp
+	return nil, nil
+}
+
 func (mid *MidServer) GetRndStats(ctx context.Context, in *pb_m.StatsReq) (*pb_m.StatsResp, error) {
 	log.Println("Called GetRndStats")
 	rndStat := &pb_m.StatsResp{

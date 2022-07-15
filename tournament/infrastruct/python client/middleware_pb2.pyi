@@ -80,6 +80,24 @@ Groups: TournType.ValueType  # 2
 global___TournType = TournType
 
 
+class IpsReq(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    def __init__(self,
+        ) -> None: ...
+global___IpsReq = IpsReq
+
+class IPsResp(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    IPS_FIELD_NUMBER: builtins.int
+    @property
+    def ips(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text]: ...
+    def __init__(self,
+        *,
+        ips: typing.Optional[typing.Iterable[typing.Text]] = ...,
+        ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["ips",b"ips"]) -> None: ...
+global___IPsResp = IPsResp
+
 class StatsReq(google.protobuf.message.Message):
     """GetStats"""
     DESCRIPTOR: google.protobuf.descriptor.Descriptor

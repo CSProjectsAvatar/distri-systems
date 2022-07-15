@@ -34,6 +34,11 @@ class MiddlewareStub(object):
                 request_serializer=middleware__pb2.StatsReq.SerializeToString,
                 response_deserializer=middleware__pb2.StatsResp.FromString,
                 )
+        self.GetIPs = channel.unary_unary(
+                '/pb.Middleware/GetIPs',
+                request_serializer=middleware__pb2.IpsReq.SerializeToString,
+                response_deserializer=middleware__pb2.IPsResp.FromString,
+                )
 
 
 class MiddlewareServicer(object):
@@ -63,6 +68,12 @@ class MiddlewareServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetIPs(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_MiddlewareServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -85,6 +96,11 @@ def add_MiddlewareServicer_to_server(servicer, server):
                     servicer.GetRndStats,
                     request_deserializer=middleware__pb2.StatsReq.FromString,
                     response_serializer=middleware__pb2.StatsResp.SerializeToString,
+            ),
+            'GetIPs': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetIPs,
+                    request_deserializer=middleware__pb2.IpsReq.FromString,
+                    response_serializer=middleware__pb2.IPsResp.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -161,5 +177,22 @@ class Middleware(object):
         return grpc.experimental.unary_unary(request, target, '/pb.Middleware/GetRndStats',
             middleware__pb2.StatsReq.SerializeToString,
             middleware__pb2.StatsResp.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetIPs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/pb.Middleware/GetIPs',
+            middleware__pb2.IpsReq.SerializeToString,
+            middleware__pb2.IPsResp.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
