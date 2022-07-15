@@ -83,7 +83,7 @@ func BuildWorkerMngr() *transport.WorkerMngr {
 // Build Middleware
 func BuildMiddleware(dm usecases.DataMngr) inter.IMiddleware {
 	addr := "localhost:" + strconv.Itoa(domain.MiddPort)
-	mid := transport.NewMidServer(addr, dm)
+	mid := transport.NewMidServer(addr, dm, nil)
 	return mid
 }
 

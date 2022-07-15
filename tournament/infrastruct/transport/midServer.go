@@ -21,12 +21,18 @@ type MidServer struct {
 	sock   *net.TCPListener
 	server *grpc.Server
 	pb_m.UnimplementedMiddlewareServer
+	ipsProv MiddlewareIpsProvider
 }
 
-func NewMidServer(addr string, dataM usecases.DataMngr) *MidServer {
+type MiddlewareIpsProvider interface {
+	MiddlewareIps() []string
+}
+
+func NewMidServer(addr string, dataM usecases.DataMngr, ipsProv MiddlewareIpsProvider) *MidServer {
 	mid := &MidServer{
-		dm:   dataM,
-		addr: addr,
+		dm:      dataM,
+		addr:    addr,
+		ipsProv: ipsProv,
 	}
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -89,8 +95,9 @@ func (mid *MidServer) GetAllIds(ctx context.Context, in *pb_m.AllIdsReq) (*pb_m.
 }
 
 func (mid *MidServer) GetIPs(ctx context.Context, in *pb_m.IpsReq) (*pb_m.IPsResp, error) {
-	//... usa pa responder pb_m.IpsResp
-	return nil, nil
+	return &pb_m.IPsResp{
+		Ips: mid.ipsProv.MiddlewareIps(),
+	}, nil
 }
 
 func (mid *MidServer) GetRndStats(ctx context.Context, in *pb_m.StatsReq) (*pb_m.StatsResp, error) {

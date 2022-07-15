@@ -19,6 +19,12 @@ type ElectionRing struct {
 	leaderChangedOut <-chan struct{}
 
 	notNumber int
+	ips       []string
+}
+
+// MiddlewareIps returns the IPs of nodes under middleware role.
+func (ring *ElectionRing) MiddlewareIps() []string {
+	return ring.ips
 }
 
 func NewElectionRingAlgo(me string) *ElectionRing {
@@ -71,6 +77,7 @@ func (ring *ElectionRing) ElectionMsg(msg *ElectionMsg) {
 
 	case COORDINATOR:
 		ring.leader = ut.Max_in(msg.OnTheRing) // Set leader as the bigger one
+		ring.ips = msg.OnTheRing               // saving ring ips so we can send them to client
 		ring.leaderChangedIn <- struct{}{}     // Notify that the leader changed
 		ring.coordFlag = !ring.coordFlag       // Change flag
 		if !ring.coordFlag {                   // Stop? (The flag was Up?)
