@@ -20,7 +20,8 @@ type TournMngr struct {
 	matchsPerPairing map[string]int
 	matchsResult     map[string]MatchResult
 
-	dmMtx *sync.Mutex
+	dmMtx  *sync.Mutex
+	mPPMtx *sync.Mutex
 }
 
 func (tm *TournMngr) Tree() *TourNode {
@@ -106,7 +107,8 @@ func NewMockTourMngr() *TournMngr {
 			Type_:   First_Defeat,
 			Players: []*Player{&Player{Id: "1"}, &Player{Id: "2"}, &Player{Id: "3"}, &Player{Id: "4"}},
 		},
-		dmMtx: &sync.Mutex{},
+		dmMtx:  &sync.Mutex{},
+		mPPMtx: &sync.Mutex{},
 	}
 	SetMockTree(tm)
 	return tm
@@ -144,6 +146,7 @@ func NewRndTour(dm DataMngr) (*TournMngr, error) {
 		matchsPerPairing: make(map[string]int),
 		matchsResult:     make(map[string]MatchResult),
 		dmMtx:            &sync.Mutex{},
+		mPPMtx:           &sync.Mutex{},
 	}
 
 	// Initialize the Tournament
@@ -202,12 +205,14 @@ func (tm *TournMngr) AlreadyRun(match *Pairing) (bool, MatchResult) {
 }
 
 func (tm *TournMngr) GetMatch(pi, pj *Player) *MatchToRun {
+	tm.mPPMtx.Lock()
 	timesPlayed, on_it := tm.matchsPerPairing[pi.Id+pj.Id]
 	if on_it {
 		tm.matchsPerPairing[pi.Id+pj.Id]++
 	} else {
 		tm.matchsPerPairing[pi.Id+pj.Id] = 1
 	}
+	tm.mPPMtx.Unlock()
 	return NewMatchToRun(tm.TInfo.ID, pi, pj, timesPlayed)
 }
 

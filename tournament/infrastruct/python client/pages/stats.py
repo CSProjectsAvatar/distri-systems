@@ -35,45 +35,32 @@ prevMatchAmm = st.session_state.prevMatch
 tourn_ids = st.session_state.tourIds
 # st.write(st.session_state.prevMatch)
 
+prevMatchesDict = {}
+# prevMatchs = 0
 while True:
 
-    # prevMatches = {}
     placeholder = st.empty()
     with placeholder.container():
         node.get_all_stats()
-        # node.get_rand_stats()
-        # st.write(node.tourStats)
 
-        # st.write(node.tourStats)
-        # for _, stat in enumerate(node.tourStats):
         for id, stat in node.tourStats.items():
-            # st.write(id)
-            # st.write(stat)
-        # id = 1
-        # stat = node.tourStats[id]
-        # prevMatchAmm = prevMatches.get(id, 0)
             statis: mid.StatsResp = stat
-
             # st.write(statis)
-            # newMatch = randint(st.session_state.prevMatch, st.session_state.prevMatch + 5)
+            if id not in prevMatchesDict:
+                prevMatchesDict[id] = 0
+
+            prevMatchs = prevMatchesDict[id]
             newMatch = statis.matches
-            # st.write(newMatch)
+
             cont = st.empty()
             with cont.container():
                 col1, col2, col3, col4 = st.columns(4)
                 col1.metric("TourName", str(statis.tourName))
-                col2.metric("Matches", str(newMatch), str(newMatch - st.session_state.prevMatch))
+                # col2.metric("Matches", str(newMatch), str(newMatch - st.session_state.prevMatch))
+                col2.metric("Matches", str(newMatch), str(newMatch - prevMatchs))
                 col3.metric("Best Player", str(statis.bestPlayer))
                 col4.metric("Winner", str(statis.winner))
 
-            # # prevMatches[id] = statis.matches
-            # st.session_state.prevMatch = newMatch
-            # # st.write(st.session_state.prevMatch)
-            # sleep(5)
-            # placeholder.empty()
-
-# get the key, values of a dict
-# dict = {'a': 1, 'b': 2, 'c': 3}
-# for key, value in dict.items():
-#     st.write(key, value)
-#     st.write()
+            prevMatchesDict[id] = newMatch
+        sleep(5)
+        placeholder.empty()

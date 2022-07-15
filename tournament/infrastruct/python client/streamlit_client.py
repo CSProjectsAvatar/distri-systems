@@ -69,12 +69,7 @@ for t_name in tourNames:
                     bytes_data = game.getvalue()
                     # grpc game File
                     game_file = mid.File(name='game', data=bytes_data)
-
-                    # MOCK
-                    game_file = 'game.py'
-                    st.write(game_file)
                     file_list.append(game_file)
-                    st.write(file_list)
 
                 # input for get the players
                 players_files = st.file_uploader("Bring the Players", ['py'], accept_multiple_files=True,
@@ -84,7 +79,7 @@ for t_name in tourNames:
                     # To read file as bytes:
                     bytes_data = player.getvalue()
                     # grpc player File
-                    player_file = mid.File(name=f'player{i}-{player.name}', data=bytes_data)
+                    player_file = mid.File(name=f'{player.name}', data=bytes_data)
                     file_list.append(player_file)
 
                 selected = st.selectbox('Type of tournament', tour_type, key='tour_type_' + t_name)
@@ -98,19 +93,20 @@ for t_name in tourNames:
                     #     st.error("Please upload the game and players")
                     # else:
                     # MOCK TOURNAMENT
-                    selected = "First Defeat"
+                    # selected = "First Defeat"
+                    # selected = "All vs All"
                     file_list = [
-                        mid.File(name='game', data=b'import random as r\nprint(r.randint(1, 3))', is_game=True),
+                        mid.File(name='game_' + str(randint(1,100)) + '.py', data=b'import random as r\nprint(r.randint(1, 3))', is_game=True),
                         mid.File(name='player0', data=b'player0.py'),
                         mid.File(name='player1', data=b'player1.py'),
-                        mid.File(name='player2', data=b'player1.py')
-                       # mid.File(name='player3', data=b'player1.py'),
-                       # mid.File(name='player4', data=b'player1.py'),
-                       # mid.File(name='player5', data=b'player1.py'),
-                       # mid.File(name='player6', data=b'player1.py'),
-                       # mid.File(name='player7', data=b'player1.py'),
-                       # mid.File(name='player8', data=b'player1.py'),
-                       # mid.File(name='player9', data=b'player1.py')
+                        mid.File(name='player2', data=b'player1.py'),
+                       mid.File(name='player3', data=b'player1.py'),
+                       mid.File(name='player4', data=b'player1.py')
+                    #    mid.File(name='player5', data=b'player1.py'),
+                    #    mid.File(name='player6', data=b'player1.py'),
+                    #    mid.File(name='player7', data=b'player1.py'),
+                    #    mid.File(name='player8', data=b'player1.py'),
+                    #    mid.File(name='player9', data=b'player1.py')
                     ]
 
                     resp = node.upload_tournment(t_name, tour_type[selected], file_list)

@@ -78,7 +78,7 @@ func (mid *MidServer) GetStats(ctx context.Context, in *pb_m.StatsReq) (*pb_m.St
 
 //get all ids of tournaments
 func (mid *MidServer) GetAllIds(ctx context.Context, in *pb_m.AllIdsReq) (*pb_m.AllIdsResp, error) {
-	log.Println("Called GetAllIds")
+	//log.Println("Called GetAllIds")
 	ids, err := mid.dm.GetAllIds()
 	if err != nil {
 		return nil, err

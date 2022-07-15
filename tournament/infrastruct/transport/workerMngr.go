@@ -32,10 +32,10 @@ func NewWorkerMngr(addr string) (*WorkerMngr, error) {
 	lis, err := net.Listen("tcp", addr)
 
 	if err != nil {
-		log.Error("failed to listen: %v", err)
+		log.Error("failed to listen:", err)
 		return nil, err
 	} else {
-		log.Println("Listen on %v", addr)
+		log.Println("Listen on", addr)
 	}
 	mngr.sock = lis.(*net.TCPListener)
 	mngr.server = grpc.NewServer()
@@ -60,7 +60,7 @@ func (mngr *WorkerMngr) GiveMeWork(ctx context.Context, in *MatchReq) (*MatchRes
 	case <-ctx.Done():
 		return nil, status.Error(codes.Canceled, "The client canceled the request")
 	case match := <-mngr.matchesToRun:
-		log.Println("Send match to worker", match.ID)
+		log.Println("Mngr:Send match to worker", match.Player1, match.Player2)
 		return &MatchResp{
 			MatchId:     match.ID,
 			TourId:      match.TourId,
@@ -71,7 +71,7 @@ func (mngr *WorkerMngr) GiveMeWork(ctx context.Context, in *MatchReq) (*MatchRes
 }
 
 func (mngr *WorkerMngr) CatchResult(ctx context.Context, in *ResultReq) (*ResultResp, error) {
-	log.Println("Received result", in.MatchId, "wins:", in.Winner)
+	//log.Println("Received result", in.FstPlayerID, in.SndPlayerID, "wins:", in.Winner)
 	mngr.results <- &Pairing{
 		ID:      in.MatchId,
 		TourId:  in.TourId,

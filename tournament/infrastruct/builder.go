@@ -1,18 +1,19 @@
 package infrastruct
 
 import (
+	"strconv"
+
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/transport"
 	inter "github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	log "github.com/sirupsen/logrus"
-	"strconv"
 )
 
 // Build Chord Node
-func BuildChordNode(remote *chord.RemoteNode, logger domain.Logger) *chord.Node {
-	localIp := "127.0.0.1"
+func BuildChordNode(remote *chord.RemoteNode, localIp string, logger domain.Logger) *chord.Node {
+	//localIp := "127.0.0.1"
 	entry, err := usecases.NewNode(
 		ChordConfig(localIp, domain.ChordPort),
 		remote,
@@ -42,14 +43,27 @@ func BuildDataMngr(chordSrvIp string, chordSrvPort uint) usecases.DataMngr {
 	return mngr
 }
 
+// Mock Lider Provider
+type MockLeaderProv struct {
+}
+
+func (m *MockLeaderProv) GetLeader() string {
+	return "192.168.122.219"
+}
+
 // Build Worker Client
 func BuildWorkerClient(
 	elect inter.IElectionPolicy,
 	sucProv inter.ISuccProvider) *transport.WorkerTransport {
 
-	addr := "127.0.0.1:" + strconv.Itoa(domain.WClientPort)
+	// addr := "127.0.0.1:" + strconv.Itoa(domain.WClientPort)
+	addr := "0.0.0.0:" + strconv.Itoa(domain.WClientPort)
 	cfg := transport.DefaultCfgAddr(addr)
+	// @audit remove
+	//leadPr := &MockLeaderProv{}
+	// --
 	client, err := transport.NewWorkerClient(cfg, elect, sucProv)
+	//client, err := transport.NewWorkerClient(cfg, leadPr, sucProv)
 	if err != nil {
 		log.Fatal(err)
 	}

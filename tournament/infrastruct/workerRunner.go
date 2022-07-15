@@ -2,14 +2,14 @@ package infrastruct
 
 import (
 	"bytes"
+	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
-
-	log "github.com/sirupsen/logrus"
+	"time"
 
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
@@ -38,9 +38,11 @@ func (wr *WorkerRunner) RunMatch(match *domain.Pairing) (domain.MatchResult, err
 	SaveFilesLocal(folderName, files)
 	// Run the match
 	//return RunMatch(folderName, tInfo.Name, match.Player1.Id, match.Player2.Id)
-	// rand in [1,3]
-	r := rand.Intn(3) + 1
+	// rand in [1,2]
+	time.Sleep(1 * time.Second)
+	r := rand.Intn(2) + 1
 	return domain.MatchResult(r), nil
+	//return domain.MatchResult(r), nil
 }
 
 func SaveFilesLocal(folderName string, files map[string]string) error {
@@ -54,7 +56,7 @@ func SaveFilesLocal(folderName string, files map[string]string) error {
 }
 
 func writeFile(folderName, file_name, file_content string) error {
-	file_path := "../files/" + folderName + "/" + file_name
+	file_path := "files/" + folderName + "/" + file_name
 	//create path
 	err := os.MkdirAll(getDir(file_path), os.ModePerm)
 	if err != nil {
@@ -69,7 +71,8 @@ func writeFile(folderName, file_name, file_content string) error {
 
 // Run a match between two players by calling the game with them as parameters
 func RunMatch(folderName, tName, player_i, player_j string) (domain.MatchResult, error) {
-	command := "python ../files/" + folderName + "/" + tName + ".py " + player_i + ".py " + player_j + ".py"
+	command := "python /files/" + folderName + "/" + tName + " " + player_i + " " + player_j
+	// with format
 	err, out, _ := RunCommand(command)
 	if err != nil {
 		log.Println(err)
@@ -92,9 +95,9 @@ func RunCommand(command string) (error, string, string) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
-	os := runtime.GOOS
+	op_sys := runtime.GOOS
 	var shellToUse, fArg string
-	switch os {
+	switch op_sys {
 	case "windows":
 		shellToUse = "cmd"
 		fArg = "/C"

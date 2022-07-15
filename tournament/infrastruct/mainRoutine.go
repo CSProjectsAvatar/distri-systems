@@ -33,12 +33,12 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 	m := &MainRoutine{}
 
 	logger := NewLogger()
-	m.ChordSrv = BuildChordNode(remote, logger) // Chord
+	myIP := utils.GetIPString()
+	m.ChordSrv = BuildChordNode(remote, myIP, logger) // Chord
 
 	m.DM = BuildDataMngr(m.ChordSrv.Ip, m.ChordSrv.Port) // DataMngr
 	sucProv := usecases.NewSuccWrapper(m.ChordSrv)
 
-	myIP := utils.GetIPString()
 	m.Elect = NewElectionRingAlgo(myIP)           // Election
 	client := BuildWorkerClient(m.Elect, sucProv) // WorkerClient
 
@@ -61,7 +61,7 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 
 	go m.WorkDay()
 	// @audit for remove after tests
-	go m.MngrDay()
+	//go m.MngrDay()
 	return m
 }
 
@@ -84,10 +84,11 @@ func (m *MainRoutine) WorkDay() {
 						log.Println("I am the Leader, Initating Mngr Service...")
 						go m.MngrDay() // Init the Leader Mode
 						m.mngrUp = true
-						// break
+						//break
 					}
 				} else {
-					time.Sleep(domain.WhaitTimeBetweenRetry)
+					//time.Sleep(domain.WhaitTimeBetweenRetry)
+					time.Sleep(1 * time.Second)
 				}
 			}
 		} else {
