@@ -11,8 +11,8 @@ import (
 )
 
 // Build Chord Node
-func BuildChordNode(remote *chord.RemoteNode, logger domain.Logger) *chord.Node {
-	localIp := "127.0.0.1"
+func BuildChordNode(remote *chord.RemoteNode, localIp string, logger domain.Logger) *chord.Node {
+	//localIp := "127.0.0.1"
 	entry, err := usecases.NewNode(
 		ChordConfig(localIp, domain.ChordPort),
 		remote,
