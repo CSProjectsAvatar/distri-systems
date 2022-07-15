@@ -21,12 +21,18 @@ type MidServer struct {
 	sock   *net.TCPListener
 	server *grpc.Server
 	pb_m.UnimplementedMiddlewareServer
+	ipsProv MiddlewareIpsProvider
 }
 
-func NewMidServer(addr string, dataM usecases.DataMngr) *MidServer {
+type MiddlewareIpsProvider interface {
+	MiddlewareIps() []string
+}
+
+func NewMidServer(addr string, dataM usecases.DataMngr, ipsProv MiddlewareIpsProvider) *MidServer {
 	mid := &MidServer{
-		dm:   dataM,
-		addr: addr,
+		dm:      dataM,
+		addr:    addr,
+		ipsProv: ipsProv,
 	}
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
