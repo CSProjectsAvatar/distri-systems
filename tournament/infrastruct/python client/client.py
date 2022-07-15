@@ -42,8 +42,10 @@ class grpcNode:
         self.ips_idx = 0  # self.ips[self.ips_idx] is self.remote_ip and that holds thanks to ip_switch decorator
 
     def get_remote_ips(self) -> List[str]:
-        # @todo
-        return ['192.168.122.220:8082', '192.168.122.221:8083', '192.168.122.222:8083']
+        with grpc.insecure_channel(self.remote_ip) as channel:
+            stub = mid_grpc.MiddlewareStub(channel)
+            resp: mid.IPsResp = stub.GetIPs(mid.IpsReq())
+            return resp.ips
 
     @ip_switch
     def upload_tournment(self, tour_name, tourn_type, file_list):

@@ -13,3 +13,5 @@ COPY tournament/usecases tournament/usecases
 COPY tournament/worker.go tournament
 RUN go build tournament/worker.go
 ENTRYPOINT ["./worker"]
+EXPOSE 9090
+EXPOSE 8080-8082
