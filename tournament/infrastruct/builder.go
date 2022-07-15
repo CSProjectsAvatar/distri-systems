@@ -1,13 +1,14 @@
 package infrastruct
 
 import (
+	"strconv"
+
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/domain/chord"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/infrastruct/transport"
 	inter "github.com/CSProjectsAvatar/distri-systems/tournament/interfaces"
 	"github.com/CSProjectsAvatar/distri-systems/tournament/usecases"
 	log "github.com/sirupsen/logrus"
-	"strconv"
 )
 
 // Build Chord Node
@@ -55,7 +56,8 @@ func BuildWorkerClient(
 	elect inter.IElectionPolicy,
 	sucProv inter.ISuccProvider) *transport.WorkerTransport {
 
-	addr := "127.0.0.1:" + strconv.Itoa(domain.WClientPort)
+	// addr := "127.0.0.1:" + strconv.Itoa(domain.WClientPort)
+	addr := "0.0.0.0:" + strconv.Itoa(domain.WClientPort)
 	cfg := transport.DefaultCfgAddr(addr)
 	// @audit remove
 	//leadPr := &MockLeaderProv{}
