@@ -47,8 +47,6 @@ if new_t_name != '' and new_t_name not in tourNames:
     tourNames.append(new_t_name)
 
 # st.write(tourNames)
-# st.write(tour_ids)
-
 # Tournaments Expanders
 for t_name in tourNames:
     t_id = tour_ids[t_name]
@@ -113,24 +111,4 @@ for t_name in tourNames:
 
                     resp = node.upload_tournment(t_name, tour_type[selected], file_list)
                     files_placeholder.empty()
-                    # st.write(resp)
 
-                    # t_id = randint(0, 100)
-                    # tour_ids[t_name] = t_id
-                    # if i < len(tourn_ids):
-                    #     tourn_ids[i] = t_id
-                    # else:
-                    #     tourn_ids.append(t_id)
-
-                # run_bttn = st.button("Run", key='runBttn_' + t_name)
-                # st.write(tour_type[selected])
-                # st.write(file_list)
-
-
-# if st.button('Stats', key='statsBttn' + t_id):
-
-    # @todo call GetStats() rpc method taking t_id into account
-    ...
-# # seleccionar el tipo de torneo
-
-# # resultados y estadisticas

@@ -24,6 +24,7 @@ type ElectionRing struct {
 
 // MiddlewareIps returns the IPs of nodes under middleware role.
 func (ring *ElectionRing) MiddlewareIps() []string {
+	//-- @todo llamar eleccion
 	return ring.ips
 }
 
@@ -35,6 +36,7 @@ func NewElectionRingAlgo(me string) *ElectionRing {
 		coordFlag:        false,
 		leaderChangedIn:  in,
 		leaderChangedOut: out,
+		ips:              []string{me},
 	}
 	return ring
 }

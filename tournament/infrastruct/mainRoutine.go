@@ -39,7 +39,8 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 	m.DM = BuildDataMngr(m.ChordSrv.Ip, m.ChordSrv.Port) // DataMngr
 	sucProv := usecases.NewSuccWrapper(m.ChordSrv)
 
-	m.Elect = NewElectionRingAlgo(myIP)           // Election
+	ringAlgo := NewElectionRingAlgo(myIP) // Election
+	m.Elect = ringAlgo
 	client := BuildWorkerClient(m.Elect, sucProv) // WorkerClient
 
 	m.WClient = client // WClient Set
@@ -50,8 +51,8 @@ func NewMainRoutine(remote *chord.RemoteNode) *MainRoutine {
 
 	m.Elect.SetTransport(client)
 
-	m.WMngr = BuildWorkerMngr()    // WorkerMngr
-	m.Midd = BuildMiddleware(m.DM) // Middleware
+	m.WMngr = BuildWorkerMngr()              // WorkerMngr
+	m.Midd = BuildMiddleware(m.DM, ringAlgo) // Middleware
 
 	m.TRunner = NewMTRunner(m.WMngr, m.DM) // Runner
 	m.MatchRunner = NewWorkerRunner(m.DM)  // MatchRunner

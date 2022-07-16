@@ -81,9 +81,9 @@ func BuildWorkerMngr() *transport.WorkerMngr {
 }
 
 // Build Middleware
-func BuildMiddleware(dm usecases.DataMngr) inter.IMiddleware {
+func BuildMiddleware(dm usecases.DataMngr, ipProv transport.MiddlewareIpsProvider) inter.IMiddleware {
 	addr := "localhost:" + strconv.Itoa(domain.MiddPort)
-	mid := transport.NewMidServer(addr, dm, nil)
+	mid := transport.NewMidServer(addr, dm, ipProv)
 	return mid
 }
 
